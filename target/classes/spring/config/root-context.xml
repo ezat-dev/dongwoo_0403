@@ -1,3 +1,73 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:a54f404a2f7f2eb8bfeaff21c9b2cf1a8dbc9bad4812b125b8582ba3ab318132
-size 2898
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+        http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd">
+
+    <!-- 스케줄러 및 비동기 처리 -->
+
+    
+    
+    
+    <task:scheduler id="scheduler" pool-size="4"/>
+    <task:executor id="executor" keep-alive="10" pool-size="10-20" queue-capacity="10" rejection-policy="ABORT"/>
+
+    <!-- MariaDB DataSource -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="org.mariadb.jdbc.Driver"/>
+        <property name="url" value="jdbc:mariadb://localhost:3306/ez_scada"/>
+        <property name="username" value="root"/>
+        <property name="password" value="1234"/>
+    </bean>
+    
+    
+    
+    
+    
+    
+        <bean id="multipartResolver" 
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="52428800"/> <!-- 50MB -->
+        <property name="maxInMemorySize" value="1000000"/> <!-- 1MB -->
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+    
+    
+    
+    
+    
+
+    <!-- MyBatis 설정 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis/config/mybatis-context.xml"/>
+    </bean>
+
+    <bean id="session" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory"/>
+    </bean>
+
+    <!-- 트랜잭션 설정 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- DAO 및 Service 스캔 -->
+    <context:component-scan base-package="com.sample_pro.dao com.sample_pro.service"/>
+
+    <!-- 초기 작업 클래스 -->
+
+    
+    
+    
+
+	
+</beans>

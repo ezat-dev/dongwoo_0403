@@ -1,3 +1,825 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:8fced454ad8f85e8804c8752fe6d7dfbf98956bc973c680fad01c8c5e47299e5
-size 87822
+@charset "utf-8";
+
+html, body {height:100%;}
+
+/* 로그인 */
+.login_container {width:816px; margin:70px auto;}
+.login_container .header {height:50px; padding-bottom:10px;}
+.login_container .header .logo {float:left; margin:0; padding:0;}
+.login_container .header .logo img {height:45px; vertical-align:top;}
+.login_container .header .svc {float:right; padding-top:36px;}
+.login_container .header .svc img {height:14px;}
+.login_container .content {border:1px solid #d1d1d1;}
+.login_container .visual_box {border-bottom:1px solid #d1d1d1;}
+.login_container .visual_box img {width:814px; height:266px; vertical-align:middle;}
+.login_container .login_box {*zoom:1; background:url(../../../common/img/login_box.gif) repeat-x 0 100%;}
+.login_container .login_box::after {content:""; display:block; clear:both; height:0; visibility:hidden;}
+.login_container .login_box fieldset {width:420px; margin:0 auto; padding:20px 0;}
+.login_container .login_box fieldset legend {display:none;}
+.login_container .login_box dl {zoom:1; margin:0; padding:0;}
+.login_container .login_box dl::after {content:""; display:block; clear:both; height:0; visibility:hidden;}
+.login_container .login_box dl dt, .login_container .login_box dl dd {float:left; height:26px; margin:0; padding:4px 5px 0; line-height:26px;}
+.login_container .login_box dl dt {width:70px; text-align:right; color:#555;}
+.login_container .login_box .lang label {margin-right:10px;}
+.login_container .login_box .login_frm {position:relative;}
+.login_container .login_box .login_frm dl {width:280px;}
+.login_container .login_box .login_frm dl dd .input_txt {width:188px;}
+.login_container .login_box .login_frm dl.dept {width:420px;}
+.login_container .login_box .login_frm dl dd .frm_select {width:270px;}
+.login_container .login_box .login_frm .btn_login {position:absolute; bottom:0; left:280px;}
+.login_container .login_box .login_frm .btn_login button {display:inline-block; overflow:visible; width:75px; height:56px; background:url(../../../common/img/login_btn.gif) no-repeat 0 0; vertical-align:middle; cursor:pointer; outline:none;}
+.login_container .login_box .login_frm .btn_login button span {visibility:hidden; overflow:hidden; width:0; height:0; font-size:0; line-height:0;}
+.login_container .login_box .option {padding:10px 0 10px 84px; font-size:11px; color:#555;}
+.login_container .login_box .option a {color:#444; text-decoration:none;}
+.login_container .login_box .option a:hover {text-decoration:underline;}
+.login_container .login_box .option label {margin-right:10px; letter-spacing:-1px;}
+.login_container .login_box .option .mgr {margin-right:8px;}
+.login_container .login_box .notice {float:left; width:340px; padding:10px; margin:15px 0 0 15px;}
+.login_container .login_box .notice a {text-decoration:none; color:#444;}
+.login_container .login_box .notice a:hover {text-decoration:underline;}
+.login_container .login_box .notice .tit_bar {height:22px; margin-bottom:5px; padding:0 6px; line-height:22px;}
+.login_container .login_box .notice .tit_bar .tit {margin:0; padding:0; font-size:1.1em;}
+.login_container .login_box .notice .bu_lst {height:108px; padding:8px 12px; border:1px solid #eee; background-color:#fff; border-radius:5px; -webkit-border-radius:5px; -moz-border-radius:5px;}
+.login_container .login_box .notice .bu_lst li {width:310px; padding:3px 0 3px 8px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis;}
+.login_container .login_box .login {float:right; margin:15px 15px 15px 0;}
+.login_container .login_box .login fieldset {width:400px; margin:0; padding:10px 0;}
+.login_container .footer {padding:20px; font:11px Tahoma; color:#555; text-align:center;}
+.login_container .mobile_web {width:860px; margin:0 auto; padding:40px 0; text-align:center;}
+.login_container .mobile_web .btn_lar {min-width:200px; text-align:center;}
+
+/* 로그인 GW6 */
+.login_gw6 .login_container {width:auto; margin:0;}
+.login_gw6 .login_container .header {width:820px; height:64px; margin:0 auto; padding:76px 0 0;}
+.login_gw6 .login_container .header .lang {float:right; padding-top:20px;}
+.login_gw6 .login_container .header .lang .combobox .select_value {min-width:100px;}
+.login_gw6 .login_container .header .lang .drop_menu {min-width:98px;}
+.login_gw6 .login_container .content {border:0;}
+.login_gw6 .login_container .visual_box {height:300px; border:0; text-align:center;}
+.login_gw6 .login_container .visual_box img {width:820px; height:300px;}
+.login_gw6 .login_container .login_box {width:820px; margin:0 auto; padding:40px 0; background:none;}
+.login_gw6 .login_container .login_box dl dt {display:none;}
+.login_gw6 .login_container .login_box dl dd {padding:4px 0;}
+.login_gw6 .login_container .login_box .notice {margin:0; padding:0 0 0 55px; background:url(../img/tit_notice.gif) no-repeat 0 0;}
+.login_gw6 .login_container .login_box .notice .tit_bar {height:auto; margin:0; padding:0; line-height:normal;}
+.login_gw6 .login_container .login_box .notice .bu_lst {height:auto; padding:8px 0; border:0;}
+.login_gw6 .login_container .login_box .notice .bu_lst li {width:323px;}
+.login_gw6 .login_container .login_box .login {margin:0; padding:0 0 0 55px; background:url(../img/tit_login.gif) no-repeat 0 0;}
+.login_gw6 .login_container .login_box .login fieldset {width:250px; padding:0;}
+.login_gw6 .login_container .login_box .login_frm dl,
+.login_gw6 .login_container .login_box .login_frm dl.dept {width:250px; padding:0;}
+.login_gw6 .login_container .login_box .login_frm dl dd {height:30px; padding:0 0 7px;}
+.login_gw6 .login_container .login_box .login_frm dl dd .frm_select {width:250px; padding:6px; vertical-align:top;}
+.login_gw6 .login_container .login_box .login_frm dl dd .input_txt {display:block; width:250px; height:30px; padding:6px;}
+.login_gw6 .login_container .login_box .login_frm dl dd .input_txt input {width:210px; height:16px; border:0; background:none; outline:none; line-height:16px;}
+.login_gw6 .login_container .login_box .login_frm dl dd .input_txt .input_id {background:url(../img/input_id.gif) no-repeat 0 50%;}
+.login_gw6 .login_container .login_box .login_frm dl dd .input_txt .input_id1 {background:url(../img/input_id1.gif) no-repeat 0 50%;}
+.login_gw6 .login_container .login_box .login_frm dl dd .input_txt .input_id2 {background:url(../img/input_id2.gif) no-repeat 0 50%;}
+.login_gw6 .login_container .login_box .login_frm dl dd .input_txt .input_pw {background:url(../img/input_pw.gif) no-repeat 0 50%;}
+.login_gw6 .login_container .login_box .login_frm dl dd .input_txt .input_pw1 {background:url(../img/input_pw1.gif) no-repeat 0 50%;}
+.login_gw6 .login_container .login_box .login_frm dl dd .input_txt .input_pw2 {background:url(../img/input_pw.gif) no-repeat 0 50%;}
+.login_gw6 .login_container .login_box .login_frm dl dd.id .input_txt {padding-left:30px; background:url(../img/ico_id.png) no-repeat 8px 50%;}
+.login_gw6 .login_container .login_box .login_frm dl dd.pw .input_txt {padding-left:30px; background:url(../img/ico_pw.png) no-repeat 8px 50%;}
+.login_gw6 .login_container .login_box .login_frm .btn_login {position:static; left:auto; bottom:auto; padding:0 0 7px;}
+.login_gw6 .login_container .login_box .login_frm .btn_login button {width:250px; height:30px; background:#214c9c; border-radius:4px; -webkit-border-radius:4px; -moz-border-radius:4px;}
+.login_gw6 .login_container .login_box .login_frm .btn_login button span {visibility:visible; width:auto; height:auto; font-size:1em; font-weight:bold; line-height:normal; color:#fff;}
+.login_gw6 .login_container .login_box .option {padding:0;}
+.login_gw6 .login_container .login_box .option label {display:inline-block; margin:8px 8px 0 0;}
+.login_gw6 .login_container .footer {width:780px; margin:0 auto; border-top:1px solid #ddd;}
+
+/* 팝업 공지 */
+.login_notice .view_info {padding:15px; border:1px solid #ddd; border-radius:5px; -webkit-border-radius:5px; -moz-border-radius:5px;}
+.login_notice .view_info .subject {margin:0 0 10px 0; padding:0; font-size:1.3em; *zoom:1;}
+.login_notice .view_info .info_dl {*zoom:1;}
+.login_notice .view_info .info_dl::after {content:""; display:block; clear:both; height:0; font-size:0; visibility:hidden;}
+.login_notice .view_info .info_dl a {color:#888; text-decoration:none;}
+.login_notice .view_info .info_dl a:hover {text-decoration:underline;}
+.login_notice .view_info .info_dl dl {float:left; margin:0 0 6px 0; line-height:16px; color:#888;}
+.login_notice .view_info .info_dl dt, .login_notice .view_info .info_dl dd {display:inline-block; *display:inline; *zoom:1;}
+.login_notice .view_info .info_dl dt {margin-right:4px;}
+.login_notice .view_info .info_dl dd {margin:0; padding:0 15px 0 0;}
+.login_notice .view_info .attach_file {margin:8px 0 0 0; border:0; border-left:2px solid #ddd;}
+.login_notice .view_info .attach_file .header {border:0; padding:2px 10px;}
+.login_notice .view_info .attach_file .header .drop_menu {width:240px;}
+.login_notice .view_info .attach_file .file ul {padding:0;}
+.login_notice .view_info .attach_file .file ul li {padding:2px 10px;}
+.login_notice .view_content {padding:10px; line-height:1.4;}
+.login_notice .menu_box {padding:8px 0; border:1px solid #eee; border-width:1px 0;}
+.login_notice .menu_box .chk_div {display:inline-block; line-height:26px; *display:inline; *zoom:1;}
+
+/* SMS 보안인증 레이어 */
+.sms_security_lyr .system_msg_box {width:auto; margin:0;}
+.sms_security_lyr .system_msg_box .img_side {padding:0 10px;}
+.sms_security_lyr .system_msg_box .txt_side {padding-top:0;}
+.sms_security_lyr .system_msg_box .txt_side .tit {color:#069;}
+.sms_security_lyr .system_msg_box .password_box {height:70px;}
+.sms_security_lyr .system_msg_box .password_box .input_txt {text-align:center; font-size:14px;}
+.sms_security_lyr .system_msg_box .password_box .timer {display:block; line-height:21px; margin-top:10px;}
+.sms_security_lyr .system_msg_box .password_box .timer .btn_sml {vertical-align:top;}
+.sms_security_lyr .system_msg_box .password_box .validation_msg {margin-top:10px;}
+
+/* 생체인증 확인 레이어 */
+.fido_push_lyr .system_msg_box {width:auto; margin:0;}
+.fido_push_lyr .system_msg_box .img_side {padding:0 10px;}
+.fido_push_lyr .system_msg_box .txt_side {padding-top:0; font-size:13px;}
+.fido_push_lyr .system_msg_box .txt_side .tit {margin-bottom:10px; color:#069;}
+.fido_push_lyr .system_msg_box .timer {margin-top:20px; text-align:center; font-weight:bold; font-size:18px;}
+.fido_push_lyr .system_msg_box .timer strong {font-size:22px;}
+.fido_push_lyr .system_msg_box .btn_area {margin:20px 0 0;}
+.fido_push_lyr .system_msg_box .btn_area .btn {min-width:80px;}
+
+/* 생체인증 가이드 레이어 */
+.fido_guide_lyr .fido_guide {padding:10px; font-size:13px;}
+.fido_guide_lyr .fido_guide p {margin:0 0 10px;}
+.fido_guide_lyr .fido_guide ol {padding:10px 10px 20px 30px; border:1px solid #ddd; background-color: #f5f5f5;}
+.fido_guide_lyr .fido_guide ol li {padding-top:10px;}
+.fido_guide_lyr .btn_area {margin:10px 0;}
+
+/* 비밀번호 변경 레이어 */
+.pw_change_box .guide_img {height:90px; margin-bottom:15px; background-color:#eee;}
+.pw_change_box .guide_txt {margin-bottom:15px;}
+.pw_change_box .tbl_frm_write .input_txt {width:220px;}
+.pw_change_box .pw_change_top {margin-bottom:10px; padding:20px; background:#006dcc url(../../../common/img/img_login.png) no-repeat 420px 50%; color:#fff;}
+.pw_change_box .pw_change_top .guide_tit {padding:13px 0 20px;}
+.pw_change_box .pw_change_top .guide_tit strong {font-size:22px; font-weight:400;}
+.pw_change_box .pw_change_top .guide_txt {color:#fff;}
+.pw_change_box .pw_change_top .guide_txt .bu_lst li {padding-left:0; background:none;}
+.pw_change_box .pw_change_top .guide_txt .txt_em {color:#fff568; text-decoration:underline;}
+
+/* ==============================================================================
+ *                                Layout Extend
+ * ============================================================================== */
+
+.login_gw6 .login_container .login_box .notice {padding:0 0 0 20px; background:none;}
+.login_gw6 .login_container .login_box .notice .bu_lst {padding:10px 0 0;}
+.login_gw6 .login_container .login_box .login {background:none; padding:0 20px 0 0;}
+.login_gw6 .login_container .login_box .login fieldset,
+.login_gw6 .login_container .login_box .login_frm dl,
+.login_gw6 .login_container .login_box .login_frm dl.dept {width:300px;}
+.login_gw6 .login_container .login_box .login_frm dl dd {height:34px; padding:0 0 8px;}
+.login_gw6 .login_container .login_box .login_frm dl dd .frm_select {width:300px; padding:8px;}
+.login_gw6 .login_container .login_box .login_frm dl dd .input_txt {width:300px; height:34px; border-radius:0; -webkit-border-radius:0; -moz-border-radius:0;}
+.login_gw6 .login_container .login_box .login_frm dl dd .input_txt input {width:260px; height:20px; line-height:20px; font-size:14px;}
+.login_gw6 .login_container .login_box .login_frm dl dd.id .input_txt {background-image:url(../img/ico_id1.png);}
+.login_gw6 .login_container .login_box .login_frm dl dd.pw .input_txt {background-image:url(../img/ico_pw1.png);}
+.login_gw6 .login_container .login_box .login_frm .btn_login button {width:300px; height:38px; line-height:36px; background:#29467b; font-size:14px; border-radius:0; -webkit-border-radius:0; -moz-border-radius:0;}
+.login_vr .login_container .content {width:820px; height:436px; margin:0 auto; box-shadow:0 2px 8px rgba(0, 0, 0, 0.4); -webkit-box-shadow:0 2px 8px rgba(0, 0, 0, 0.4); -moz-box-shadow:0 2px 8px rgba(0, 0, 0, 0.4);}
+.login_vr .login_container .visual_box {float:left; width:410px; height:436px;}
+.login_vr .login_container .visual_box img {width:410px; height:436px;}
+.login_vr .login_container .login_box {position:relative; float:right; width:350px; height:406px; padding:30px 30px 0;}
+.login_vr .login_container .login_box .notice  {float:none; width:300px; margin:0 auto; padding:10px 0 0;}
+.login_vr .login_container .login_box .notice .bu_lst {height:64px; overflow:hidden;}
+.login_vr .login_container .login_box .login {position:absolute; bottom:0; left:50%; float:none; width:300px; margin-left:-150px; padding:0 0 40px;}
+.login_vr .login_container .login_box fieldset legend {display:block; padding-bottom:10px; font-size:1.1em; font-weight:600;}
+.login_vr .login_container .footer {border-top:0; padding:30px 0;}
+
+/* ==============================================================================
+ *                                  GW7 Login
+ * ============================================================================== */
+
+/* input */
+.login_gw7 .login_container .login_box .login_frm .ip_box {padding:0; margin:0 0 8px; list-style:none;}
+.login_gw7 .login_container .login_box .login_frm .ip_box label {font-size:0;}
+.login_gw7 .login_container .login_box .login_frm .ip_box .info {position:relative; padding:0; margin:-1px 0 0; box-sizing:border-box;}
+.login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before {content:''; position:absolute; width:1px; height:100%; top:0; left:0; transform:scaleY(0); -webkit-transform:scaleY(0); -moz-transform:scaleY(0); -ms-transform:scaleY(0); -o-transform:scaleY(0); transform-origin:top left; -webkit-transform-origin:top left; -moz-transform-origin:top left; -ms-transform-origin:top left; -o-transform-origin:top left; transition:transform 0.3s; -webkit-transition:transform 0.3s; -moz-transition:transform 0.3s; -ms-transition:transform 0.3s; -o-transition:transform 0.3s;}
+.login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after {content:''; position:absolute; width:1px; height:100%; bottom:0; right:0; transform:scaleY(0); -webkit-transform:scaleY(0); -moz-transform:scaleY(0); -ms-transform:scaleY(0); -o-transform:scaleY(0); transform-origin:bottom right; -webkit-transform-origin:bottom right; -moz-transform-origin:bottom right; -ms-transform-origin:bottom right; -o-transform-origin:bottom right; transition:transform 0.3s; -webkit-transition:transform 0.3s; -moz-transition:transform 0.3s; -ms-transition:transform 0.3s; -o-transition:transform 0.3s;}
+.login_gw7 .login_container .login_box .login_frm .ip_box .info:before {content:''; position:absolute; width:100%; height:1px; top:0; left:0; transform:scaleX(0); transform:scaleX(0); transform:scaleX(0); transform:scaleX(0); transform-origin:top left; transform-origin:top left; transform-origin:top left; transform-origin:top left; transform-origin:top left; transition:transform 0.3s; transition:transform 0.3s; transition:transform 0.3s; transition:transform 0.3s; transition:transform 0.3s;}
+.login_gw7 .login_container .login_box .login_frm .ip_box .info:after {content:''; position:absolute; width:100%; height:1px; bottom:0; right:0; transform:scaleX(0); -webkit-transform:scaleX(0); -moz-transform:scaleX(0); -ms-transform:scaleX(0); -o-transform:scaleX(0); transform-origin:bottom right; -webkit-transform-origin:bottom right; -moz-transform-origin:bottom right; -ms-transform-origin:bottom right; -o-transform-origin:bottom right; transition:transform 0.3s; -webkit-transition:transform 0.3s; -moz-transition:transform 0.3s; -ms-transition:transform 0.3s; -o-transition:transform 0.3s;}
+.login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:hover:before,
+.login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:hover:after,
+.login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .input_txt:before,
+.login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .input_txt:after {transform:scaleY(1); -webkit-transform:scaleY(1); -moz-transform:scaleY(1); -ms-transform:scaleY(1); -o-transform:scaleY(1); z-index:100;}
+.login_gw7 .login_container .login_box .login_frm .ip_box .info:hover:before,
+.login_gw7 .login_container .login_box .login_frm .ip_box .info:hover:after,
+.login_gw7 .login_container .login_box .login_frm .ip_box .info.focus:before,
+.login_gw7 .login_container .login_box .login_frm .ip_box .info.focus:after {transform:scaleX(1); z-index:100;}
+.login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt .ico {position:absolute; top:11px; left:8px; width:auto; font-size:15px; color:#999;}
+.login_gw7 .login_container .login_box .login_frm .input_txt .input_id {background:url(../img/input_id.gif) no-repeat 8px 50%;}
+.login_gw7 .login_container .login_box .login_frm .input_txt .input_id1 {background:url(../img/input_id1.gif) no-repeat 8px 50%;}
+.login_gw7 .login_container .login_box .login_frm .input_txt .input_id2 {background:url(../img/input_id2.gif) no-repeat 8px 50%;}
+.login_gw7 .login_container .login_box .login_frm .input_txt .input_id3 {background:url(../img/input_id3.gif) no-repeat 8px 50%;}
+.login_gw7 .login_container .login_box .login_frm .input_txt .input_pw {background:url(../img/input_pw.gif) no-repeat 8px 50%;}
+.login_gw7 .login_container .login_box .login_frm .input_txt .input_pw1 {background:url(../img/input_pw1.gif) no-repeat 8px 50%;}
+.layout_ex .login_gw7 .login_container .login_box .login_frm .input_txt input {width:278px; height:30px; line-height:30px; padding:0 8px; font-size:14px; border:0; outline:none;}
+.layout_ex .login_gw7 .login_container .login_box .login_frm .info .input_txt {display:block; width:300px; height:36px; padding:2px; border-radius:inherit; -moz-border-radius:inherit;}
+
+/* button */
+.login_gw7 .login_container .login_box .login_frm .btn_login {position:relative; box-sizing:border-box; -webkit-box-sizing:border-box; padding:0; margin:0 0 7px;}
+.login_gw7 .login_container .login_box .login_frm .btn_login button {overflow:hidden; transition:background-color 0.3s; -webkit-transition:background-color 0.3s; -moz-transition:background-color 0.3s; -ms-transition:background-color 0.3s; -o-transition:background-color 0.3s; transition:background-color 0.3s; -webkit-transition:background-color 0.3s; -moz-transition:background-color 0.3s; -ms-transition:background-color 0.3s; -o-transition:background-color 0.3s;}
+.login_gw7 .login_container .login_box .login_frm .btn_login button span {font-weight:600;}
+.login_gw7 .login_container .login_box .login_frm .btn_login button > span {display:inline-block; opacity:0; transform:translate3d(0, -10px, 0); -webkit-transform:translate3d(0, -10px, 0); -moz-transform:translate3d(0, -10px, 0); -ms-transform:translate3d(0, -10px, 0); -o-transform:translate3d(0, -10px, 0); transition:transform 0.3s, opacity 0.3s; -webkit-transition:-webkit-transform 0.3s, opacity 0.3s; -moz-transition:transform 0.3s, opacity 0.3s; -ms-transition:transform 0.3s, opacity 0.3s; -o-transition:transform 0.3s, opacity 0.3s; -webkit-transition-timing-function:cubic-bezier(0.75, 0, 0.125, 1); transition-timing-function:cubic-bezier(0.75, 0, 0.125, 1); line-height:36px;}
+.login_gw7 .login_container .login_box .login_frm .btn_login button:before {content:attr(data-text); position:absolute; top:0; left:0; width:100%; height:100%; transition:transform 0.3s, opacity 0.3s; -webkit-transition:-webkit-transform 0.3s, opacity 0.3s; -moz-transition:transform 0.3s, opacity 0.3s; -ms-transition:transform 0.3s, opacity 0.3s; -o-transition:transform 0.3s, opacity 0.3s; transition-timing-function:cubic-bezier(0.75, 0, 0.125, 1); -webkit-transition-timing-function:cubic-bezier(0.75, 0, 0.125, 1); -moz-transition-timing-function:cubic-bezier(0.75, 0, 0.125, 1); -ms-transition-timing-function:cubic-bezier(0.75, 0, 0.125, 1); -o-transition-timing-function:cubic-bezier(0.75, 0, 0.125, 1);}
+.login_gw7 .login_container .login_box .login_frm .btn_login.focus button:before,
+.login_gw7 .login_container .login_box .login_frm .btn_login button:hover:before {opacity:0; transform:translate3d(0, 100%, 0); -webkit-transform:translate3d(0, 100%, 0); -moz-transform:translate3d(0, 100%, 0); -ms-transform:translate3d(0, 100%, 0); -o-transform:translate3d(0, 100%, 0);}
+.login_gw7 .login_container .login_box .login_frm .btn_login.focus button > span,
+.login_gw7 .login_container .login_box .login_frm .btn_login button:hover > span {opacity:1; transform:translate3d(0, 0, 0); -webkit-transform:translate3d(0, 0, 0); -moz-transform:translate3d(0, 0, 0); -ms-transform:translate3d(0, 0, 0); -o-transform:translate3d(0, 0, 0);}
+.login_gw7 .login_container .login_box .login_frm .btn_login.focus button > span:nth-child(1),
+.login_gw7 .login_container .login_box .login_frm .btn_login button:hover > span:nth-child(1) {transition-delay:0.045s; -webkit-transition-delay:0.045s; -moz-transition-delay:0.045s; -ms-transition-delay:0.045s; -o-transition-delay:0.045s;}
+.login_gw7 .login_container .login_box .login_frm .btn_login.focus button > span:nth-child(2),
+.login_gw7 .login_container .login_box .login_frm .btn_login button:hover > span:nth-child(2) {transition-delay:0.09s; -webkit-transition-delay:0.09s; -moz-transition-delay:0.09s; -ms-transition-delay:0.09s; -o-transition-delay:0.09s}
+.login_gw7 .login_container .login_box .login_frm .btn_login.focus button > span:nth-child(3),
+.login_gw7 .login_container .login_box .login_frm .btn_login button:hover > span:nth-child(3) {transition-delay:0.135s; -webkit-transition-delay:0.135s; -moz-transition-delay:0.135s; -ms-transition-delay:0.135s; -o-transition-delay:0.135s;}
+.login_gw7 .login_container .login_box .login_frm .btn_login.focus button > span:nth-child(4),
+.login_gw7 .login_container .login_box .login_frm .btn_login button:hover > span:nth-child(4) {transition-delay:0.18s; -webkit-transition-delay:0.18s; -moz-transition-delay:0.18s; -ms-transition-delay:0.18s; -o-transition-delay:0.18s;}
+.login_gw7 .login_container .login_box .login_frm .btn_login.focus button > span:nth-child(5),
+.login_gw7 .login_container .login_box .login_frm .btn_login button:hover > span:nth-child(5) {transition-delay:0.225s; -webkit-transition-delay:0.225s; -moz-transition-delay:0.225s; -ms-transition-delay:0.225s; -o-transition-delay:0.225s;}
+.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {position:relative; color:#fff; font-weight:600;}
+
+/* checkbox */
+.login_gw7 .login_container .login_box .option::after {content:""; display:block; clear:both; height:0; font-size:0; visibility:hidden;}
+.login_gw7 .login_container .login_box .option .chk_info {float:left; margin-right:5px;}
+.login_gw7 .login_container .login_box .option label {position:relative; display:inline-block; cursor:pointer;}
+.login_gw7 .login_container .login_box .option label span {display:inline-block; position:relative; width:14px; height:14px; margin-right:4px; vertical-align:top; transform-origin:center; -webkit-transform-origin:center; -moz-transform-origin:center; -ms-transform-origin:center; -o-transform-origin:center; border:1px solid #c5c5c5; background-color:#fff;}
+.login_gw7 .login_container .login_box .option label span:before {content:""; width:0; height:2px; border-radius:2px; background:#c5c5c5; position:absolute; top:6px; left:3px; transform:rotate(45deg); -webkit-transform:rotate(45deg); -moz-transform:rotate(45deg); -ms-transform:rotate(45deg); -o-transform:rotate(45deg); transition:width 0.05s ease 0.05s; -webkit-transition:width 0.05s ease 0.05s; -moz-transition:width 0.05s ease 0.05s; -ms-transition:width 0.05s ease 0.05s; -o-transition:width 0.05s ease 0.05s; transform-origin:0% 0%; -webkit-transform-origin:0% 0%; -moz-transform-origin:0% 0%; -ms-transform-origin:0% 0%; -o-transform-origin:0% 0%;}
+.login_gw7 .login_container .login_box .option label span:after {content:""; width:0; height:2px; border-radius:2px; background:#c5c5c5; position:absolute; top:11px; left:5px; transform:rotate(305deg); -webkit-transform:rotate(305deg); -moz-transform:rotate(305deg); -ms-transform:rotate(305deg); -o-transform:rotate(305deg); transition:width 0.05s ease; -webkit-transition:width 0.05s ease; -moz-transition:width 0.05s ease; -ms-transition:width 0.05s ease; -o-transition:width 0.05s ease; transform-origin:0% 0%; -webkit-transform-origin:0% 0%; -moz-transform-origin:0% 0%; -ms-transform-origin:0% 0%; -o-transform-origin:0% 0%;}
+.login_gw7 .login_container .login_box .option input[type="checkbox"] {position:absolute; width:0; height:0; opacity:0;}
+.login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after {width:10px; transition:width 0.15s ease 0.1s; -webkit-transition:width 0.15s ease 0.1s; -moz-transition:width 0.15s ease 0.1s; -ms-transition:width 0.15s ease 0.1s; -o-transition:width 0.15s ease 0.1s;}
+.login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before {width:5px; transition:width 0.1s ease; -webkit-transition:width 0.1s ease; -moz-transition:width 0.1s ease; -ms-transition:width 0.1s ease; -o-transition:width 0.1s ease;}
+.login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after {width:10px; transition:width 0.15s ease 0.1s; -webkit-transition:width 0.15s ease 0.1s; -moz-transition:width 0.15s ease 0.1s; -ms-transition:width 0.15s ease 0.1s; -o-transition:width 0.15s ease 0.1s;}
+.login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {width:5px; transition:width 0.1s ease;  -webkit-transition:width 0.1s ease; -moz-transition:width 0.1s ease; -ms-transition:width 0.1s ease; -o-transition:width 0.1s ease;}
+
+/* ticker */
+.notice_ticker {width:1000px; height:80px; background-color:rgba(17, 88, 193, 0.8);}
+.notice_ticker .ticker_box {position:relative; height:80px; overflow:hidden;}
+.notice_ticker .ticker_box .ticker_tit {position:absolute; top:0; left:0; width:100px; height:80px; line-height:80px; padding:0 50px; background-color:rgba(0, 0, 0, 0.3); text-align:center; font-size:22px; color:#fff;}
+.notice_ticker #news {padding:22px 125px 0 230px;}
+.notice_ticker #news a {position:relative; display:block; width:100%; color:#fff; text-decoration:none; font-size:13px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis;}
+.notice_ticker #news a:hover .sub {text-decoration:underline;}
+.notice_ticker #news .date {display:block; padding-top:5px; opacity:0.5;}
+.notice_ticker #newscontent {display:block; width:100%;}
+.notice_ticker #controls {position:absolute; top:30px; right:20px;}
+.notice_ticker #controls a {display:inline-block; width:21px; height:21px; margin-left:6px; background:rgba(0, 0, 0, 0.2) url(../img/ticker_ctrl.png) no-repeat 0 0; border-radius:15px; vertical-align:top;}
+.notice_ticker #controls a svg {display:none;}
+.notice_ticker #controls #pause_trigger {background-position:0 -21px;}
+.notice_ticker #controls #prev_trigger {background-position:0 -42px;}
+.notice_ticker #controls #next_trigger {background-position:0 -63px;}
+
+/* 로그인 */
+.login_gw7 .login_container {position:absolute; top:50%; left:50%; width:820px; margin:-360px 0 0 -410px;}
+.login_gw7 .login_container .header {height:45px; padding-bottom:15px;}
+.login_gw7 .login_container .header .logo img {vertical-align:top;}
+.login_gw7 .login_container .header .lang {float:right; padding:6px 5px 0 0;}
+.login_gw7 .login_container .header .lang .combobox .select_value {min-width:110px; height:31px; line-height:29px; border-radius:0; background-position:100% -34px; font-size:13px;}
+.login_gw7 .login_container .header .lang .drop_menu {min-width:108px; border-radius:0; font-size:13px; background-clip:border-box;}
+.login_gw7 .login_container .header .lang .drop_menu label {padding:5px 8px;}
+.login_gw7 .login_container .content {width:820px; border:0; border-radius:10px; background-color:#fff; overflow:hidden; box-shadow:0 5px 10px rgba(0, 0, 0, 0.2); z-index:2;}
+.login_gw7 .login_container .visual_box {height:300px; border:0; text-align:center;}
+.login_gw7 .login_container .visual_box img {width:820px; height:300px;}
+.login_gw7 .login_container .sy-pager li {width:10px; height:10px; margin-right:10px;}
+.login_gw7 .login_container .sy-box.sy-loading {height:100%;}
+.login_gw7 .login_container .sy-controls li a:after {width:30px; height:51px; margin-top:-26px; margin-right:-15px; background:url(../img/prev_next.png) no-repeat 0 0; border-radius:0;}
+.login_gw7 .login_container .sy-controls li.sy-next a:after {background-position:-30px 0;}
+.login_gw7 .login_container .login_box {width:820px; margin:0; padding:40px 0; background:none;}
+.login_gw7 .login_container .login_box dl dt {display:none;}
+.login_gw7 .login_container .login_box dl dd {padding:4px 0;}
+.login_gw7 .login_container .login_box .notice {margin:0; padding:0 0 0 40px;}
+.login_gw7 .login_container .login_box .notice .tit_bar {height:auto; margin:0; padding:0; line-height:normal;}
+.login_gw7 .login_container .login_box .notice .tit_bar .tit {font-size:15px;}
+.login_gw7 .login_container .login_box .notice .bu_lst {height:auto; padding:10px 0; border:0; font-size:13px;}
+.login_gw7 .login_container .login_box .notice .bu_lst li {width:323px;}
+.login_gw7 .login_container .login_box .login {margin:0; padding:0 40px 0 0;}
+.login_gw7 .login_container .login_box .login fieldset {width:300px; padding:0;}
+.login_gw7 .login_container .login_box .login_tab ul {height:30px; margin:0 0 8px; padding:0; list-style:none; border-left:1px solid #c5c5c5;}
+.login_gw7 .login_container .login_box .login_tab ul li {float:left; width:50%;}
+.login_gw7 .login_container .login_box .login_tab ul li a {display:block; height:28px; line-height:28px; border:1px solid #c5c5c5; border-left:0; background-color:#f5f5f5; color:#999; text-align:center; text-decoration:none;}
+.login_gw7 .login_container .login_box .login_tab ul li.active a {height:29px; border-bottom:0; background:none; font-weight:bold; color:#444; cursor:default;}
+.login_gw7 .login_container .login_box .login_frm dl,
+.login_gw7 .login_container .login_box .login_frm dl.dept {width:300px; padding:0;}
+.login_gw7 .login_container .login_box .login_frm dl.dept .select_value {width:330px; height:50px; padding:0 40px 0 15px; border:0; border-radius:0; font-size:14px; background:url(../img/dept_drop.gif) no-repeat 100% 24px; vertical-align:top;}
+.login_gw7 .login_container .login_box .login_frm dl.dept .drop_menu {width:328px; margin:0; padding:8px 0; border-radius:0; font-size:14px; background-clip:border-box;}
+.login_gw7 .login_container .login_box .login_frm dl.dept .drop_menu label {padding:6px 14px;}
+.login_gw7 .login_container .login_box .login_frm dl dd {height:36px; padding:0;}
+.login_gw7 .login_container .login_box .login_frm dl dd .frm_select {width:300px; height:36px; line-height:34px; padding:0 16px 0 8px; background:#fff url(../../../common/img/combobox.gif) no-repeat 100% -31px; vertical-align:top; font-size:13px; appearance:none; -webkit-appearance:none;}
+.login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {position:relative; border-color:#0f56be; z-index:100;}
+.login_gw7 .login_container .login_box .login_frm dl dd .frm_select::-ms-expand {display:none;}
+.login_gw7 .login_container .login_box .login_frm dl dd .input_txt {display:block; width:300px; height:34px; padding:6px; border-radius:0; -webkit-border-radius:0; -moz-border-radius:0;}
+.login_gw7 .login_container .login_box .login_frm dl dd .input_txt input {width:260px; height:20px; line-height:20px; border:0; background:none; outline:none; font-size:14px;}
+.login_gw7 .login_container .login_box .login_frm dl dd .input_txt input[type=text]::-ms-clear {display:none;}
+.login_gw7 .login_container .login_box .login_frm dl dd .input_txt .input_id {background:url(../img/input_id.gif) no-repeat 0 50%;}
+.login_gw7 .login_container .login_box .login_frm dl dd .input_txt .input_id1 {background:url(../img/input_id1.gif) no-repeat 0 50%;}
+.login_gw7 .login_container .login_box .login_frm dl dd .input_txt .input_id2 {background:url(../img/input_id2.gif) no-repeat 0 50%;}
+.login_gw7 .login_container .login_box .login_frm dl dd .input_txt .input_pw {background:url(../img/input_pw.gif) no-repeat 0 50%;}
+.login_gw7 .login_container .login_box .login_frm dl dd .input_txt .input_pw1 {background:url(../img/input_pw1.gif) no-repeat 0 50%;}
+.login_gw7 .login_container .login_box .login_frm dl dd .input_txt .input_pw2 {background:url(../img/input_pw.gif) no-repeat 0 50%;}
+.login_gw7 .login_container .login_box .login_frm dl dd.id .input_txt {padding-left:30px; background:url(../img/ico_id1.png) no-repeat 8px 50%;}
+.login_gw7 .login_container .login_box .login_frm dl dd.pw .input_txt {padding-left:30px; background:url(../img/ico_pw1.png) no-repeat 8px 50%;}
+.login_gw7 .login_container .login_box .login_frm .btn_login {position:static; left:auto; bottom:auto;}
+.login_gw7 .login_container .login_box .login_frm .btn_login button {width:300px; height:38px; line-height:36px; background:#29467b; font-size:14px; border-radius:0;}
+.login_gw7 .login_container .login_box .login_frm .btn_login button span {visibility:visible; width:auto; height:auto; font-size:1em; font-weight:bold; line-height:38px; color:#fff;}
+.login_gw7 .login_container .login_box .option {padding:8px 16px 0 0; font-size:12px;}
+.login_gw7 .login_container .login_box .option label {display:inline-block; vertical-align:top;}
+.login_gw7 .login_container .footer {padding:30px 10px;}
+.login_gw7 .chk_fido {position:relative; margin-top:-10px; padding-bottom:8px; text-align:right; z-index:100;}
+.login_gw7 .chk_fido .txt {display:inline-block; height:26px; line-height:26px; margin-right:6px;}
+.login_gw7 .chk_fido .onoffswitch {display:inline-block; position:relative; width:40px; margin:1px 0; vertical-align:top; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none;}
+.login_gw7 .chk_fido .onoffswitch-checkbox {display:none;}
+.login_gw7 .chk_fido .onoffswitch-label {display:block; overflow:hidden; cursor:pointer; height:20px; padding:0; line-height:20px; border:2px solid #ddd; border-radius:13px; background-color:#fff; -webkit-transition:0.2s; -o-transition:0.2s; transition:0.2s;}
+.login_gw7 .chk_fido .onoffswitch-label:before {content:""; display:block; width:20px; margin:0; background:#fff; position:absolute; top:0; bottom:0; right:16px; border:2px solid #ddd; border-radius:13px; transition:all 0.2s ease-in 0s;}
+.login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#0f72d1;}
+.login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#0f72d1;}
+.login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {right:0px;}
+
+.login_vr .login_gw7 .login_container {width:890px; margin:-330px 0 0 -445px;}
+.login_vr .login_gw7 .login_container .content {width:890px; height:500px; box-shadow:0 3px 10px rgba(0, 0, 0, 0.2);}
+.login_vr .login_gw7 .login_container .visual_box {float:left; width:470px; height:500px;}
+.login_vr .login_gw7 .login_container .visual_box img {width:470px; height:500px;}
+.login_vr .login_gw7 .login_container .sy-pager {position:relative; margin:-30px 0 0; z-index:5;}
+.login_vr .login_gw7 .login_container .login_box {position:relative; float:right; width:350px; height:470px; padding:30px 35px 0;}
+.login_vr .login_gw7 .login_container .login_box .notice  {float:none; width:300px; margin:0 auto; padding:10px 0 0;}
+.login_vr .login_gw7 .login_container .login_box .notice .bu_lst {height:64px; padding-bottom:0; overflow:hidden;}
+.login_vr .login_gw7 .login_container .login_box .notice .bu_lst li {width:300px;}
+.login_vr .login_gw7 .login_container .login_box .login {position:absolute; bottom:0; left:50%; float:none; width:300px; margin-left:-150px; padding:0 0 40px;}
+.login_vr .login_gw7 .login_container .login_box fieldset legend {display:none; padding-bottom:10px; font-size:1.1em; font-weight:600;}
+
+.login_full .login_gw7 {height:100%;}
+.login_full .login_gw7 .login_container {width:410px; margin:-300px 0 0 -205px;}
+.login_full .login_container .header {position:relative; width:410px; height:45px; margin-bottom:-105px; padding:30px 0; z-index:1;}
+.login_full .login_container .header .logo {float:none; padding:0; text-align:center;}
+.login_full .login_container .header .logo img {vertical-align:top;}
+.login_full .login_container .header .lang {position:fixed; top:15px; right:15px; padding:0;}
+.login_full .login_container .header .lang .combobox .select_value {border-color:transparent; box-shadow:0 2px 4px rgba(0, 0, 0, 0.1);}
+.login_full .login_container .header .lang .combobox .drop_menu {border-color:#fff; border-radius:6px; -webkit-border-radius:5px; -moz-border-radius:5px;}
+.login_full .login_container .content {width:410px; margin:0 auto; padding-top:105px; overflow:visible;}
+.login_full .login_container .visual_box {position:fixed; top:0; left:0; width:100%; height:100%; background-color:#29313e;}
+.login_full .login_container .visual_box img {width:100%; height:auto; min-width:100%; min-height:100%; opacity:0.7;}
+.login_full .login_container .login_box {position:relative; width:330px; height:420px; margin-top:-105px; padding:105px 40px 30px; background-color:#fff; border-radius:10px; box-shadow:0 5px 10px rgba(0, 0, 0, 0.2);}
+.login_full .login_container .login_box .notice  {position:absolute; bottom:30px; left:40px; width:330px; margin:0 auto; padding:0;}
+.login_full .login_container .login_box .notice .bu_lst li {width:322px;}
+.login_full .login_container .login_box .login {position:absolute; top:105px; left:40px; width:330px; padding:0;}
+.login_full .login_container .login_box .login legend {display:none;}
+.login_full .login_container .login_box .login fieldset,
+.login_full .login_container .login_box .login_frm dl.dept,
+.login_full .login_container .login_box .login_frm dl dd .frm_select {width:330px;}
+.login_full .login_container .login_box .login_frm dl dd .frm_select {padding:0 8px;}
+.login_full .login_container .login_box .login_frm dl dd {padding-bottom:10px;}
+.login_full .login_container .login_box .login_frm .btn_login button {width:330px; height:40px; line-height:40px;}
+.login_full .login_container .login_box .login_frm .ip_box .info {margin:0 0 10px;}
+.login_full .login_container .login_box .option {font-size:12px;}
+.login_full .login_container .footer {position:relative; width:410px; height:50px; line-height:50px; margin:0; padding:0; border:0; color:#fff;}
+.login_full .login_container .sy-box {height:100%;}
+.login_full .login_container .sy-slide {height:100%; background-repeat:no-repeat; background-position:50% 50%; background-attachment:fixed; background-size:cover; -webkit-background-size:cover; -moz-background-size:cover; -o-background-size:cover;}
+.login_full .login_container .sy-slide img {display:none;}
+.login_full .login_container .sy-slide > a {height:100%;}
+.login_full .login_container .sy-controls {position:fixed; z-index:100;}
+.login_full .login_container .sy-controls li {min-width:auto; width:100px;}
+.login_full .login_container .sy-pager {position:fixed; bottom:0; left:50%; width:400px; margin:0 0 0 -200px; padding:20px 0; z-index:100;}
+.login_full .login_gw7 .login_container .login_box .login_frm .input_txt input {width:308px;}
+.login_full .login_gw7 .login_container .login_box .login_frm .info .input_txt {width:330px;}
+
+.login_fullvr {height:auto; background-repeat:no-repeat; background-position:50% 50%; background-attachment:fixed; background-size:cover; -webkit-background-size:cover; -moz-background-size:cover; -o-background-size:cover;}
+.login_fullvr .login_gw7 {height:100%;}
+.login_fullvr .login_gw7 .login_container {width:1000px; margin:-180px 0 0 -500px;}
+.login_fullvr .login_container .header {position:fixed; top:0; left:0; width:100%; height:85px; padding:0; background-color:#fff; z-index:110;}
+.login_fullvr .login_container .header .inner {width:1000px; margin:0 auto; padding:20px 0;}
+.login_fullvr .login_container .header .inner::after {content:""; display:block; clear:both; height:0; font-size:0; visibility:hidden;}
+.login_fullvr .login_container .content {float:right; width:330px; height:350px; border-radius:0; overflow:visible; box-shadow:none;}
+.login_fullvr .login_container .visual_box {position:fixed; top:0; left:0; width:100%; height:100%; background-repeat:no-repeat; background-position:50% 50%; background-attachment:fixed; background-size:cover; -webkit-background-size:cover; -moz-background-size:cover; -o-background-size:cover;}
+.login_fullvr .login_container .visual_box img {display:none; width:100%; height:auto; min-width:100%; min-height:100%; opacity:0.7;}
+.login_fullvr .login_container .visual_box .bl {display:block; width:100%; height:100%;}
+.login_fullvr .login_container .login_box {position:relative; width:330px; padding:0;}
+.login_fullvr .login_container .login_box .notice  {display:none;}
+.login_fullvr .login_container .login_box .login {width:330px; padding:0;}
+.login_fullvr .login_container .login_box .login legend {display:block; position:absolute; top:0; left:-670px; width:580px; max-height:220px; padding-top:15px; overflow:hidden; font-size:41px; color:#fff; text-shadow:1px 1px 5px rgba(0, 0, 0, 0.3); z-index:100;}
+.login_fullvr .login_container .login_box .login legend::after {content:''; position:absolute; top:0; left:4px; width:50px; border-top:3px solid #fff; box-shadow:1px 1px 5px rgba(0, 0, 0, 0.3);}
+.login_fullvr .login_container .login_box .login fieldset {width:330px;}
+.login_fullvr .login_container .login_box .login_tab ul {border-left:0; box-shadow:0 5px 10px rgba(0, 0, 0, 0.2);}
+.login_fullvr .login_container .login_box .login_tab ul li a {height:30px; line-height:30px; border:0; background-color:#fff;}
+.login_fullvr .login_container .login_box .login_tab ul li.active a {height:30px; background-color:#0e80d9; color:#fff;}
+.login_fullvr .login_container .login_box .login_frm {background-color:#fff; box-shadow:0 5px 10px rgba(0, 0, 0, 0.2); z-index:100;}
+.login_fullvr .login_container .login_box .login_frm dl {width:330px;}
+.login_fullvr .login_container .login_box .login_frm dl dd {height:50px; padding-bottom:0;}
+.login_fullvr .login_container .login_box .login_frm dl dd .input_txt {width:330px; height:50px; padding:5px; border:0;}
+.login_fullvr .login_container .login_box .login_frm dl dd .input_txt input {width:330px; padding:0;}
+.login_fullvr .login_container .login_box .login_frm dl dd .frm_select {width:330px; height:50px; padding:0 25px 0 15px; border:0; font-size:14px; background-position:100% -104px;}
+.login_fullvr .login_container .login_box .login_frm dl dd.id {border-bottom:1px solid #c5c5c5;}
+.login_fullvr .login_container .login_box .login_frm dl dd.id .input_txt,
+.login_fullvr .login_container .login_box .login_frm dl dd.pw .input_txt {padding-left:40px; background-position:15px 50%;}
+.login_fullvr .login_container .login_box .login_frm dl.dept {width:330px; border-bottom:1px solid #c5c5c5;}
+.login_fullvr .login_container .login_box .login_frm .btn_login {margin:0;}
+.login_fullvr .login_container .login_box .login_frm .btn_login button {width:330px; height:60px; line-height:60px; border-radius:0; font-size:23px; font-weight:normal !important; outline:none;}
+.login_fullvr .login_container .login_box .login_frm .btn_login button span {line-height:60px; font-weight:normal;}
+.login_fullvr .login_container .login_box .login_frm .ip_box .info {margin:-1px 0 0;}
+.login_fullvr .login_container .login_box .login_frm .ip_box .focus {position:relative;}
+.login_fullvr .login_container .login_box .option {position:absolute; top:100%; left:0; padding-top:10px; font-size:13px; color:#fff; text-shadow:1px 1px 2px rgba(0, 0, 0, 0.5); z-index:100;}
+.login_fullvr .login_container .login_box .option label {line-height:22px;}
+.login_fullvr .login_container .login_box .option label span {margin-right:4px; border:4px solid #fff !important; background:#fff url(../img/chk.gif) no-repeat 50% 50%; border-radius:12px; vertical-align:top; box-shadow:1px 1px 3px rgba(0, 0, 0, 0.2);}
+.login_fullvr .login_container .login_box .option .chk {background:#fff url(../img/chk.png) no-repeat 50% -1px; box-shadow:1px 1px 2px rgba(0, 0, 0, 0.2);}
+.login_fullvr .login_container .login_box .option .check .chk {background-image:url(../img/chk_on.png);}
+.login_fullvr .login_container .login_box .option .ch_pw {display:inline-block; line-height:22px; color:#fff; vertical-align:top;}
+.login_fullvr .login_container .notice_box {clear:both; position:relative; z-index:100;}
+.login_fullvr .login_container .notice_box .notice_ticker #news {font-size:13px;}
+.login_fullvr .login_container .footer {display:none;}
+.login_fullvr .login_container .sy-box {height:100%;}
+.login_fullvr .login_container .sy-slide {height:100%; background-repeat:no-repeat; background-position:50% 50%; background-attachment:fixed; background-size:cover; -webkit-background-size:cover; -moz-background-size:cover; -o-background-size:cover;}
+.login_fullvr .login_container .sy-slide img {display:none;}
+.login_fullvr .login_container .sy-slide > a {height:100%;}
+.login_fullvr .login_container .sy-slide .bl {display:block; width:100%; height:100%;}
+.login_fullvr .login_container .sy-controls {position:fixed; z-index:100;}
+.login_fullvr .login_container .sy-controls li {min-width:auto; width:100px;}
+.login_fullvr .login_container .sy-pager {position:fixed; bottom:0; left:50%; width:400px; margin:0 0 0 -200px; padding:20px 0; z-index:100;}
+.login_fullvr .login_container .mobile_web {clear:both; position:relative; width:100%; margin:0; padding:30px 0; text-align:center; z-index: 1000;}
+.login_fullvr .login_gw7 .login_container .login_box .login_frm .input_txt input {width:285px; height:40px; line-height:40px; padding:0; font-size:16px;}
+.login_fullvr .login_gw7 .login_container .login_box .login_frm .info .input_txt {width:330px;}
+.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#0badf5 0,#1158c1 100%);}
+.login_fullvr .chk_fido .txt {color:#fff; text-shadow:1px 1px 2px rgba(0, 0, 0, 0.5);}
+.login_fullvr .chk_fido .onoffswitch-label {border-color:#aaa; background-color:#aaa; box-shadow:0 2px 5px rgba(0, 0, 0, 0.1);}
+.login_fullvr .chk_fido .onoffswitch-label:before {border-color:#aaa;}
+
+.login_fullcen .login_gw7 .login_container {width:330px; margin:-160px 0 0 -165px;}
+.login_fullcen .login_container .content {height:auto;}
+.login_fullcen .login_container .login_box {background:none; box-shadow:none;}
+.login_fullcen .login_container .login_box .login legend {display:block; position:relative; top:auto; left:auto; width:600px; max-height:124px; margin:0 -135px 20px -135px; padding:0; font-size:31px; text-align:center;}
+.login_fullcen .login_container .login_box .login legend::after {display:none;}
+.login_fullcen .login_container .login_box .login_frm {width:330px; background-color:#fff; box-shadow:0 5px 10px rgba(0, 0, 0, 0.2);}
+.login_fullcen .login_container .notice_box {position:fixed; top:85px; left:0; width:100%;}
+.login_fullcen .login_container .mobile_web {clear:both; position:relative; width:330px; margin:0; padding:60px 0 30px; text-align:center; z-index: 1000;}
+.login_fullcen .notice_ticker {width:100%; height:51px; background-color:rgba(0, 0, 0, 0.3) !important;}
+.login_fullcen .notice_ticker .ticker_box {position:relative; width:1000px; margin:0 auto; height:51px; overflow:hidden;}
+.login_fullcen .notice_ticker .ticker_box .ticker_tit {display:none;}
+.login_fullcen .notice_ticker #news {padding:0 100px 0 26px; background:url(../img/ico_noti.png) no-repeat 0 50%;}
+.login_fullcen .notice_ticker #news .date {display:none;}
+.login_fullcen .notice_ticker #newscontent {height:51px; line-height:51px;}
+.login_fullcen .notice_ticker #controls {position:absolute; top:15px; right:0;}
+
+.login_fullrgt .login_gw7 .login_container {width:1000px; margin:-250px 0 0 -500px;}
+.login_fullrgt .login_container .content {height:390px;}
+.login_fullrgt .login_container .login_box {background:none; box-shadow:none;}
+.login_fullrgt .login_container .login_box .login legend {display:block; position:relative; top:auto; left:auto; width:330px; max-height:82px; margin-bottom:15px; padding:0; font-size:31px;}
+.login_fullrgt .login_container .login_box .login legend::after {display:none;}
+.login_fullrgt .login_container .login_box .login_frm {width:330px; background-color:#fff; box-shadow:0 5px 10px rgba(0, 0, 0, 0.2);}
+.login_fullrgt .login_container .mobile_web {clear:both; float:right; position:relative; width:330px; margin:0; padding:30px 0; text-align:center; z-index: 1000;}
+.login_fullrgt .notice_ticker {float:right; width:330px; height:115px; background-color:rgba(0, 0, 0, 0.5);}
+.login_fullrgt .notice_ticker .ticker_box {position:relative; margin:0 auto; height:115px; overflow:hidden;}
+.login_fullrgt .notice_ticker .ticker_box .ticker_tit {position:static; top:auto; left:auto; width:160px; height:55px; line-height:55px; padding-left:20px; background:none; text-align:left; font-size:16px; font-weight:600;}
+.login_fullrgt .notice_ticker #news {padding:0 20px;}
+.login_fullrgt .notice_ticker #controls {position:absolute; top:18px; right:18px;}
+
+/* ================ Color Customize ================ */
+
+/* input form */
+.login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#0f56be;}
+.login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#1158c1;}
+
+/* button */
+.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#0f56be;}
+.login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#004495;}
+.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#0badf5 0,#1158c1 100%);}
+
+/* checkbox */
+.login_gw7 .login_container .login_box .option label:hover span,
+.login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#0f56be;}
+.login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#0f56be;}
+
+/* ================ Color Theme ================ */
+
+/* input form */
+.gw_color1 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color1 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color1 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color1 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#2c4f91;}
+.gw_color1 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color1 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#2c4f91;}
+.gw_color2 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color2 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color2 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color2 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#0d7bbf;}
+.gw_color2 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color2 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#0d7bbf;}
+.gw_color3 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color3 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color3 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color3 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#00a2b1;}
+.gw_color3 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color3 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#00a2b1;}
+.gw_color4 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color4 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color4 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color4 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#006742;}
+.gw_color4 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color4 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#006742;}
+.gw_color5 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color5 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color5 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color5 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#54951e;}
+.gw_color5 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color5 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#54951e;}
+.gw_color6 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color6 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color6 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color6 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#f2c91a;}
+.gw_color6 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color6 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#f2c91a;}
+.gw_color7 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color7 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color7 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color7 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#f57323;}
+.gw_color7 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color7 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#f57323;}
+.gw_color8 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color8 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color8 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color8 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#cc071e;}
+.gw_color8 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color8 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#cc071e;}
+.gw_color9 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color9 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color9 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color9 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#7b61b7;}
+.gw_color9 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color9 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#7b61b7;}
+.gw_color10 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color10 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color10 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color10 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#826555;}
+.gw_color10 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color10 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#826555;}
+.gw_color11 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color11 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color11 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color11 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#858b93;}
+.gw_color11 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color11 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#858b93;}
+.gw_color12 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color12 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color12 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color12 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#222222;}
+.gw_color12 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color12 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#222222;}
+.gw_color13 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color13 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color13 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color13 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#57b7dd;}
+.gw_color13 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color13 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#57b7dd;}
+.gw_color14 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color14 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color14 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color14 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#f78dbb;}
+.gw_color14 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color14 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#f78dbb;}
+.gw_color15 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:after,
+.gw_color15 .login_gw7 .login_container .login_box .login_frm .ip_box .info .input_txt:before,
+.gw_color15 .login_gw7 .login_container .login_box .login_frm .ip_box .info:after,
+.gw_color15 .login_gw7 .login_container .login_box .login_frm .ip_box .info:before {background:#2c4f91;}
+.gw_color15 .login_gw7 .login_container .login_box .login_frm .ip_box .info:hover .ico,
+.gw_color15 .login_gw7 .login_container .login_box .login_frm .ip_box .info.focus .ico {color:#2c4f91;}
+
+/* button */
+.gw_color1.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#2c4f91;}
+.gw_color1 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color1 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#274275;}
+.gw_color1.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#4c7fde 0,#2c4f91 100%);}
+.gw_color2.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#0d7bbf;}
+.gw_color2 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color2 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#005f99;}
+.gw_color2.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#0badf5 0,#1158c1 100%);}
+/* .gw_color2.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#41b1f6 0,#0d7bbf 100%);} */
+.gw_color3.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#00a2b1;}
+.gw_color3 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color3 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#007e8a;}
+.gw_color3.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#31d3e2 0,#00a2b1 100%);}
+.gw_color4.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#006742;}
+.gw_color4 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color4 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#044c32;}
+.gw_color4.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#25b782 0,#006742 100%);}
+.gw_color5.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#54951e;}
+.gw_color5 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color5 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#417119;}
+.gw_color5.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#8bcf53 0,#54951e 100%);}
+.gw_color6.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#f2c91a;}
+.gw_color6 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color6 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#f2921a;}
+.gw_color6.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#ffe161 0,#f2c91a 100%);}
+.gw_color7.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#f57323;}
+.gw_color7 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color7 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#d25000;}
+.gw_color7.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#ffb74c 0,#f57323 100%);}
+.gw_color8.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#cc071e;}
+.gw_color8 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color8 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#980012;}
+.gw_color8.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#ff6274 0,#cc071e 100%);}
+.gw_color9.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#7b61b7;}
+.gw_color9 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color9 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#584389;}
+.gw_color9.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#bfa3ff 0,#7b61b7 100%);}
+.gw_color10.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#826555;}
+.gw_color10 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color10 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#63493a;}
+.gw_color10.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#c9a28c 0,#826555 100%);}
+.gw_color11.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#858b93;}
+.gw_color11 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color11 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#666a71;}
+.gw_color11.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#d0d4da 0,#858b93 100%);}
+.gw_color12.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#222222;}
+.gw_color12 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color12 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#000000;}
+.gw_color12.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#5e5e5e 0,#222222 100%);}
+.gw_color13.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#57b7dd;}
+.gw_color13 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color13 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#2a9ecd;}
+.gw_color13.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#8cdeff 0,#57b7dd 100%);}
+.gw_color14.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#f78dbb;}
+.gw_color14 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color14 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#d8558e;}
+.gw_color14.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#ffc3dd 0,#f78dbb 100%);}
+.gw_color15.layout_ex .login_gw7 .login_container .login_box .login_frm .btn_login button {background:#2c4f91;}
+.gw_color15 .login_gw7 .login_container .login_box .login_frm .btn_login.focus button,
+.gw_color15 .login_gw7 .login_container .login_box .login_frm .btn_login button:hover {background-color:#274275;}
+.gw_color15.login_fullvr .login_gw7 .login_container .login_box .login_frm .btn_login button {background-image:linear-gradient(to right,#4c7fde 0,#2c4f91 100%);}
+
+/* checkbox */
+.gw_color1 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color1 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#2c4f91;}
+.gw_color1 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color1 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color1 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color1 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#2c4f91;}
+.gw_color2 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color2 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#0f56be;}
+.gw_color2 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color2 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color2 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color2 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#0f56be;}
+.gw_color3 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color3 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#00a2b1;}
+.gw_color3 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color3 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color3 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color3 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#00a2b1;}
+.gw_color4 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color4 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#006742;}
+.gw_color4 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color4 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color4 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color4 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#006742;}
+.gw_color5 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color5 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#54951e;}
+.gw_color5 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color5 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color5 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color5 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#54951e;}
+.gw_color6 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color6 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#f2c91a;}
+.gw_color6 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color6 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color6 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color6 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#f2c91a;}
+.gw_color7 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color7 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#f57323;}
+.gw_color7 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color7 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color7 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color7 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#f57323;}
+.gw_color8 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color8 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#cc071e;}
+.gw_color8 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color8 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color8 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color8 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#cc071e;}
+.gw_color9 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color9 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#7b61b7;}
+.gw_color9 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color9 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color9 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color9 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#7b61b7;}
+.gw_color10 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color10 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#826555;}
+.gw_color10 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color10 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color10 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color10 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#826555;}
+.gw_color11 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color11 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#858b93;}
+.gw_color11 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color11 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color11 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color11 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#858b93;}
+.gw_color12 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color12 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#222222;}
+.gw_color12 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color12 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color12 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color12 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#222222;}
+.gw_color13 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color13 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#57b7dd;}
+.gw_color13 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color13 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color13 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color13 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#57b7dd;}
+.gw_color14 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color14 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#f78dbb;}
+.gw_color14 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color14 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color14 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color14 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#f78dbb;}
+.gw_color15 .login_gw7 .login_container .login_box .option label:hover span,
+.gw_color15 .login_gw7 .login_container .login_box .option .chk_info.focus label span {border-color:#2c4f91;}
+.gw_color15 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:after,
+.gw_color15 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label span:before,
+.gw_color15 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:after,
+.gw_color15 .login_gw7 .login_container .login_box .option input[type="checkbox"]:checked + label:hover span:before {background:#2c4f91;}
+
+/* selectbox */
+.gw_color1 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#2c4f91;}
+.gw_color2 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#0d7bbf;}
+.gw_color3 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#00a2b1;}
+.gw_color4 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#006742;}
+.gw_color5 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#54951e;}
+.gw_color6 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#f2c91a;}
+.gw_color7 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#f57323;}
+.gw_color8 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#cc071e;}
+.gw_color9 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#7b61b7;}
+.gw_color10 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#826555;}
+.gw_color11 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#858b93;}
+.gw_color12 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#222222;}
+.gw_color13 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#57b7dd;}
+.gw_color14 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#f78dbb;}
+.gw_color15 .login_gw7 .login_container .login_box .login_frm dl dd .frm_select:focus {border-color:#2c4f91;}
+
+/* Notice */
+.gw_color1 .notice_ticker {background-color:#2c4f91;}
+/* .gw_color2 .notice_ticker {background-color:#0d7bbf;} */
+.gw_color3 .notice_ticker {background-color:#00a2b1;}
+.gw_color4 .notice_ticker {background-color:#006742;}
+.gw_color5 .notice_ticker {background-color:#54951e;}
+.gw_color6 .notice_ticker {background-color:#f2c91a;}
+.gw_color7 .notice_ticker {background-color:#f57323;}
+.gw_color8 .notice_ticker {background-color:#cc071e;}
+.gw_color9 .notice_ticker {background-color:#7b61b7;}
+.gw_color10 .notice_ticker {background-color:#826555;}
+.gw_color11 .notice_ticker {background-color:#858b93;}
+.gw_color12 .notice_ticker {background-color:#222222;}
+.gw_color13 .notice_ticker {background-color:#57b7dd;}
+.gw_color14 .notice_ticker {background-color:#f78dbb;}
+.gw_color15 .notice_ticker {background-color:#2c4f91;}
+
+/* FIDO Tab */
+.gw_color1.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#365faa;}
+/* .gw_color2 .login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#0d7bbf;} */
+.gw_color3.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#11b3c2;}
+.gw_color4.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#0e845a;}
+.gw_color5.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#54951e;}
+.gw_color6.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#f2c91a;}
+.gw_color7.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#f88c32;}
+.gw_color8.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#df2a3f;}
+.gw_color9.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#8f74cc;}
+.gw_color10.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#987866;}
+.gw_color11.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#969ca3;}
+.gw_color12.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#3b3b3b;}
+.gw_color13.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#63c0e5;}
+.gw_color14.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#fa9dc5;}
+.gw_color15.login_fullvr .login_container .login_box .login_tab ul li.active a {background-color:#365faa;}
+
+.gw_color1 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#365faa;}
+.gw_color1 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color1 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#365faa;}
+/* .gw_col or2.login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#0d7bbf;}
+.gw_color2 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color2 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#0d7bbf;} */
+.gw_color3 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#11b3c2;}
+.gw_color3 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color3 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#11b3c2;}
+.gw_color4 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#0e845a;}
+.gw_color4 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color4 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#0e845a;}
+.gw_color5 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#54951e;}
+.gw_color5 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color5 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#54951e;}
+.gw_color6 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#f2c91a;}
+.gw_color6 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color6 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#f2c91a;}
+.gw_color7 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#f88c32;}
+.gw_color7 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color7 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#f88c32;}
+.gw_color8 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#df2a3f;}
+.gw_color8 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color8 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#df2a3f;}
+.gw_color9 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#8f74cc;}
+.gw_color9 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color9 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#8f74cc;}
+.gw_color10 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#987866;}
+.gw_color10 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color10 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#987866;}
+.gw_color11 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#969ca3;}
+.gw_color11 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color11 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#969ca3;}
+.gw_color12 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#3b3b3b;}
+.gw_color12 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color12 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#3b3b3b;}
+.gw_color13 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#63c0e5;}
+.gw_color13 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color13 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#63c0e5;}
+.gw_color14 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#fa9dc5;}
+.gw_color14 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color14 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#fa9dc5;}
+.gw_color15 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label {background-color:#365faa;}
+.gw_color15 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label, 
+.gw_color15 .login_gw7 .chk_fido .onoffswitch-checkbox:checked + .onoffswitch-label:before {border-color:#365faa;}

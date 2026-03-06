@@ -1,3 +1,18 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7a3ddbca3dc4e712fa9dc1053533d45b29af81a7c4a662bd53fcd53ea18bcf5b
-size 540
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="droppedGoods">
+
+	
+	<select id="getDroppedGoodsList" parameterType="droppedGoods" resultType="droppedGoods"> 
+	SELECT * FROM v_workprddown 
+	WHERE w_date = #{w_date}
+	ORDER BY w_sdatetime DESC
+	</select>
+	
+	<update id="updateDroppedGoods" parameterType="map"> 
+	UPDATE tb_workprddown SET ${column} = #{value} WHERE d_lot = #{d_lot} 
+	</update>
+
+</mapper>

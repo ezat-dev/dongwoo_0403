@@ -1,3 +1,40 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:02ab3a2345a995776cdca1e01e048ea08e7b85f1f87bd8179dac5ba9c86cf027
-size 1321
+.header {
+    margin-left: 131px;
+/*    margin-right: 8px;*/
+    margin-top: 5px; 
+    height: 53px; /* 기존 높이 */
+    background-color: #33363d;
+    border-radius: 6px 6px 0px 0px;
+    display: flex; /* 플렉스 박스로 설정 */
+    align-items: center; /* 수직 가운데 정렬 */
+    justify-content: space-between; /* 좌우 정렬 */
+}
+.logout-button {
+    height: 40px; /* tab보다 조금 작게 설정 */
+    padding: 0 11px; /* 좌우 패딩 */
+    border: 1px solid rgb(53, 53, 53);
+    border-radius: 4px; /* 모서리 둥글게 */
+    background-color: #ffffff; /* 배경색 */
+    cursor: pointer; /* 포인터 커서 */
+    display: flex; /* 내부 요소를 플렉스 박스로 설정 */
+    align-items: center; /* 버튼 안에서 세로 가운데 정렬 */
+    margin-right: 30px;
+    
+    /*opacity: 0.5;  버튼을 흐릿하게 */
+ 	/*pointer-events: none;  마우스 이벤트 차단 */
+}
+
+
+.logout-button:hover {
+    background-color: #f0f0f0; /* hover 시 색상 변화 */
+}
+.button-image {
+    width: 20px; /* 원하는 너비 설정 */
+    height: 20px; /* 원하는 높이 설정 */
+    margin-right: 0px; /* 이미지와 텍스트 사이의 여백 */
+    vertical-align: middle; /* 세로 가운데 정렬 */
+}
+
+.loginName{
+	display: flex;
+}

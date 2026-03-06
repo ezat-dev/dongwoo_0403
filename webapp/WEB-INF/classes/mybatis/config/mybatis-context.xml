@@ -1,3 +1,31 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7a7538450bccd63e8d3d17f5ee43f37de4263e213095425608f3df22cd7d2f31
-size 954
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+<typeAliases>
+	<package name="com.sample_pro.domain"/>
+</typeAliases>
+  <mappers>
+  	<mapper resource="mybatis/mapper/users.xml"/>
+
+  	<mapper resource="mybatis/mapper/condition.xml"/>
+  	
+  	<!-- 스페어 쿼리 -->
+  	<mapper resource="mybatis/mapper/machineSpare.xml"/>
+  	
+  	<!-- 기준정보관리 쿼리 -->
+  	<mapper resource="mybatis/mapper/standardData.xml"/>
+  	<!-- 기준관리 쿼리 -->
+  	<mapper resource="mybatis/mapper/standard.xml"/>
+
+    <mapper resource="mybatis/mapper/quality.xml"/>
+    
+    <mapper resource="mybatis/mapper/droppedGoods.xml"/>
+
+    <!--  열처리 작업이력  -->
+	<mapper resource="mybatis/mapper/productManage.xml"/>
+
+    <mapper resource="mybatis/mapper/monitoring.xml"/>
+  </mappers>
+</configuration>

@@ -1,3 +1,220 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:a8f1c623c28947c93aef2200402a9e9e08549749dd1d7708a6c18d6b3317c0a0
-size 5583
+/* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+
+body {
+    font-family: 'Roboto', sans-serif; /* 사용하고자 하는 폰트로 변경 */
+}
+/*
+.main {
+    margin-left: 225px;
+    margin-right:8px; 
+    margin-top : 90px;
+    width : 87.85%;
+    height: calc(100vh - 102px); 
+    background-color: #ffffff; 
+    padding: 1rem; 
+    border-radius: 0px 0px 6px 6px;
+	}
+*/	
+/*
+	.tab {
+    margin-left: 117px;
+    margin-right: 8px;
+    margin-top: 5px; 
+    height: 53px; 
+    background-color: #33363d;
+    border-radius: 6px 6px 0px 0px;
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+	}
+*/
+
+
+.user-insert-box {
+  background: #ffffff;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 1px;
+  width: 1349px;
+  height: 260.04px;
+  position: absolute;
+  left: 71px;
+  top: 119px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+}
+
+.user-inser-header {
+  background: #33363d;
+  width: 1346.55px;
+  height: 53.96px;
+  position: absolute;
+  left: 72.23px;
+  top: 119.23px;
+  font-size: 25px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-no-box,
+.user-buso-box,
+.user-name-box,
+.user-jick-box,
+.user-jdate-box,
+.user-odate-box,
+.user-id-box,
+.user-pwd-box,
+.user-phone-box,
+.user-add-box,
+.user-bigo-box,
+.user-sms-box {
+  background: #dddddd;
+  width: 126.32px;
+  height: 25.75px;
+  position: absolute;
+  display: flex; /* Flexbox 사용 */
+  align-items: center; /* 세로 중앙 정렬 */
+  justify-content: center; /* 가로 중앙 정렬 */
+}
+
+.user-no-box { top: 193.81px; left: 91.85px; }
+.user-buso-box { top: 222.01px; left: 91.85px; }
+.user-name-box { top: 193.81px; left: 742.14px; }
+.user-jick-box { top: 222.01px; left: 742.14px; }
+.user-jdate-box { top: 250.22px; left: 91.85px; }
+.user-odate-box { top: 250.22px; left: 742.14px; }
+.user-id-box { top: 278.43px; left: 91.85px; }
+.user-pwd-box { top: 278.43px; left: 742.14px; }
+.user-phone-box { top: 306.63px; left: 91.85px; height: 41.7px; }
+.user-add-box { top: 350.78px; left: 91.85px; }
+.user-bigo-box { top: 378.99px; left: 91.85px; height: 44.15px; }
+.user-sms-box { top: 306.63px; left: 742.14px; height: 41.7px; }
+
+.user-no,
+.user-name,
+.user-buso,
+.user-jick,
+.user-id,
+.user-pwd,
+.user-phone,
+.user-jdate,
+.user-odate
+ {
+  background: #ffffff;
+  border-style: solid;
+  border-color: #949494;
+  border-width: 1px;
+  width: 515.07px;
+  height: 25.75px;
+  position: absolute;
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+}
+.user-add
+ {
+  background: #ffffff;
+  border-style: solid;
+  border-color: #949494;
+  border-width: 1px;
+  width: 1166px;
+  height: 25.75px;
+  position: absolute;
+  display: flex;
+  align-items: center; 
+  justify-content: center;
+}
+.user-bigo
+{	
+  background: #ffffff;
+  border-style: solid;
+  border-color: #949494;
+  border-width: 1px;
+  width: 1166px;
+  height: 44.15px;
+  position: absolute;
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+	
+}
+
+.user-no { top: 193.81px; left: 220.62px; }
+.user-name { top: 193.81px; left: 873.04px; }
+.user-buso { top: 222.01px; left: 220.62px; }
+.user-jick { top: 222.01px; left: 873.04px; }
+.user-jdate { top: 250.22px; left: 220.62px; }
+.user-odate { top: 250.22px; left: 873.04px; }
+.user-id { top: 278.43px; left: 220.62px; }
+.user-pwd { top: 278.43px; left: 873.04px; }
+.user-phone { top: 315.22px; left: 220.62px; }
+.user-add { top: 350.78px; left: 220.62px; }
+.user-bigo { top: 378.99px; left: 220.62px; }
+
+.saveModal{
+  width: 100px;
+    height: 35px;
+    left: 1145px;
+    top: 307px;
+    position: absolute;
+    background-color: #FFD700; /* 노란색 배경 */
+    color: black; /* 흰색 글자 */
+    border: 2px solid #FFC107; /* 테두리 색상 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    font-weight: bold; /* 글자 두께 */
+    text-align: center; /* 중앙 정렬 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    transition: background-color 0.3s, transform 0.2s; /* 부드러운 효과 */
+    line-height: 35px; /* 텍스트 수직 중앙 정렬 */
+}
+
+.closeModal{
+	width: 100px;
+    height: 35px;
+    left: 1305px;
+    top: 306px;
+    position: absolute;
+    background-color: #A9A9A9; /* 회색 배경 */
+    color: black; /* 흰색 글자 */
+    border: 2px solid #808080; /* 어두운 회색 테두리 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    font-weight: bold; /* 글자 두께 */
+    text-align: center; /* 중앙 정렬 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    transition: background-color 0.3s, transform 0.2s; /* 부드러운 효과 */
+    line-height: 35px; /* 텍스트 수직 중앙 정렬 */
+	
+}
+.save { left: 595.88px; top: 463.61px; }
+.close { left: 754.08px; top: 463.61px; }
+
+/* 호버 효과 */
+.save:hover {
+    background-color: #FFC107; /* 호버 시 색상 변경 */
+    transform: scale(1.05); /* 약간 확대 */
+}
+
+/* 호버 효과 */
+.close:hover {
+    background-color: #808080; /* 호버 시 색상 변경 */
+    transform: scale(1.05); /* 약간 확대 */
+}
+
+
+.userModal {
+    position: fixed; /* 화면에 고정 */
+    top: 10%; /* 수직 중앙 */
+    left: 15%; /* 수평 중앙 */
+    display : none;
+    transform: translate(-50%, -50%); /* 정확한 중앙 정렬 */
+    z-index: 1000; /* 다른 요소 위에 표시 */
+}
+
+
+
+
+
+
+	

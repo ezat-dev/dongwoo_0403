@@ -1,3 +1,61 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:879e7dcbf269d34fcc18d00a61a08a9c9525d129e32d3da2f5b89536d516a54e
-size 1713
+package com.sample_pro.service;
+
+import com.sample_pro.dao.TagDao;
+import com.sample_pro.domain.Folder;
+import com.sample_pro.domain.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+
+@Service("tagService")
+public class TagServiceImpl implements TagService {
+
+    @Autowired
+    private TagDao tagDao;
+
+    // ── 폴더 ─────────────────────────────────────────────
+
+    @Override
+    public List<Folder> getFolderList() {
+        return tagDao.selectFolderList();
+    }
+
+    @Override
+    @Transactional
+    public void insertFolder(Folder folder) {
+        tagDao.insertFolder(folder);
+    }
+
+    @Override
+    @Transactional
+    public void deleteFolder(int folderId) {
+        tagDao.deleteTagsByFolderId(folderId);  // 태그 먼저
+        tagDao.deleteFolder(folderId);          // 폴더 삭제
+    }
+
+    // ── 태그 ─────────────────────────────────────────────
+
+    @Override
+    public List<Tag> getTagList(int folderId) {
+        return tagDao.selectTagList(folderId);
+    }
+
+    @Override
+    @Transactional
+    public void insertTag(Tag tag) {
+        tagDao.insertTag(tag);
+    }
+
+    @Override
+    @Transactional
+    public void updateTag(Tag tag) {
+        tagDao.updateTag(tag);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTag(int id) {
+        tagDao.deleteTag(id);
+    }
+}

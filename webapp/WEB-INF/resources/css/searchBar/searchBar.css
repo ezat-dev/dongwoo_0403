@@ -1,3 +1,13 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:71ccc36607c01638959ddfb7cee21ff215db9cc13b93e737a82029219cfcd834
-size 430
+.search {
+	width:100%;
+/*    margin-left: 131px;
+    margin-right: 8px;*/
+    margin-top: 5px; 
+    height: 45px; /* 기존 높이 */
+    /*background-color: #33363d;*/ 
+     /*border: 1px solid rgb(53, 53, 53);*/    
+    border-radius: 6px 6px 0px 0px;
+    display: flex; /* 플렉스 박스로 설정 */
+    align-items: center; /* 수직 가운데 정렬 */
+    justify-content: space-between; /* 좌우 정렬 */
+}

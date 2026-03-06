@@ -1,3 +1,292 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:b625f02f9754363456a50fa4a4c5c4668aa763b49d666807666a8595a14797f4
-size 12692
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="quality">
+
+	<select id="getqualityList" parameterType="Quality" resultType="Quality">
+	    SELECT *
+	    FROM tb_tustest
+	    <where>
+	        <if test="t_year != null and t_year != ''">
+	            AND t_year = #{t_year}
+	        </if>
+	    </where>
+	    ORDER BY id ASC
+	</select>
+
+
+	<insert id="savetusTest" parameterType="Quality">
+	    INSERT INTO tb_tustest (
+	        id, mch_name, t_year, t_month, t_url, t_ok,
+	        t_gb, t_day
+	    ) VALUES (
+	        #{id}, #{mch_name}, #{t_year}, #{t_month}, #{t_url}, #{t_ok},
+	        #{t_gb}, #{t_day}
+	    )
+	    ON DUPLICATE KEY UPDATE
+	        mch_name = VALUES(mch_name),
+	        t_year = VALUES(t_year),
+	        t_month = VALUES(t_month),
+	        t_url = VALUES(t_url),
+	        t_ok = VALUES(t_ok),
+	        t_gb = VALUES(t_gb),
+	        t_day = VALUES(t_day)
+
+	</insert>
+
+
+    <!-- 3. deltusTest: id 기준으로 삭제 -->
+    <delete id="deltusTest" parameterType="Quality">
+        DELETE FROM tb_tustest
+        WHERE id = #{id}
+    </delete>
+    
+    
+    <select id="getHeatTreatingOil" parameterType="Quality" resultType="Quality">
+    SELECT *
+    FROM tb_heattreatingoil
+    <where>
+        <if test="t_year != null and t_year != ''">
+            AND year = #{t_year}
+        </if>
+    </where>
+    ORDER BY id ASC
+	</select>
+	
+	
+    <insert id="saveHeatTreatingOil" parameterType="Quality">
+    INSERT INTO tb_heattreatingoil (
+        id, year, y_month, tx1, tx2, tx3, tx4
+    ) VALUES (
+        #{id}, #{year}, #{y_month}, #{tx1}, #{tx2}, #{tx3}, #{tx4}
+    )
+    ON DUPLICATE KEY UPDATE
+        year = VALUES(year),
+        y_month = VALUES(y_month),
+        tx1 = VALUES(tx1),
+        tx2 = VALUES(tx2),
+        tx3 = VALUES(tx3),
+        tx4 = VALUES(tx4)
+	</insert>
+    
+    
+    <update id="delHeatTreatingOil" parameterType="Quality">
+    UPDATE tb_heattreatingoil
+    SET
+        tx1 = '',
+        tx2 = '',
+        tx3 = '',
+        tx4 = ''
+    WHERE id = #{id}
+	</update>
+	
+    
+   <select id="getFproof" parameterType="Quality" resultType="Quality">
+        SELECT *
+        FROM tb_f_proof
+        <where>
+            <if test="y_m != null and y_m != ''">
+                AND y_m = #{y_m}
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+    
+     <update id="saveFproof" parameterType="Quality">
+        UPDATE tb_f_proof
+        SET ${column} = #{value}
+        WHERE id = #{id}
+    </update>
+    
+    <update id="delFproof" parameterType="Quality">
+        UPDATE tb_f_proof
+        SET
+            y_m       = '',
+            mch_name  = '',
+            standard  = '',
+            up_down   = '',
+            m_1  = '', m_2  = '', m_3  = '', m_4  = '', m_5  = '',
+            m_6  = '', m_7  = '', m_8  = '', m_9  = '', m_10 = '',
+            m_11 = '', m_12 = '', m_13 = '', m_14 = '', m_15 = '',
+            m_16 = '', m_17 = '', m_18 = '', m_19 = '', m_20 = '',
+            m_21 = '', m_22 = '', m_23 = '', m_24 = '', m_25 = '',
+            m_26 = '', m_27 = '', m_28 = '', m_29 = '', m_30 = '',
+            m_31 = ''
+        WHERE id = #{id}
+    </update>
+    
+    
+    <select id="cpkStandardList" parameterType="quality" resultType="quality">
+     SELECT item_no AS h_pnum, item_name AS h_pname, steel_grade AS h_gang, t_grade AS h_t_gb, SUBSTRING_INDEX(hardness_req,'~',1) AS h_hard_dw, SUBSTRING_INDEX(hardness_req,'~',-1) AS h_hard_up FROM tb_standard WHERE item_no = #{h_pnum} </select>
+	<select id="cpkValueList" parameterType="quality" resultType="quality">
+	SELECT *, (h_max - h_min) AS h_range FROM ( SELECT h_pnum, ROUND(h_val1,2) AS h_x1, ROUND(h_val2,2) AS h_x2, ROUND(h_val3,2) AS h_x3, h_regdate, h_regtime, DATE_FORMAT(h_regdate,'%m/%d') AS h_day, LEFT(h_regtime,5) AS h_time, SUBSTRING_INDEX(hardness_req,'~',1) AS h_hard_dw, SUBSTRING_INDEX(hardness_req,'~',-1) AS h_hard_up, ROUND(( (CASE WHEN h_val1 != 0 THEN h_val1 ELSE 0 END) + (CASE WHEN h_val2 != 0 THEN h_val2 ELSE 0 END) + (CASE WHEN h_val3 != 0 THEN h_val3 ELSE 0 END) ) / NULLIF( (CASE WHEN h_val1 != 0 THEN 1 ELSE 0 END) + (CASE WHEN h_val2 != 0 THEN 1 ELSE 0 END) + (CASE WHEN h_val3 != 0 THEN 1 ELSE 0 END), 0 ),2) AS h_avg, ROUND(CASE WHEN h_val1 = 0 THEN GREATEST(h_val2, h_val3) WHEN h_val2 = 0 THEN GREATEST(h_val1, h_val3) WHEN h_val3 = 0 THEN GREATEST(h_val1, h_val2) ELSE GREATEST(h_val1, h_val2, h_val3) END,2) AS h_max, ROUND(CASE WHEN h_val1 = 0 THEN LEAST(h_val2, h_val3) WHEN h_val2 = 0 THEN LEAST(h_val1, h_val3) WHEN h_val3 = 0 THEN LEAST(h_val1, h_val2) ELSE LEAST(h_val1, h_val2, h_val3) END,2) AS h_min FROM tb_hardness A INNER JOIN tb_standard B ON A.h_pnum = B.item_no WHERE 1=1 AND A.h_regdate >= #{h_sdate} AND A.h_regdate
+	<![CDATA[ <= ]]>
+	#{h_edate} AND A.h_pnum = #{h_pnum} ) AS AA LIMIT 30
+	</select>
+	
+	<!-- 설비 보전관리 -->
+	<select id="machineManageList" parameterType="quality" resultType="quality">
+		SELECT *
+		FROM tb_machine_manage
+		WHERE 1=1
+		AND m_yn = 'Y'
+		<if test="m_sdate != null and m_sdate != ''">
+			AND m_date <![CDATA[>=]]> #{m_sdate}
+		</if>
+		<if test="m_edate != null and m_edate != ''">
+			AND m_date <![CDATA[<=]]> #{m_edate}
+		</if>
+	</select>
+	
+	<select id="machineQualityDupChk" parameterType="quality" resultType="quality">
+		SELECT *
+		FROM tb_machine_manage
+		WHERE 1=1
+		AND m_idx = #{m_idx}
+	</select>
+	
+	<!-- 설비보전관리 등록 -->
+	<insert id="machineQualitySave" parameterType="quality">
+		<if test='m_query_gb == "I"'>
+			INSERT INTO tb_machine_manage (m_date, m_title, m_desc) VALUES (#{m_date}, #{m_title}, #{m_desc})
+		</if>
+		
+		<if test='m_query_gb == "U"'>
+			UPDATE tb_machine_manage SET 
+				m_date = #{m_date}, m_title = #{m_title}, m_desc = #{m_desc}
+			WHERE m_idx = #{m_idx}
+		</if>
+		
+	</insert>
+	
+	<update id="machineQualityDelete" parameterType="quality">
+		UPDATE tb_machine_manage SET m_yn = 'N'
+		WHERE m_idx = #{m_idx}
+	</update>
+	
+	<insert id="satDataInsert" parameterType="quality">
+		{CALL sp_sat_rowdata(#{s_smonth})}
+	</insert>
+	
+	<select id="satList" parameterType="quality" resultType="quality">
+		SELECT *
+		FROM tb_sat
+		WHERE s_month = #{s_smonth}
+	</select>
+	
+	<update id="satSave" parameterType="quality">
+		UPDATE tb_sat SET ${field} = #{value}
+		WHERE cnt = #{cnt}
+	</update>
+	
+	<!-- Ppk -->
+	<insert id="ppkRowDataInsert" parameterType="quality">
+		{CALL sp_ppk_rowdata(#{p_year})}
+	</insert>
+	
+	<select id="ppkAllList" parameterType="quality" resultType="quality">
+		SELECT *,
+		C.item_name AS p_pname,
+		C.hardness_req AS p_spec,
+		SUBSTRING_INDEX(C.hardness_req,'~',1) AS p_low,
+		SUBSTRING_INDEX(C.hardness_req,'~',-1) AS p_upp,
+		B.user_name AS p_user_name,
+		CONCAT(
+		p_val1,';',p_val2,';',p_val3,';',p_val4,';',p_val5,';',
+		p_val6,';',p_val7,';',p_val8,';',p_val9,';',p_val10,';',
+		p_val11,';',p_val12,';',p_val13,';',p_val14,';',p_val15,';',
+		p_val16,';',p_val17,';',p_val18,';',p_val19,';',p_val20,';',
+		p_val21,';',p_val22,';',p_val23,';',p_val24,';',p_val25,';',
+		p_val26,';',p_val27,';',p_val28,';',p_val29,';',p_val30,';',
+		p_val31,';',p_val32,';',p_val33,';',p_val34,';',p_val35,';',
+		p_val36,';',p_val37,';',p_val38,';',p_val39,';',p_val40,';',
+		p_val41,';',p_val42,';',p_val43,';',p_val44,';',p_val45,';',
+		p_val46,';',p_val47,';',p_val48,';',p_val49,';',p_val50,';',
+		p_val51,';',p_val52,';',p_val53,';',p_val54,';',p_val55,';',
+		p_val56,';',p_val57,';',p_val58,';',p_val59,';',p_val60,';',
+		p_val61,';',p_val62,';',p_val63,';',p_val64,';',p_val65,';',
+		p_val66,';',p_val67,';',p_val68,';',p_val69,';',p_val70,';',
+		p_val71,';',p_val72,';',p_val73,';',p_val74,';',p_val75,';',
+		p_val76,';',p_val77,';',p_val78,';',p_val79,';',p_val80,';',
+		p_val81,';',p_val82,';',p_val83,';',p_val84,';',p_val85,';',
+		p_val86,';',p_val87,';',p_val88,';',p_val89,';',p_val90,';',
+		p_val91,';',p_val92,';',p_val93,';',p_val94,';',p_val95,';',
+		p_val96,';',p_val97,';',p_val98,';',p_val99,';',p_val100) AS p_val_json		
+		FROM tb_ppk A
+		LEFT OUTER JOIN
+			tb_user B
+		ON A.p_user_code = B.user_code
+		LEFT OUTER JOIN
+			tb_standard C
+		ON A.p_pnum = C.item_no	
+		WHERE LEFT(p_ymon,4) = #{p_year}
+	</select>
+	
+	<select id="ppkDetailList" parameterType="quality" resultType="quality">
+		SELECT *,
+		C.item_name AS p_pname,
+		C.item_no AS p_pnum,
+		C.hardness_req AS p_spec,
+		SUBSTRING_INDEX(C.hardness_req,'~',1) AS p_low,
+		SUBSTRING_INDEX(C.hardness_req,'~',-1) AS p_upp,
+		B.user_name AS p_user_name,
+		B.user_code AS p_user_code,
+		CONCAT(
+		p_val1,';',p_val2,';',p_val3,';',p_val4,';',p_val5,';',
+		p_val6,';',p_val7,';',p_val8,';',p_val9,';',p_val10,';',
+		p_val11,';',p_val12,';',p_val13,';',p_val14,';',p_val15,';',
+		p_val16,';',p_val17,';',p_val18,';',p_val19,';',p_val20,';',
+		p_val21,';',p_val22,';',p_val23,';',p_val24,';',p_val25,';',
+		p_val26,';',p_val27,';',p_val28,';',p_val29,';',p_val30,';',
+		p_val31,';',p_val32,';',p_val33,';',p_val34,';',p_val35,';',
+		p_val36,';',p_val37,';',p_val38,';',p_val39,';',p_val40,';',
+		p_val41,';',p_val42,';',p_val43,';',p_val44,';',p_val45,';',
+		p_val46,';',p_val47,';',p_val48,';',p_val49,';',p_val50,';',
+		p_val51,';',p_val52,';',p_val53,';',p_val54,';',p_val55,';',
+		p_val56,';',p_val57,';',p_val58,';',p_val59,';',p_val60,';',
+		p_val61,';',p_val62,';',p_val63,';',p_val64,';',p_val65,';',
+		p_val66,';',p_val67,';',p_val68,';',p_val69,';',p_val70,';',
+		p_val71,';',p_val72,';',p_val73,';',p_val74,';',p_val75,';',
+		p_val76,';',p_val77,';',p_val78,';',p_val79,';',p_val80,';',
+		p_val81,';',p_val82,';',p_val83,';',p_val84,';',p_val85,';',
+		p_val86,';',p_val87,';',p_val88,';',p_val89,';',p_val90,';',
+		p_val91,';',p_val92,';',p_val93,';',p_val94,';',p_val95,';',
+		p_val96,';',p_val97,';',p_val98,';',p_val99,';',p_val100) AS p_val_json		
+		
+		FROM tb_ppk A
+		LEFT OUTER JOIN
+			tb_user B
+		ON A.p_user_code = B.user_code
+		LEFT OUTER JOIN
+			tb_standard C
+		ON A.p_pnum = C.item_no	
+		WHERE p_cnt = #{p_cnt}
+	</select>
+	
+	<update id="ppkSave" parameterType="quality">
+		UPDATE tb_ppk SET
+			p_pnum = #{p_pnum}, p_user_code = #{p_user_code},
+			p_val1 = #{p_val1}, p_val2 = #{p_val2}, p_val3 = #{p_val3}, p_val4 = #{p_val4}, p_val5 = #{p_val5},
+			p_val6 = #{p_val6}, p_val7 = #{p_val7}, p_val8 = #{p_val8}, p_val9 = #{p_val9}, p_val10 = #{p_val10},
+			p_val11 = #{p_val11}, p_val12 = #{p_val12}, p_val13 = #{p_val13}, p_val14 = #{p_val14}, p_val15 = #{p_val15},
+			p_val16 = #{p_val16}, p_val17 = #{p_val17}, p_val18 = #{p_val18}, p_val19 = #{p_val19}, p_val20 = #{p_val20},
+			p_val21 = #{p_val21}, p_val22 = #{p_val22}, p_val23 = #{p_val23}, p_val24 = #{p_val24}, p_val25 = #{p_val25},
+			p_val26 = #{p_val26}, p_val27 = #{p_val27}, p_val28 = #{p_val28}, p_val29 = #{p_val29}, p_val30 = #{p_val30},
+			p_val31 = #{p_val31}, p_val32 = #{p_val32}, p_val33 = #{p_val33}, p_val34 = #{p_val34}, p_val35 = #{p_val35},
+			p_val36 = #{p_val36}, p_val37 = #{p_val37}, p_val38 = #{p_val38}, p_val39 = #{p_val39}, p_val40 = #{p_val40},
+			p_val41 = #{p_val41}, p_val42 = #{p_val42}, p_val43 = #{p_val43}, p_val44 = #{p_val44}, p_val45 = #{p_val45},
+			p_val46 = #{p_val46}, p_val47 = #{p_val47}, p_val48 = #{p_val48}, p_val49 = #{p_val49}, p_val50 = #{p_val50},
+			p_val51 = #{p_val51}, p_val52 = #{p_val52}, p_val53 = #{p_val53}, p_val54 = #{p_val54}, p_val55 = #{p_val55},
+			p_val56 = #{p_val56}, p_val57 = #{p_val57}, p_val58 = #{p_val58}, p_val59 = #{p_val59}, p_val60 = #{p_val60},
+			p_val61 = #{p_val61}, p_val62 = #{p_val62}, p_val63 = #{p_val63}, p_val64 = #{p_val64}, p_val65 = #{p_val65},
+			p_val66 = #{p_val66}, p_val67 = #{p_val67}, p_val68 = #{p_val68}, p_val69 = #{p_val69}, p_val70 = #{p_val70},
+			p_val71 = #{p_val71}, p_val72 = #{p_val72}, p_val73 = #{p_val73}, p_val74 = #{p_val74}, p_val75 = #{p_val75},
+			p_val76 = #{p_val76}, p_val77 = #{p_val77}, p_val78 = #{p_val78}, p_val79 = #{p_val79}, p_val80 = #{p_val80},
+			p_val81 = #{p_val81}, p_val82 = #{p_val82}, p_val83 = #{p_val83}, p_val84 = #{p_val84}, p_val85 = #{p_val85},
+			p_val86 = #{p_val86}, p_val87 = #{p_val87}, p_val88 = #{p_val88}, p_val89 = #{p_val89}, p_val90 = #{p_val90},
+			p_val91 = #{p_val91}, p_val92 = #{p_val92}, p_val93 = #{p_val93}, p_val94 = #{p_val94}, p_val95 = #{p_val95},
+			p_val96 = #{p_val96}, p_val97 = #{p_val97}, p_val98 = #{p_val98}, p_val99 = #{p_val99}, p_val100 = #{p_val100}
+		WHERE p_cnt = #{p_cnt}
+	</update>
+</mapper>

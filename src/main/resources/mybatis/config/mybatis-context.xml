@@ -1,3 +1,14 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:89a6fdd9e9ccc15be70593eb2f43ab2106d5db2187cde16d2ba7774c70d8bb6c
-size 402
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+<typeAliases>
+	<package name="com.sample_pro.domain"/>
+</typeAliases>
+  <mappers>
+  	<mapper resource="mybatis/mapper/users.xml"/>
+
+    <mapper resource="mybatis/mapper/TagMapper.xml"/>
+  </mappers>
+</configuration>

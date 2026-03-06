@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:1de4f91ef9960e4be32c0ed88e92fb3048e1560036eed121c15366ff9f63f821
-size 629
+package com.sample_pro.domain;
+
+public class Folder {
+
+    private int    id;
+    private String name;
+    private Integer parentId;   // NULL 허용
+
+    public int     getId()       { return id; }
+    public String  getName()     { return name; }
+    public Integer getParentId() { return parentId; }
+
+    public void setId(int id)             { this.id = id; }
+    public void setName(String name)      { this.name = name; }
+    public void setParentId(Integer pid)  { this.parentId = pid; }
+
+    @Override
+    public String toString() {
+        return "Folder{id=" + id + ", name='" + name + "'}";
+    }
+}

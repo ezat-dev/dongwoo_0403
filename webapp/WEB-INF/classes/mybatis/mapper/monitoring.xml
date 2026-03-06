@@ -1,3 +1,119 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:17452e21572d5d44fdb68774e3b83b45ed6f982e5123f612e433f02d55ad9881
-size 2883
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="monitoring">
+
+<select id="gettrend" parameterType="monitoring" resultType="monitoring">
+SELECT *,
+CASE WHEN tc_cnt IS NOT NULL THEN 1000 ELSE NULL END AS tc_val,
+CASE WHEN tc_cnt IS NOT NULL THEN tc_name ELSE '' END AS tc_val_name,
+CASE WHEN w_lot IS NOT NULL THEN 1200 ELSE NULL END AS lot_val,
+CASE WHEN w_lot IS NOT NULL THEN w_lot ELSE '' END AS lot_name
+FROM (
+	SELECT
+      regtime,
+      hw_pv,
+      qf1_pv,
+      qf2_pv,
+      qf3_pv,
+      qf4_pv,
+      qf5_pv,
+      oil_cool_pv,
+      oil_heat_pv,
+      (cp_a_pv * 0.001) AS cp_a_pv,
+      (cp_b_pv * 0.001) AS cp_b_pv,
+      rw_pv,
+      tf1_pv,
+      tf2_pv,
+      tf3_pv,
+      tf4_pv,
+      tf5_pv,
+      cold_cool_pv,
+      cold_heat_pv,
+      hw_sp,
+      qf1_sp,
+      qf2_sp,
+      qf3_sp,
+      qf4_sp,
+      qf5_sp,
+      oil_cool_sp,
+      oil_heat_sp,
+      cp_a_sp,
+      cp_b_sp,
+      rw_sp,
+      tf1_sp,
+      tf2_sp,
+      tf3_sp,
+      tf4_sp,
+      tf5_sp,
+      cold_cool_sp,
+      cold_heat_sp,
+      qf_inv_pv,
+      qt_inv_pv,
+      cleaner1_inv_pv,
+      cleaner2_inv_pv,
+      tf_inv_pv,
+      agi_inv_pv,
+      qf_inv_sp,
+      qt_inv_sp,
+      cleaner1_inv_sp,
+      cleaner2_inv_sp,
+      tf_inv_sp,
+      agi_inv_sp,
+      'AAA' AS zz
+    FROM tb_temp
+    WHERE regtime BETWEEN #{startDate} AND #{endDate}
+) AS A
+LEFT OUTER JOIN
+(
+	SELECT *,
+	'AAA' AS zzz
+	FROM tb_temp_change
+	WHERE tc_regtime BETWEEN #{startDate} AND #{endDate}
+) AS B
+ ON LEFT(A.regtime,16) = LEFT(B.tc_regtime,16)
+LEFT OUTER JOIN
+(
+ 	SELECT w_sdatetime, w_lot
+ 	FROM tb_worklist
+ 	WHERE regtime BETWEEN #{startDate} AND #{endDate}
+) AS C
+ON LEFT(A.regtime,16) = LEFT(C.w_sdatetime,16)
+ORDER BY regtime
+  </select>
+  
+  <!--  알람현황  -->
+	<select id="alarmList" resultType="monitoring"> 
+	SELECT * FROM v_alarmstate 
+	</select>
+	
+	<!-- 트렌드 사인오프 리스트 -->
+	<select id="trendSignList" resultType="monitoring">
+		SELECT *,
+		user_name AS tc_user_name
+		FROM tb_temp_change A
+		INNER JOIN
+			tb_user B
+		ON A.tc_user_code = B.user_code
+		WHERE 1=1
+	</select>
+	
+	<select id="trendSignDupChk" parameterType="monitoring" resultType="int">
+		SELECT COUNT(*) AS ccc
+		FROM tb_temp_change
+		WHERE tc_cnt = #{tc_cnt}
+	</select>
+	
+	<insert id="trendSignSave" parameterType="monitoring">
+		INSERT INTO tb_temp_change
+			(tc_regtime, tc_name, tc_desc, tc_user_code)
+		VALUES
+			(#{tc_regtime}, #{tc_name}, #{tc_desc}, #{tc_user_code})
+	</insert>
+	
+	<update id="trendSignUpdate" parameterType="monitoring">
+		UPDATE tb_temp_chage SET tc_desc = #{tc_desc}, tc_name = #{tc_name}
+		WHERE tc_cnt = #{tc_cnt}
+	</update>
+</mapper>

@@ -1,3 +1,183 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:cd5358402fe75cc0ed06574327632e72f6cbca80f6d32d2e4493e86bdfe2a9e7
-size 3573
+.group-1,
+.group-1 * {
+  box-sizing: border-box;
+}
+.group-1 {
+  height: 953px;
+  position: relative;
+}
+
+
+.main {
+  background: #ffffff;
+  width: 1918px;
+  height: 953px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.background-1 {
+  opacity: 0.5;
+  width: 1917px;
+  height: 953px;
+  position: absolute;
+  left: 1px;
+  top: 0px;
+  object-fit: cover;
+}
+.login-box {
+  background: #79838f;
+  border-style: solid;
+  border-color: #ffffff;
+  border-width: 2px;
+  opacity: 0.8;
+  width: 490px;
+  height: 467px;
+  position: absolute;
+  left: 1195px;
+  top: 247px;
+}
+.login_btn {
+    background: #1071ef;
+    width: 354px;
+    height: 70px;
+    position: absolute;
+    left: 1263px;
+    top: 602px;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    border: none; /* 테두리 제거 */
+    border-radius: 5px; /* 모서리 둥글게 설정 */
+    cursor: pointer; /* 마우스 커서를 포인터로 변경 */
+    transition: background 0.3s, transform 0.2s; /* 부드러운 전환 효과 */
+}
+
+.login_btn:hover {
+    background: #005bb5; /* 호버 시 배경색 변경 */
+    transform: translateY(-2px); /* 위로 살짝 이동 */
+}
+
+.login_btn:active {
+    transform: translateY(0); /* 클릭 시 원래 위치로 복귀 */
+}
+.id-input {
+  background: #ffffff;
+  border-radius: 7px;
+  border-style: solid;
+  border-color: #213851;
+  border-width: 2px;
+  opacity: 0.4;
+  width: 354px;
+  height: 65px;
+  position: absolute;
+  left: 1263px;
+  top: 380px;
+}
+.pw-input {
+  background: #ffffff;
+  border-radius: 7px;
+  border-style: solid;
+  border-color: #213851;
+  border-width: 2px;
+  opacity: 0.4;
+  width: 354px;
+  height: 65px;
+  position: absolute;
+  left: 1263px;
+  top: 508px;
+}
+.text-1 {
+  color: #ffffff;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  position: absolute;
+  left: 310px;
+  top: 546px;
+  width: 531px;
+  height: 36px;
+}
+.text-2 {
+  color: #ffffff;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  position: absolute;
+  left: 14px;
+  top: 897px;
+  width: 531px;
+  height: 36px;
+}
+#n_id {
+  color: #000000;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  position: absolute;
+  left: 1290px;
+  top: 402px;
+  outline: none;
+}
+#n_pw {
+  color: #000000;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  position: absolute;
+  left: 1290px;
+  top: 529px;
+  outline: none;
+}
+.text-5 {
+  color: #f3f3f3;
+  text-align: left;
+  font-family: "Inter-SemiBold", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  position: absolute;
+  left: 1263px;
+  top: 345px;
+}
+.text-6 {
+  color: #f3f3f3;
+  text-align: left;
+  font-family: "Inter-SemiBold", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  position: absolute;
+  left: 1263px;
+  top: 474px;
+}
+.logo {
+  width: 223.53px;
+  height: 161.87px;
+  position: absolute;
+  left: 292px;
+  top: 379.35px;
+  overflow: visible;
+}
+.text-4 {
+  color: #f3f3f3;
+  text-align: left;
+  font-family: "Inter-Bold", sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  position: absolute;
+  left: 1311px;
+  top: 285px;
+}
+.text-3 {
+  color: #ffffff;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  position: absolute;
+  left: 14px;
+  top: 919px;
+}

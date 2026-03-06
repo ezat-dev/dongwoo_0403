@@ -1,3 +1,88 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:30c00bc9868e58434335667014e76ea1ca98d642268aa25a5e958addd0ab06fb
-size 3165
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="TagMapper">
+
+    <resultMap id="folderMap" type="com.sample_pro.domain.Folder">
+        <id     property="id"       column="id"/>
+        <result property="name"     column="name"/>
+        <result property="parentId" column="parent_id"/>
+    </resultMap>
+
+    <resultMap id="tagMap" type="com.sample_pro.domain.Tag">
+        <id     property="id"        column="id"/>
+        <result property="folderId"  column="folder_id"/>
+        <result property="name"      column="name"/>
+        <result property="address"   column="address"/>
+        <result property="type"      column="type"/>
+        <result property="plcType"   column="plc_type"/>
+        <result property="value"     column="value"/>
+        <result property="quality"   column="quality"/>
+        <result property="timestamp" column="timestamp"/>
+    </resultMap>
+
+    <!-- ══ 폴더 ══ -->
+
+    <select id="selectFolderList" resultMap="folderMap">
+        SELECT id, name, parent_id
+        FROM   folders
+        ORDER  BY name ASC
+    </select>
+
+    <insert id="insertFolder" parameterType="com.sample_pro.domain.Folder"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT IGNORE INTO folders (name, parent_id)
+        VALUES (#{name}, #{parentId})
+    </insert>
+
+    <delete id="deleteFolder" parameterType="int">
+        DELETE FROM folders WHERE id = #{folderId}
+    </delete>
+
+    <delete id="deleteTagsByFolderId" parameterType="int">
+        DELETE FROM folders_tags WHERE folder_id = #{folderId}
+    </delete>
+
+    <!-- ══ 태그 ══ -->
+
+    <select id="selectTagList" parameterType="int" resultMap="tagMap">
+        SELECT id, folder_id, name, address, type, plc_type, value, quality,
+               DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i:%s') AS timestamp
+        FROM   folders_tags
+        WHERE  folder_id = #{folderId}
+        ORDER  BY id ASC
+    </select>
+
+    <!-- 태그 추가 -->
+    <insert id="insertTag" parameterType="com.sample_pro.domain.Tag"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO folders_tags
+            (folder_id, name, address, type, plc_type, timestamp)
+        VALUES
+            (#{folderId}, #{name}, #{address}, #{type}, #{plcType}, NOW())
+        ON DUPLICATE KEY UPDATE
+            address  = VALUES(address),
+            type     = VALUES(type),
+            plc_type = VALUES(plc_type),
+            timestamp = NOW()
+    </insert>
+
+    <!-- 태그 수정 -->
+    <update id="updateTag" parameterType="com.sample_pro.domain.Tag">
+        UPDATE folders_tags
+        SET    name      = #{name},
+               address   = #{address},
+               type      = #{type},
+               plc_type  = #{plcType},
+               timestamp = NOW()
+        WHERE  id = #{id}
+    </update>
+
+    <!-- 태그 삭제 -->
+    <delete id="deleteTag" parameterType="int">
+        DELETE FROM folders_tags WHERE id = #{id}
+    </delete>
+
+</mapper>

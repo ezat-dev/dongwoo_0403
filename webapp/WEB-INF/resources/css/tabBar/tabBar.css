@@ -1,3 +1,111 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:3a54e56e223e73ec0370ec384bd3956c0d5e32ddff24d3fdcb9b75993711ef5f
-size 4027
+.tab {
+	width:95%;
+	margin-bottom: 40px;
+    /*margin-left: 131px;
+    margin-right: 8px;*/
+    margin-top: 5px; 
+    height: 45px; /* 기존 높이 */
+/*    background-color: #33363d;*/ 
+     /*border: 1px solid rgb(53, 53, 53);*/
+    border-radius: 6px 6px 0px 0px;
+    display: flex; /* 플렉스 박스로 설정 */
+    align-items: center; /* 수직 가운데 정렬 */
+    justify-content: space-between; /* 좌우 정렬 */
+}
+
+.button-container {
+    display: flex; /* 버튼들을 수평으로 나열 */
+    gap: 10px; /* 버튼 사이 여백 */
+    margin-left: auto; /* 왼쪽 여백을 자동으로 설정하여 오른쪽으로 정렬 */
+    margin-right: 10px; /* 오른쪽 여백 */
+}
+
+.select-button {
+    height: 40px; /* tab보다 조금 작게 설정 */
+    padding: 0 11px; /* 좌우 패딩 */
+    border: 1px solid rgb(53, 53, 53);
+    border-radius: 4px; /* 모서리 둥글게 */
+    background-color: #ffffff; /* 배경색 */
+    cursor: pointer; /* 포인터 커서 */
+    display: flex; /* 내부 요소를 플렉스 박스로 설정 */
+    align-items: center; /* 버튼 안에서 세로 가운데 정렬 */
+    /*opacity: 0.5;  버튼을 흐릿하게 */
+   	/*pointer-events: none;  마우스 이벤트 차단 */
+}
+.insert-button {
+    height: 40px; /* tab보다 조금 작게 설정 */
+    padding: 0 11px; /* 좌우 패딩 */
+    border: 1px solid rgb(53, 53, 53);
+    border-radius: 4px; /* 모서리 둥글게 */
+    background-color: #ffffff; /* 배경색 */
+    cursor: pointer; /* 포인터 커서 */
+    display: flex; /* 내부 요소를 플렉스 박스로 설정 */
+    align-items: center; /* 버튼 안에서 세로 가운데 정렬 */
+}
+
+.delete-button {
+    height: 40px; /* tab보다 조금 작게 설정 */
+    padding: 0 11px; /* 좌우 패딩 */
+    border: 1px solid rgb(53, 53, 53);
+    border-radius: 4px; /* 모서리 둥글게 */
+    background-color: #ffffff; /* 배경색 */
+    cursor: pointer; /* 포인터 커서 */
+    display: flex; /* 내부 요소를 플렉스 박스로 설정 */
+    align-items: center; /* 버튼 안에서 세로 가운데 정렬 */
+}
+
+.button-image {
+    width: 10px;
+    height: 10px;
+}
+
+
+.excel-button {
+    height: 40px; /* tab보다 조금 작게 설정 */
+    padding: 0 11px; /* 좌우 패딩 */
+    border: 1px solid rgb(53, 53, 53);
+    border-radius: 4px; /* 모서리 둥글게 */
+    background-color: #ffffff; /* 배경색 */
+    cursor: pointer; /* 포인터 커서 */
+    display: flex; /* 내부 요소를 플렉스 박스로 설정 */
+    align-items: center; /* 버튼 안에서 세로 가운데 정렬 */
+}
+.printer-button {
+    height: 40px; /* tab보다 조금 작게 설정 */
+    padding: 0 11px; /* 좌우 패딩 */
+    border: 1px solid rgb(53, 53, 53);
+    border-radius: 4px; /* 모서리 둥글게 */
+    background-color: #ffffff; /* 배경색 */
+    cursor: pointer; /* 포인터 커서 */
+    display: flex; /* 내부 요소를 플렉스 박스로 설정 */
+    align-items: center; /* 버튼 안에서 세로 가운데 정렬 */
+    /*opacity: 0.5;  버튼을 흐릿하게 */
+ 	/*pointer-events: none;  마우스 이벤트 차단 */
+}
+
+/* 버튼 hover 효과 */
+.select-button:hover {
+    background-color: #f0f0f0; /* hover 시 색상 변화 */
+}
+.insert-button:hover {
+    background-color: #f0f0f0; /* hover 시 색상 변화 */
+}
+.delete-button:hover {
+    background-color: #f0f0f0; /* hover 시 색상 변화 */
+}
+.excel-button:hover {
+    background-color: #f0f0f0; /* hover 시 색상 변화 */
+}
+.printer-button:hover {
+    background-color: #f0f0f0; /* hover 시 색상 변화 */
+}
+.close {
+    background-color: #f0f0f0; /* hover 시 색상 변화 */
+}
+
+.button-image {
+    width: 20px; /* 원하는 너비 설정 */
+    height: 20px; /* 원하는 높이 설정 */
+    margin-right: 0px; /* 이미지와 텍스트 사이의 여백 */
+    vertical-align: middle; /* 세로 가운데 정렬 */
+}

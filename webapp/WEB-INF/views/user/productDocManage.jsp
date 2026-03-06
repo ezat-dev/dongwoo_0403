@@ -1,3 +1,61 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:b300cf7691e65df9fb99bf0d1eb2a075bfd67504a74d89ecc3ac75b2607c041d
-size 1093
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사양별 대기통수</title>
+<%@include file="../include/pluginpage.jsp" %>    
+<style>
+.search{
+	height:40px;
+}
+.container {
+	display: flex;
+	justify-content: space-between;
+	padding: 20px;
+	margin-left:1008px;
+	margin-top:200px;
+}
+    
+</style>
+    
+    
+<body>
+
+	<main class="main">
+    	<!-- 조회조건 표시 -->
+    	<div class="search">
+    		
+    	</div>
+    	
+    	
+		<jsp:include page="../include/tabBar.jsp"/>
+	   
+	    
+	    <!-- 화면표시 -->
+	    <div class="view">
+	    	
+	    </div>
+	    
+
+	</main>
+	
+<script>
+	//전역변수
+  let now_page_code = "i02";
+	//로드
+	$(function(){
+		$(".headerP").text("문서관리 - 사양별 대기통수");
+	});
+
+	//이벤트
+	
+	
+	//함수
+
+</script>
+
+</body>
+</html>

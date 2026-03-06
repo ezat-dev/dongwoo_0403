@@ -1,3 +1,9 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:480a441b5f8382f11fac823bf3c682d16d5494c6087d3071ec18f0c677b41dbd
-size 346
+<?xml version="1.0" encoding="UTF-8"?>
+<faceted-project>
+  <fixed facet="wst.jsdt.web"/>
+  <installed facet="java" version="1.8"/>
+  <installed facet="jst.web" version="3.1"/>
+  <installed facet="jst.jsf" version="2.2"/>
+  <installed facet="jst.jaxrs" version="2.1"/>
+  <installed facet="wst.jsdt.web" version="1.0"/>
+</faceted-project>

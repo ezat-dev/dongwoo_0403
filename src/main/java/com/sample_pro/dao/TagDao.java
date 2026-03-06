@@ -1,3 +1,20 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:5cd7bf153176c08d55bfa8f48fe8cd7a1cc15f10c109ee686beb48cb4ec9f1ed
-size 825
+package com.sample_pro.dao;
+
+import com.sample_pro.domain.Folder;
+import com.sample_pro.domain.Tag;
+import java.util.List;
+
+public interface TagDao {
+
+    // ── 폴더 ─────────────────────────────────────────────
+    List<Folder> selectFolderList();
+    void insertFolder(Folder folder);      // ← 추가
+    void deleteFolder(int folderId);       // ← 추가
+    void deleteTagsByFolderId(int folderId); // ← 추가
+
+    // ── 태그 ─────────────────────────────────────────────
+    List<Tag> selectTagList(int folderId);
+    void insertTag(Tag tag);
+    void updateTag(Tag tag);
+    void deleteTag(int id);
+}

@@ -1,3 +1,564 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:debc2652260694b41ce5de7ff858cf380ac6518a6bc198f27dcfca324aae953e
-size 15005
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="condition">
+
+	<!-- 기준정보 조회 -->
+	<select id="getStandardDataList" parameterType="condition"
+		resultType="condition">
+		SELECT *
+		FROM tb_standard
+		<where>
+			<if
+				test="item_no != null and item_no != '' and item_no != 'ALL'">
+				item_no = #{item_no}
+			</if>
+		</where>
+	</select>
+
+	<!-- 기준정보 추가 -->
+	<insert id="insertStandardData" parameterType="condition">
+		INSERT INTO tb_standard (
+		equipment_name,
+		item_no,
+		item_name,
+		steel_grade,
+		t_grade,
+		batch,
+		ref_soak_temp,
+		ref_cool_temp,
+		ref_cp,
+		apply_soak_temp,
+		apply_cool_temp,
+		apply_cp,
+		load1,
+		load2,
+		load3,
+		std_load,
+		hardness_req
+		) VALUES (
+		#{equipment_name, jdbcType=VARCHAR},
+		#{item_no, jdbcType=VARCHAR},
+		#{item_name, jdbcType=VARCHAR},
+		#{steel_grade, jdbcType=VARCHAR},
+		#{t_grade, jdbcType=VARCHAR},
+		#{batch, jdbcType=VARCHAR},
+		#{ref_soak_temp, jdbcType=INTEGER},
+		#{ref_cool_temp, jdbcType=INTEGER},
+		#{ref_cp},
+		#{apply_soak_temp, jdbcType=INTEGER},
+		#{apply_cool_temp, jdbcType=INTEGER},
+		#{apply_cp},
+		#{load1, jdbcType=INTEGER},
+		#{load2, jdbcType=INTEGER},
+		#{load3, jdbcType=INTEGER},
+		#{std_load, jdbcType=INTEGER},
+		#{hardness_req, jdbcType=VARCHAR}
+		)
+	</insert>
+	
+	<!-- 기준정보 업데이트-->
+	<update id="updateStandardData" parameterType="condition">
+    UPDATE tb_standard
+    SET
+        equipment_name = #{equipment_name, jdbcType=VARCHAR},
+        item_no = #{item_no, jdbcType=VARCHAR},
+        item_name = #{item_name, jdbcType=VARCHAR},
+        steel_grade = #{steel_grade, jdbcType=VARCHAR},
+        t_grade = #{t_grade, jdbcType=VARCHAR},
+        batch = #{batch, jdbcType=VARCHAR},
+        ref_soak_temp = #{ref_soak_temp, jdbcType=INTEGER},
+        ref_cool_temp = #{ref_cool_temp, jdbcType=INTEGER},
+        ref_cp = #{ref_cp},
+        apply_soak_temp = #{apply_soak_temp, jdbcType=INTEGER},
+        apply_cool_temp = #{apply_cool_temp, jdbcType=INTEGER},
+        apply_cp = #{apply_cp},
+        load1 = #{load1, jdbcType=INTEGER},
+        load2 = #{load2, jdbcType=INTEGER},
+        load3 = #{load3, jdbcType=INTEGER},
+        std_load = #{std_load, jdbcType=INTEGER},
+        hardness_req = #{hardness_req, jdbcType=VARCHAR}
+    WHERE
+        item_no = #{item_no, jdbcType=VARCHAR}
+</update>
+
+	<!-- 기준정보 삭제 -->
+	<delete id="deleteStandardData" parameterType="condition">
+		DELETE FROM
+		tb_standard
+		WHERE item_no = #{item_no}
+	</delete>
+
+	<!-- /////////////////////////////////////// -->
+	<!--기준정보 -->
+	<select id="getStandardInfoList" parameterType="condition" resultType="condition">
+		SELECT *
+		FROM tb_standard
+		<where>
+			<if test="item_no != null and item_no != ''">
+				AND item_no LIKE CONCAT('%', #{item_no}, '%')
+			</if>
+			<if test="t_grade != null and t_grade != ''">
+				AND t_grade LIKE CONCAT('%', #{t_grade}, '%')
+			</if>
+			<if test="steel_grade != null and steel_grade != ''">
+				AND steel_grade LIKE CONCAT('%', #{steel_grade}, '%')
+			</if>
+		</where>
+	</select>
+
+		<insert id="saveDivisionWeight" parameterType="condition">
+		INSERT INTO tb_standard (
+			equipment_name,
+			item_no,
+			item_name,
+			steel_grade,
+			t_grade,
+			apply_temp1,
+			apply_temp2,
+			apply_cp,
+			std_load,
+			hardness_req
+		)
+		VALUES (
+			#{equipment_name},
+			#{item_no},
+			#{item_name},
+			#{steel_grade},
+			#{t_grade},
+			#{apply_temp1},
+			#{apply_temp2},
+			#{apply_cp},
+			#{std_load},
+			#{hardness_req}
+		)
+		ON DUPLICATE KEY UPDATE
+			equipment_name = VALUES(equipment_name),
+			item_name = VALUES(item_name),
+			steel_grade = VALUES(steel_grade),
+			t_grade = VALUES(t_grade),
+			apply_temp1 = VALUES(apply_temp1),
+			apply_temp2 = VALUES(apply_temp2),
+			apply_cp = VALUES(apply_cp),
+			std_load = VALUES(std_load),
+			hardness_req = VALUES(hardness_req)
+	</insert>
+
+
+
+	<delete id="delDivisionWeight" parameterType="string">
+		DELETE FROM tb_standard
+		WHERE item_no = #{item_no}
+	</delete>
+
+<update id="updateDivisionWeight" parameterType="condition">
+	UPDATE tb_standard
+	SET
+		equipment_name = #{equipment_name},
+		item_name = #{item_name},
+		steel_grade = #{steel_grade},
+		t_grade = #{t_grade},
+		apply_temp1 = #{apply_temp1},
+		apply_temp2 = #{apply_temp2},
+		apply_cp = #{apply_cp},
+		std_load = #{std_load},
+		hardness_req = #{hardness_req}
+	WHERE
+		item_no = #{item_no}
+</update>
+
+
+	<!--TC조절 -->
+
+	<select id="getCorrStatusList" parameterType="map"
+		resultType="Condition">
+		SELECT *
+		FROM tb_corr_status
+		<where>
+			<if test="equipment_name != null and equipment_name != ''">
+				AND equipment_name = #{equipment_name}
+			</if>
+
+			<if test="startDate != null and startDate != ''">
+				AND replacement_date <![CDATA[>=]]>
+				#{startDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				AND replacement_date <![CDATA[<=]]>
+				#{endDate}
+			</if>
+		</where>
+		ORDER BY tdatetime DESC
+	</select>
+
+	<delete id="delCorrStatus" parameterType="string">
+		DELETE FROM tb_corr_status
+		WHERE no = #{no}
+	</delete>
+
+
+	<update id="saveCorrStatus" parameterType="corrStatus">
+		UPDATE tb_corr_status
+		SET
+		equipment_name = #{equipment_name},
+		location = #{location},
+		serial_number = #{serial_number},
+		replacement_date = #{replacement_date},
+		next_date = #{next_date},
+		replacement_cycle = #{replacement_cycle},
+		remarks = #{remarks}
+		WHERE no = #{no}
+	</update>
+
+	<!--조건관리 -->
+	<select id="getconditionList" parameterType="Condition"
+		resultType="Condition">
+		SELECT *
+		FROM tb_part_temp
+		WHERE 1 = 1
+		<if test="startDate != null and startDate != ''">
+			AND `date` LIKE CONCAT(#{startDate}, '%')
+		</if>
+		<if test="mch_code != null and mch_code != ''">
+			AND mch_code = #{mch_code}
+		</if>
+	</select>
+
+
+	<update id="machinePartTempUpdate" parameterType="Condition">
+		UPDATE tb_part_temp
+		<set>
+			<if test="filed == 'specific_gravity'">specific_gravity = #{value},</if>
+			<if test="filed == 'visocosity'">visocosity = #{value},</if>
+			<if test="filed == 'tank_temp'">tank_temp = #{value},</if>
+			<if test="filed == 'chiller_temp'">chiller_temp = #{value},</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+
+
+
+
+
+
+
+
+	<select id="getMachineliquidmanage" parameterType="Condition"
+		resultType="Condition">
+		SELECT *
+		FROM tb_machineliquidmanage
+		WHERE 1 = 1
+		<if test="in_date != null and in_date != ''">
+			AND in_date = #{in_date}
+		</if>
+		<if test="mch_name != null and mch_name != ''">
+			AND mch_name = #{mch_name}
+		</if>
+	</select>
+
+	<insert id="insertMachineliquidmanage" parameterType="Condition">
+		INSERT INTO tb_machineliquidmanage (
+		id,
+		mch_name,
+		in_date,
+		m68_mixer_no,
+		m68_g1_temp,
+		m68_g2_temp,
+		m68_g1_lot_no,
+		m68_g2_lot_no,
+		m68_thickener_time,
+		m68_thickener_g,
+		m68_thickener_lot,
+		m68_post_rpm,
+		m68_mixing_start_time,
+		m68_mixing_time,
+		m68_checker,
+		m68_mch_temp,
+		m68_humidity,
+		m68_viscosity,
+		m68_out_time,
+		kmp_humidity,
+		kmp_mixing_temp,
+		kmp_mch_temp,
+		kmp_liquid_lot_no,
+		kmp_mixing_start_time,
+		kmp_mixing_time,
+		kmp_mch_visc,
+		kmp_out_time,
+		kmp_checker
+		)
+		VALUES (
+		#{id},
+		#{mch_name},
+		#{in_date},
+		#{m68_mixer_no},
+		#{m68_g1_temp},
+		#{m68_g2_temp},
+		#{m68_g1_lot_no},
+		#{m68_g2_lot_no},
+		#{m68_thickener_time},
+		#{m68_thickener_g},
+		#{m68_thickener_lot},
+		#{m68_post_rpm},
+		#{m68_mixing_start_time},
+		#{m68_mixing_time},
+		#{m68_checker},
+		#{m68_mch_temp},
+		#{m68_humidity},
+		#{m68_viscosity},
+		#{m68_out_time},
+		#{kmp_humidity},
+		#{kmp_mixing_temp},
+		#{kmp_mch_temp},
+		#{kmp_liquid_lot_no},
+		#{kmp_mixing_start_time},
+		#{kmp_mixing_time},
+		#{kmp_mch_visc},
+		#{kmp_out_time},
+		#{kmp_checker}
+		)
+		ON DUPLICATE KEY UPDATE
+		in_date = VALUES(in_date),
+		mch_name = VALUES(mch_name),
+		m68_mixer_no = VALUES(m68_mixer_no),
+		m68_g1_temp = VALUES(m68_g1_temp),
+		m68_g2_temp = VALUES(m68_g2_temp),
+		m68_g1_lot_no = VALUES(m68_g1_lot_no),
+		m68_g2_lot_no = VALUES(m68_g2_lot_no),
+		m68_thickener_time = VALUES(m68_thickener_time),
+		m68_thickener_g = VALUES(m68_thickener_g),
+		m68_thickener_lot = VALUES(m68_thickener_lot),
+		m68_post_rpm = VALUES(m68_post_rpm),
+		m68_mixing_start_time = VALUES(m68_mixing_start_time),
+		m68_mixing_time = VALUES(m68_mixing_time),
+		m68_checker = VALUES(m68_checker),
+		m68_mch_temp = VALUES(m68_mch_temp),
+		m68_humidity = VALUES(m68_humidity),
+		m68_viscosity = VALUES(m68_viscosity),
+		m68_out_time = VALUES(m68_out_time),
+		kmp_humidity = VALUES(kmp_humidity),
+		kmp_mixing_temp = VALUES(kmp_mixing_temp),
+		kmp_mch_temp = VALUES(kmp_mch_temp),
+		kmp_liquid_lot_no = VALUES(kmp_liquid_lot_no),
+		kmp_mixing_start_time = VALUES(kmp_mixing_start_time),
+		kmp_mixing_time = VALUES(kmp_mixing_time),
+		kmp_mch_visc = VALUES(kmp_mch_visc),
+		kmp_out_time = VALUES(kmp_out_time),
+		kmp_checker = VALUES(kmp_checker)
+	</insert>
+
+
+
+
+
+	<select id="getMachineliquidmanage2" parameterType="Condition"
+		resultType="Condition">
+		SELECT *
+		FROM tb_machineliquidmanage_2
+		WHERE 1=1
+		<if test="mch_name != null and mch_name != ''">
+			AND mch_name = #{mch_name}
+		</if>
+		<if test="in_date != null and in_date != ''">
+			AND in_date = #{in_date}
+		</if>
+		ORDER BY ck_time DESC
+	</select>
+
+	<!-- insert 매퍼: id 제외 -->
+	<insert id="insertMachineliquidmanage2"
+		parameterType="Condition">
+		INSERT INTO tb_machineliquidmanage_2 (
+		id,
+		mch_name,
+		in_date,
+		tank_no,
+		ck_time,
+		liquid_lot_no,
+		liquid_in,
+		distilles_in,
+		liquid_viscosity,
+		specific_gravity,
+		viscosity_after,
+		ck_time2,
+		operator
+		)
+		VALUES (
+		#{id},
+		#{mch_name},
+		#{in_date},
+		#{tank_no},
+		#{ck_time},
+		#{liquid_lot_no},
+		#{liquid_in},
+		#{distilles_in},
+		#{liquid_viscosity},
+		#{specific_gravity},
+		#{viscosity_after},
+		#{ck_time2},
+		#{operator}
+		)
+		ON DUPLICATE KEY UPDATE
+		mch_name = VALUES(mch_name),
+		in_date = VALUES(in_date),
+		tank_no = VALUES(tank_no),
+		ck_time = VALUES(ck_time),
+		liquid_lot_no = VALUES(liquid_lot_no),
+		liquid_in = VALUES(liquid_in),
+		distilles_in = VALUES(distilles_in),
+		liquid_viscosity = VALUES(liquid_viscosity),
+		specific_gravity = VALUES(specific_gravity),
+		viscosity_after = VALUES(viscosity_after),
+		ck_time2 = VALUES(ck_time2),
+		operator = VALUES(operator)
+	</insert>
+
+
+
+	<delete id="deleteMachineliquidmanage" parameterType="int">
+		DELETE FROM tb_machineliquidmanage
+		WHERE id = #{id}
+	</delete>
+	<delete id="deleteMachineliquidmanage2" parameterType="int">
+		DELETE FROM tb_machineliquidmanage_2
+		WHERE id = #{id}
+	</delete>
+
+<!-- 표준문서 목록 조회 -->
+	<select id="standardDocList" parameterType="Condition" resultType="Condition">
+	  SELECT *
+	  FROM tb_standard_doc
+	  <where>
+	    <if test="mch_name != null and mch_name.trim() != ''">
+	      AND mch_name = #{mch_name}
+	    </if>
+
+	    <if test="startDate != null and endDate != null">
+	      AND cr_date BETWEEN #{startDate} AND #{endDate}
+	    </if>
+	  </where>
+	</select>
+
+
+    <!-- 표준문서 저장 (있으면 업데이트, 없으면 인서트) -->
+	<insert id="standardDocSaves" parameterType="Condition">
+	    INSERT INTO tb_standard_doc (
+	        idx, cr_date, mch_name, box1, box2, box3, box4, memo
+	    ) VALUES (
+	        #{idx}, #{cr_date}, #{mch_name}, #{box1}, #{box2}, #{box3}, #{box4}, #{memo}
+	    )
+	    ON DUPLICATE KEY UPDATE
+	        cr_date = VALUES(cr_date),
+	        mch_name = VALUES(mch_name),
+	        box1 = VALUES(box1),
+	        box2 = VALUES(box2),
+	        box3 = VALUES(box3),
+	        box4 = VALUES(box4),
+	        memo = VALUES(memo)
+	</insert>
+
+    <!-- 표준문서 삭제 -->
+    <delete id="standardDocDel" parameterType="Condition">
+        DELETE FROM tb_standard_doc
+        WHERE idx = #{idx}
+    </delete>
+    
+    
+    
+    <select id="getCheckManageList" parameterType="Condition" resultType="Condition">
+	  SELECT *
+	  FROM tb_check_manage
+	  WHERE ck_date LIKE CONCAT('%', #{ck_date}, '%')
+	  ORDER BY ck_date
+	</select>
+	
+	<update id="updateCheckManage" parameterType="Condition">
+	  UPDATE tb_check_manage
+	  SET
+	    ck_date = #{ck_date},
+	    a_1 = #{a_1},
+	    a_2 = #{a_2},
+	    a_3 = #{a_3},
+	    a_4 = #{a_4},
+	    a_5 = #{a_5}
+	  WHERE idx = #{idx}
+	</update>
+
+	<!--  열전대 교체이력  -->
+	<select id="getThermocoupleListDupChk" parameterType="string" resultType="int">
+		SELECT COUNT(*) AS ccnt
+		FROM tb_thermocouple
+		WHERE year = #{year}
+	</select>
+	
+	<insert id="thermocoupleRowData" parameterType="string">
+		{CALL sp_thermocouple_rowdata (#{year})}
+	</insert>
+	
+	<select id="getThermocoupleList" parameterType="string" resultType="Thermocouple"> 
+		SELECT *
+		FROM (
+			SELECT cnt, year, hogi, zone, change_date, change_ndate, bigo,
+				LAG(change_date) OVER(PARTITION BY ZONE ORDER BY YEAR) AS change_bdate
+			FROM tb_thermocouple
+		) AS A
+		WHERE year = #{year} 
+	</select>
+	
+	<!--  열전대 교체이력 저장  -->
+	<update id="thermocoupleSave" parameterType="Thermocouple"> 
+		UPDATE tb_thermocouple SET 
+			change_date = #{change_date}, change_bdate = #{change_bdate}, 
+			change_ndate = #{change_ndate}, bigo = #{bigo} 
+		WHERE cnt = #{cnt} 
+	</update>
+	
+	<!--  온도조절계보정현황 리스트  -->
+	<select id="getTempCorrectionListDupChk" parameterType="tempCorrectionQue" resultType="int">
+		SELECT COUNT(*) AS ccnt
+		FROM tb_temperature
+		WHERE year = #{year}
+	</select>
+	
+	<insert id="tempCorrectionRowData" parameterType="tempCorrectionQue">
+		{CALL sp_temp_corr_rowdata (#{year})}
+	</insert>
+	
+	<select id="getTempCorrectionQueList" parameterType="tempCorrectionQue" resultType="tempCorrectionQue"> 
+		SELECT * FROM tb_temperature 
+		WHERE year = #{year} 
+	</select>
+	
+	<update id="updateTempCorrectionField" parameterType="tempCorrectionQue"> 
+		UPDATE tb_temperature SET 
+			${c_field} = #{c_value} 
+		WHERE cnt = #{cnt}
+	</update>
+	
+	
+	<!-- 일상점검일지 -->
+	<select id="dailyCheckListRowCheck" parameterType="condition" resultType="int">
+		SELECT COUNT(*) AS ccnt
+		FROM tb_dailycheck
+		WHERE d_ym = #{d_sdate} 
+	</select>
+	
+	<insert id="dailyCheckListRowDataInsert" parameterType="condition">
+		{CALL sp_dailycheck_rowdata(#{d_sdate})}
+	</insert>
+	
+	<select id="dailyCheckList" parameterType="condition" resultType="condition">
+		SELECT *
+		FROM tb_dailycheck
+		WHERE d_ym = #{d_sdate}
+	</select>
+	
+	<update id="dailyCheckUpdate" parameterType="condition">
+		UPDATE tb_dailycheck
+		SET ${d_field} = #{d_value}
+		WHERE cnt = #{cnt}
+	</update>
+	
+</mapper>
