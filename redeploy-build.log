@@ -1,0 +1,39 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< com.ez25367:web >---------------------------
+[INFO] Building sample_pro 1.0.0-BUILD-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ web ---
+[INFO] Deleting D:\sts_pro\sample_pro\target
+[INFO] 
+[INFO] --- resources:3.4.0:resources (default-resources) @ web ---
+[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 13 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.10.1:compile (default-compile) @ web ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 50 source files to D:\sts_pro\sample_pro\target\classes
+[INFO] 
+[INFO] --- resources:3.4.0:testResources (default-testResources) @ web ---
+[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 1 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.10.1:testCompile (default-testCompile) @ web ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ web ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- war:3.3.1:war (default-war) @ web ---
+[INFO] Packaging webapp
+[INFO] Assembling webapp [web] in [D:\sts_pro\sample_pro\webapp]
+[INFO] Processing war project
+[INFO] Building war: D:\sts_pro\sample_pro\target\sample_pro.war
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  5.566 s
+[INFO] Finished at: 2026-04-02T15:14:34+09:00
+[INFO] ------------------------------------------------------------------------

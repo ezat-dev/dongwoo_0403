@@ -22,7 +22,7 @@
 	<select id="userPermissionUserSelect" parameterType="users" resultType="users">
         SELECT *
         FROM tb_user
-        WHERE user_level <![CDATA[<>]]> 0 AND user_yn = 'Y'
+        WHERE user_yn = 'Y'
     </select>
 	
 	<select id="userInsertSelect" parameterType="users" resultType="users">
@@ -52,38 +52,48 @@
  
     
     <!-- 작업자등록 -->
-    <insert id="userInsertInsert" parameterType="users">
- INSERT INTO tb_user
-    (user_code,
-     user_id,
-     user_pw,
-     user_name,
-     user_level,
-     user_busu,
-     user_jick,
-     user_phone,
-     st_day)
-  VALUES
-    (#{user_code, jdbcType=INTEGER},
-     #{user_id,   jdbcType=VARCHAR},
-     #{user_pw,   jdbcType=VARCHAR},
-     #{user_name, jdbcType=VARCHAR},
-     #{user_level,jdbcType=INTEGER},
-     #{user_busu, jdbcType=VARCHAR},
-     #{user_jick, jdbcType=VARCHAR},
-     #{user_phone,jdbcType=VARCHAR},
-     #{st_day,    jdbcType=VARCHAR})
-  ON DUPLICATE KEY UPDATE
-    user_id    = VALUES(user_id),
-    user_pw    = VALUES(user_pw),
-    user_name  = VALUES(user_name),
-    user_level = VALUES(user_level),
-    user_busu  = VALUES(user_busu),
-    user_jick  = VALUES(user_jick),
-    user_phone = VALUES(user_phone),
-    st_day     = VALUES(st_day)
-	</insert>
-	
+<!-- 	<insert id="userInsertInsert" parameterType="users">
+	    INSERT INTO tb_user
+	        (user_code, user_id, user_pw, user_name, user_level, user_busu, user_jick, user_phone, st_day)
+	    VALUES
+	        (#{user_code}, #{user_id}, #{user_pw}, #{user_name}, #{user_level},
+	         #{user_busu}, #{user_jick}, #{user_phone}, #{st_day})
+	    ON DUPLICATE KEY UPDATE
+	        user_pw    = #{user_pw},
+	        user_name  = #{user_name},
+	        user_level = #{user_level},
+	        user_busu  = #{user_busu},
+	        user_jick  = #{user_jick},
+	        user_phone = #{user_phone},
+	        st_day     = #{st_day}
+	</insert> -->
+
+
+<insert id="userInsertInsert" parameterType="users">
+    INSERT INTO tb_user
+    (
+        user_id, user_pw, user_name, user_level, 
+        user_busu, user_jick, user_phone, st_day
+    )
+    VALUES
+    (
+        #{user_id}, #{user_pw}, #{user_name}, #{user_level},
+        #{user_busu}, #{user_jick}, #{user_phone}, #{st_day}
+    )
+</insert>
+
+<update id="userUpdate" parameterType="users">
+    UPDATE tb_user
+    SET user_pw    = #{user_pw},
+        user_name  = #{user_name},
+        user_level = #{user_level},
+        user_busu  = #{user_busu},
+        user_jick  = #{user_jick},
+        user_phone = #{user_phone},
+        st_day     = #{st_day}
+    WHERE user_code = #{user_code}
+</update>
+
 	<delete id="deleteUser" parameterType="users">
 	  DELETE FROM tb_user
 	  WHERE user_code = #{user_code}
@@ -100,35 +110,51 @@
 	</select>
 
 
-	<!-- 선택한 사용자 권한수정 -->
 	<update id="userPermissionUpdate" parameterType="permission">
-		UPDATE tb_permission SET
-		       a02 = #{a02}, 
-		       a03 = #{a03}, 
-		       b01 = #{b01}, 
-		       b02 = #{b02}, 
-		       b03 = #{b03}, 
-		       b04 = #{b04}, 
-		       b05 = #{b05}, 
-		       b06 = #{b06}, 
-		       b07 = #{b07}, 
-		       c01 = #{c01}, 
-		       c02 = #{c02}, 
-		       c03 = #{c03}, 
-		       c04 = #{c04}, 
-		       c05 = #{c05}, 
-		       d01 = #{d01}, 
-		       d02 = #{d02},
-		       d03 = #{d03},
-		       d04 = #{d04},
-		       d05 = #{d05},
-		       d06 = #{d06},
-		       d07 = #{d07},
-		       e01 = #{e01},
-		       e02 = #{e02}, 
-		       e03 = #{e03}
-		 WHERE user_code = #{user_code}	
-	</update>
+    UPDATE tb_permission SET
+       a01 = #{a01},
+       a02 = #{a02}, 
+       a03 = #{a03}, 
+       a05 = #{a05},
+       a06 = #{a06},
+       b01 = #{b01}, 
+       b02 = #{b02}, 
+       b03 = #{b03}, 
+       b04 = #{b04}, 
+       b05 = #{b05}, 
+       b06 = #{b06}, 
+       b07 = #{b07}, 
+       c01 = #{c01}, 
+       c02 = #{c02}, 
+       c03 = #{c03}, 
+       c04 = #{c04}, 
+       c05 = #{c05}, 
+       c06 = #{c06},
+       c07 = #{c07},
+       d01 = #{d01},
+       d02 = #{d02},
+       d03 = #{d03},
+       d04 = #{d04},
+       d05 = #{d05},
+       d06 = #{d06},
+       d07 = #{d07},
+       e01 = #{e01},
+       e02 = #{e02}, 
+       e03 = #{e03},
+       e04 = #{e04},
+       e05 = #{e05},
+       e06 = #{e06},
+       e07 = #{e07},
+       f01 = #{f01},
+       f02 = #{f02},
+       f03 = #{f03},
+       f04 = #{f04},
+       f05 = #{f05},
+       f06 = #{f06},
+       f07 = #{f07}
+     WHERE user_code = #{user_code}  
+</update>
+
 	
 	<!-- 유저메뉴 (카운트 수가 10개 미만인지) -->
 	<select id="userMenuCount" parameterType="userMenu" resultType="int">
@@ -171,17 +197,7 @@
 	</select>	
 	
 	
-	<select id="equipment_name_select" parameterType="facility" resultType="facility">
-    SELECT 
-        facility_code, 
-        facility_name, 
-        facility_comment, 
-        facility_yn,
-        facility_mach_code
-    FROM tb_facility
-    WHERE facility_yn = 'Y'
-    ORDER BY facility_code
-	</select>
+
 	
 	
 	<update id="userLoginMenuRemove" parameterType="userMenu">
@@ -570,4 +586,32 @@
 		FROM tb_user
 		WHERE 1=1
 	</select>
+	
+	
+	<insert id="insertLoginLog" parameterType="map">
+    INSERT INTO tb_user_login_log
+    (
+        user_code,
+        memo,
+        login_dt
+    )
+    VALUES
+    ( 
+        #{userCode},
+        #{memo},
+        NOW()
+    )
+</insert>
+	<select id="selectLoginLogList" resultType="map">
+    SELECT
+        user_id,
+        user_name,
+        user_busu,
+        user_jick,
+        login_dt,
+        memo
+    FROM vw_user_login_log
+    ORDER BY login_dt DESC
+</select>
+	
 </mapper>

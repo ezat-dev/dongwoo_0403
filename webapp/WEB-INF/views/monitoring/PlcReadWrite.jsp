@@ -1,9 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+    String ctx = request.getContextPath();
+%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <title>PLC MONITOR</title>
+<link rel="stylesheet" href="<%=ctx%>/css/monitoring/monitor_nav.css">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow: hidden; }
@@ -52,6 +56,13 @@ body { background: #07090F; color: #A8D8F0; font-family: 'Consolas', monospace; 
     cursor: pointer; border-radius: 3px; transition: all .15s; white-space: nowrap;
 }
 .btn-add-plc:hover { border-color: #00F0FF; color: #00F0FF; }
+.btn-add-modbus {
+    height: 30px; padding: 0 12px; background: transparent;
+    border: 1px dashed #2A4A6A; color: #2A4A6A;
+    font-family: 'Consolas', monospace; font-size: 11px;
+    cursor: pointer; border-radius: 3px; transition: all .15s; white-space: nowrap;
+}
+.btn-add-modbus:hover { border-color: #4DD0E1; color: #4DD0E1; }
 
 /* ══ 패널 공통 ══ */
 .cfg-panel { background: #0D1128; border: 1px solid #1A3A5C; border-radius: 4px; flex-shrink: 0; }
@@ -82,6 +93,7 @@ select.plc-inp { cursor: pointer; width: 200px; color: #00FF88; border-color: #0
 .badge { font-size: 10px; font-weight: bold; letter-spacing: 1px; padding: 2px 8px; border-radius: 2px; }
 .badge-ls   { background: #001A10; border: 1px solid #00FF88; color: #00FF88; }
 .badge-mits { background: #100018; border: 1px solid #B24BF3; color: #B24BF3; }
+.badge-modbus { background: #00141A; border: 1px solid #4DD0E1; color: #4DD0E1; }
 
 .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: #2A4A6A; transition: all .3s; }
 .conn-dot.ok  { background: #00FF88; box-shadow: 0 0 5px #00FF88; }
@@ -162,6 +174,13 @@ select.plc-inp { cursor: pointer; width: 200px; color: #00FF88; border-color: #0
 .td-hex  { color:#FFD060; font-size:11px; }
 .td-bin  { color:#2A4A6A; font-size:9px; letter-spacing:1px; }
 .td-time { color:#2A4A6A; font-size:10px; }
+.td-area { font-size:9px; white-space:nowrap; }
+.area-badge { display:inline-block; padding:1px 6px; border-radius:2px; font-size:9px; font-weight:bold; letter-spacing:.5px; border:1px solid; }
+.area-1x { background:#071A0E; border-color:#00FF88; color:#00FF88; }
+.area-2x { background:#071418; border-color:#4DD0E1; color:#4DD0E1; }
+.area-3x { background:#14100A; border-color:#FFB700; color:#FFB700; }
+.area-4x { background:#100A18; border-color:#B24BF3; color:#B24BF3; }
+.area-raw{ background:#0A0A0A; border-color:#3A5A7A; color:#3A5A7A; }
 
 .w-chunk-head { font-size:9px; font-weight:bold; color:#1A3A5C; letter-spacing:1px; padding:8px 0 3px; border-top:1px solid #0D1A2E; margin-top:4px; }
 .w-chunk-head:first-of-type { border-top:none; margin-top:0; padding-top:0; }
@@ -203,12 +222,14 @@ select.plc-inp { cursor: pointer; width: 200px; color: #00FF88; border-color: #0
 
 <div>
   <div class="page-title">PLC  MONITOR</div>
-  <div class="page-sub">// Multi-PLC  ·  LS FEnet / Mitsubishi MC3E  ·  Browser → Spring → C# → PLC</div>
+  <div class="page-sub">// Multi-PLC  ·  LS FEnet / Mitsubishi MC3E / Modbus TCP  ·  Browser → Spring → C# → PLC</div>
 </div>
+<jsp:include page="/WEB-INF/views/include/monitorNav.jsp"/>
 <div class="divider"></div>
 
 <!-- ══ PLC 탭 바 ══ -->
 <div class="plc-tab-bar" id="plcTabBar">
+  <button class="btn-add-modbus" onclick="openModbusAddModal()">Modbus TCP ADD</button>
   <button class="btn-add-plc" onclick="openAddModal()">＋  PLC 추가</button>
 </div>
 
@@ -226,6 +247,7 @@ select.plc-inp { cursor: pointer; width: 200px; color: #00FF88; border-color: #0
     <select class="plc-inp" id="selPlcType" onchange="onPlcTypeChange()">
       <option value="LS">LS  (XGT / FEnet)</option>
       <option value="MITSUBISHI">Mitsubishi  (Q시리즈 / MC 3E)</option>
+      <option value="MODBUS_TCP">Modbus TCP  (Holding Register)</option>
     </select>
     <span class="cfg-label">IP</span>
     <input class="plc-inp ip" id="inpPlcIp" type="text" value="192.168.1.238">
@@ -312,13 +334,14 @@ select.plc-inp { cursor: pointer; width: 200px; color: #00FF88; border-color: #0
       <table class="r-table">
         <thead><tr>
           <th style="width:70px">D주소</th>
+          <th style="width:68px">영역</th>
           <th style="width:60px">DEC</th>
           <th style="width:60px">HEX</th>
           <th>BIN</th>
           <th style="width:70px">갱신시각</th>
         </tr></thead>
         <tbody id="readBody">
-          <tr><td colspan="5" style="color:#2A4A6A;text-align:center;padding:24px">폴링 시작 후 표시</td></tr>
+          <tr><td colspan="6" style="color:#2A4A6A;text-align:center;padding:24px">폴링 시작 후 표시</td></tr>
         </tbody>
       </table>
     </div>
@@ -362,6 +385,7 @@ select.plc-inp { cursor: pointer; width: 200px; color: #00FF88; border-color: #0
       <select class="plc-inp" id="addType" onchange="onAddTypeChange()" style="width:100%">
         <option value="LS">LS  (XGT / FEnet)</option>
         <option value="MITSUBISHI">Mitsubishi  (Q시리즈 / MC 3E)</option>
+        <option value="MODBUS_TCP">Modbus TCP  (Holding Register)</option>
       </select>
     </div>
     <div class="modal-field">
@@ -375,6 +399,32 @@ select.plc-inp { cursor: pointer; width: 200px; color: #00FF88; border-color: #0
     <div class="modal-actions">
       <button class="btn btn-red"    onclick="closeAddModal()">취소</button>
       <button class="btn btn-yellow" onclick="confirmAdd()">추가</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addModbusModal">
+  <div class="modal-box">
+    <h3>Modbus TCP Add</h3>
+    <div class="modal-field">
+      <label>ID</label>
+      <input class="plc-inp" id="addModbusId" type="text" placeholder="ex: modbus1" style="width:100%">
+    </div>
+    <div class="modal-field">
+      <label>Display Name</label>
+      <input class="plc-inp label" id="addModbusLabel" type="text" placeholder="ex: Modbus Line-1" style="width:100%">
+    </div>
+    <div class="modal-field">
+      <label>IP Address</label>
+      <input class="plc-inp ip" id="addModbusIp" type="text" value="192.168.1." style="width:100%">
+    </div>
+    <div class="modal-field">
+      <label>Port</label>
+      <input class="plc-inp port" id="addModbusPort" type="number" value="502" style="width:100%">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-red" onclick="closeModbusAddModal()">Cancel</button>
+      <button class="btn btn-yellow" onclick="confirmAddModbus()">Add</button>
     </div>
   </div>
 </div>
@@ -393,6 +443,73 @@ var currentId  = null; // 현재 선택된 탭 id
 var plcIdCount = 1;    // 자동 id 생성 카운터
 
 // ── 탭 렌더 ───────────────────────────────────────────────
+function getDefaultPortByType(type) {
+    if (type === 'MITSUBISHI') return 6004;
+    if (type === 'MODBUS_TCP') return 502;
+    return 2004;
+}
+
+function nextPlcId(prefix) {
+    plcIdCount++;
+    return (prefix || 'plc') + plcIdCount;
+}
+
+function buildPlcState(id, label, ip, port, plcType) {
+    return {
+        label: label,
+        ip: ip,
+        port: port,
+        plcType: plcType,
+        connOk: null,
+        connMsg: '미확인',
+        stats:   { readOk:0, readFail:0, writeOk:0, writeFail:0 },
+        values:  {},
+        prevValues: {},
+        chunks:  [],
+        polling: { running:false, timer:null, elapsedTimer:null, startTime:null, cycle:0,
+                   chunkIdx:0, isChunking:false, writeBuilt:false }
+    };
+}
+
+function isModbusType(plcType) {
+    return plcType === 'MODBUS_TCP';
+}
+
+// Modbus 주소가 비트 영역(0x/1x/2x)인지 여부
+function isBitArea(addr) {
+    return (addr >= 1 && addr <= 9999)
+        || (addr >= 10001 && addr <= 19999)
+        || (addr >= 20001 && addr <= 29999);
+}
+// 쓰기 가능 여부 (2x Discrete Input, 3x Input Register는 읽기 전용)
+function isReadOnly(addr, plcType) {
+    if (!isModbusType(plcType)) return false;
+    return (addr >= 20001 && addr <= 29999) || (addr >= 30001 && addr <= 39999);
+}
+
+// Modbus 주소 → 영역 배지 HTML (MODBUS_TCP일 때만 표시)
+function modbusAreaBadge(addr, plcType) {
+    if (!isModbusType(plcType)) return '<span style="color:#2A4A6A;font-size:9px">—</span>';
+    if (addr >= 1     && addr <= 9999)  return '<span class="area-badge area-1x">0x COIL</span>';
+    if (addr >= 10001 && addr <= 19999) return '<span class="area-badge area-1x">1x COIL</span>';
+    if (addr >= 20001 && addr <= 29999) return '<span class="area-badge area-2x">2x DI</span>';
+    if (addr >= 30001 && addr <= 39999) return '<span class="area-badge area-3x">3x INPUT</span>';
+    if (addr >= 40001 && addr <= 49999) return '<span class="area-badge area-4x">4x HOLD</span>';
+    return '<span class="area-badge area-raw">RAW</span>';
+}
+
+function getPlcTypeById(plcId) {
+    return (plcId && plcMap[plcId] && plcMap[plcId].plcType) ? plcMap[plcId].plcType : 'LS';
+}
+
+function addrLabelByType(addr, plcType) {
+    return isModbusType(plcType) ? String(addr) : ('D' + addr);
+}
+
+function addrLabel(addr, plcId) {
+    return addrLabelByType(addr, getPlcTypeById(plcId || currentId));
+}
+
 function renderTabs() {
     var bar = document.getElementById('plcTabBar');
     var html = '';
@@ -409,6 +526,7 @@ function renderTabs() {
               + '</div>';
     });
     html += '<button class="btn-add-plc" onclick="openAddModal()">＋  PLC 추가</button>';
+    html += '<button class="btn-add-modbus" onclick="openModbusAddModal()">Modbus TCP ADD</button>';
     bar.innerHTML = html;
 }
 
@@ -428,6 +546,14 @@ function loadTabState() {
     document.getElementById('inpPlcIp').value    = p.ip;
     document.getElementById('inpPlcPort').value  = p.port;
     document.getElementById('inpPlcLabel').value = p.label;
+    if (p.plcType === 'MODBUS_TCP') {
+        var startEl = document.getElementById('cfgStart');
+        var curStart = parseInt(startEl.value, 10);
+        if (isNaN(curStart) || curStart >= 10000) {
+            startEl.value = 0;
+            updateChunkInfo();
+        }
+    }
     updateTypeBadge(p.plcType);
     setConnStatus(p.connMsg || '미확인', p.connOk === true ? 'ok' : p.connOk === false ? 'err' : '');
 
@@ -449,7 +575,7 @@ function loadTabState() {
         buildAllWriteRows();
     } else {
         document.getElementById('readBody').innerHTML =
-            '<tr><td colspan="5" style="color:#2A4A6A;text-align:center;padding:24px">폴링 시작 후 표시</td></tr>';
+            '<tr><td colspan="6" style="color:#2A4A6A;text-align:center;padding:24px">폴링 시작 후 표시</td></tr>';
         document.getElementById('writeBody').innerHTML =
             '<div style="color:#2A4A6A;text-align:center;padding:20px;font-size:11px">폴링 시작 후 표시</div>';
     }
@@ -458,17 +584,18 @@ function loadTabState() {
 
 // ── PLC 추가 ──────────────────────────────────────────────
 function openAddModal() {
-    plcIdCount++;
-    document.getElementById('addId').value    = 'plc' + plcIdCount;
+    var newId = nextPlcId('plc');
+    document.getElementById('addId').value    = newId;
     document.getElementById('addLabel').value = 'PLC-' + plcIdCount;
+    document.getElementById('addType').value  = 'LS';
     document.getElementById('addIp').value    = '192.168.1.';
-    document.getElementById('addPort').value  = 2004;
+    document.getElementById('addPort').value  = getDefaultPortByType('LS');
     document.getElementById('addModal').classList.add('show');
 }
 function closeAddModal() { document.getElementById('addModal').classList.remove('show'); }
 function onAddTypeChange() {
     var t = document.getElementById('addType').value;
-    document.getElementById('addPort').value = t === 'MITSUBISHI' ? 6004 : 2004;
+    document.getElementById('addPort').value = getDefaultPortByType(t);
 }
 
 function confirmAdd() {
@@ -509,6 +636,47 @@ function confirmAdd() {
 }
 
 // ── PLC 제거 ──────────────────────────────────────────────
+function openModbusAddModal() {
+    var newId = nextPlcId('modbus');
+    document.getElementById('addModbusId').value = newId;
+    document.getElementById('addModbusLabel').value = 'MODBUS-' + plcIdCount;
+    document.getElementById('addModbusIp').value = '192.168.1.';
+    document.getElementById('addModbusPort').value = getDefaultPortByType('MODBUS_TCP');
+    document.getElementById('addModbusModal').classList.add('show');
+}
+
+function closeModbusAddModal() {
+    document.getElementById('addModbusModal').classList.remove('show');
+}
+
+function confirmAddModbus() {
+    var id = document.getElementById('addModbusId').value.trim();
+    var label = document.getElementById('addModbusLabel').value.trim() || id;
+    var ip = document.getElementById('addModbusIp').value.trim();
+    var port = parseInt(document.getElementById('addModbusPort').value, 10);
+    var plcType = 'MODBUS_TCP';
+
+    if (!id || !ip) { alert('ID and IP are required'); return; }
+    if (plcMap[id]) { alert('ID already exists: ' + id); return; }
+    if (isNaN(port) || port < 1 || port > 65535) port = getDefaultPortByType(plcType);
+
+    fetch('/sample_pro/plc/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, ip: ip, port: port, plcType: plcType, label: label })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (!d.success) { clog('ADD FAIL: ' + d.error, 'e'); return; }
+        plcMap[id] = buildPlcState(id, label, ip, port, plcType);
+        closeModbusAddModal();
+        renderTabs();
+        selectTab(id);
+        clog('PLC ADDED: [' + id + '] ' + label + '  ' + plcType + '  ' + ip + ':' + port, 'w');
+    })
+    .catch(e => clog('ADD ERR: ' + e.message, 'e'));
+}
+
 function removePlc(e, id) {
     e.stopPropagation();
     if (!confirm('[' + plcMap[id].label + '] 을(를) 제거하시겠습니까?')) return;
@@ -534,7 +702,15 @@ function removePlc(e, id) {
 // ── 접속 설정 적용 ────────────────────────────────────────
 function onPlcTypeChange() {
     var t = document.getElementById('selPlcType').value;
-    document.getElementById('inpPlcPort').value = t === 'MITSUBISHI' ? 6004 : 2004;
+    document.getElementById('inpPlcPort').value = getDefaultPortByType(t);
+    if (t === 'MODBUS_TCP') {
+        var startEl = document.getElementById('cfgStart');
+        var curStart = parseInt(startEl.value, 10);
+        if (isNaN(curStart) || curStart >= 10000) {
+            startEl.value = 0;
+            updateChunkInfo();
+        }
+    }
 }
 
 function applyConn() {
@@ -582,8 +758,10 @@ function pingCurrent() {
 
 function updateTypeBadge(type) {
     var el = document.getElementById('plcTypeBadge');
-    if (type === 'MITSUBISHI') { el.textContent = 'Mitsubishi Q'; el.className = 'badge badge-mits'; }
-    else                       { el.textContent = 'LS XGT';       el.className = 'badge badge-ls'; }
+    if (type === 'MITSUBISHI') { el.textContent = 'Mitsubishi Q'; el.className = 'badge badge-mits'; return; }
+    if (type === 'MODBUS_TCP') { el.textContent = 'Modbus TCP';   el.className = 'badge badge-modbus'; return; }
+    el.textContent = 'LS XGT';
+    el.className = 'badge badge-ls';
 }
 function setConnStatus(msg, cls) {
     document.getElementById('connMsg').textContent = msg;
@@ -638,7 +816,7 @@ function startPolling() {
     p.polling.elapsedTimer = setInterval(function(){ updateElapsed(currentId); }, 1000);
 
     document.getElementById('rangeLabel').textContent =
-        '// D'+start+'~D'+(start+count-1)+'  ('+count+'개  '+p.chunks.length+'청크)';
+        '// '+addrLabelByType(start, p.plcType)+'~'+addrLabelByType(start+count-1, p.plcType)+'  ('+count+'개  '+p.chunks.length+'청크)';
     document.getElementById('btnStart').style.display = 'none';
     document.getElementById('btnStop').style.display  = '';
     document.getElementById('spinner').classList.add('on');
@@ -646,7 +824,7 @@ function startPolling() {
     updateChunkInfo();
     setStatus('폴링 중...', '');
     renderTabs();
-    clog('시작 ['+currentId+'] D'+start+'~D'+(start+count-1)+'  간격='+interval+'ms', 'r');
+    clog('시작 ['+currentId+'] '+addrLabelByType(start, p.plcType)+'~'+addrLabelByType(start+count-1, p.plcType)+'  간격='+interval+'ms', 'r');
 
     startChunkCycle(currentId);
     var tid = currentId;
@@ -699,12 +877,17 @@ function fetchNextChunk(id) {
     var ci = pol.chunkIdx, chunk = p.chunks[ci];
     if (id === currentId) setPip(ci, 'active');
 
-    fetch('/sample_pro/plc/read/' + id + '?start=' + chunk.start + '&count=' + chunk.count)
+    var useBits = isModbusType(p.plcType) && isBitArea(chunk.start);
+    var readUrl = useBits
+        ? '/sample_pro/plc/readBits/' + id + '?start=' + chunk.start + '&count=' + chunk.count
+        : '/sample_pro/plc/read/'     + id + '?start=' + chunk.start + '&count=' + chunk.count;
+
+    fetch(readUrl)
     .then(function(res){ if(!res.ok) throw new Error('HTTP '+res.status); return res.json(); })
     .then(function(data){
         if(!data.success) throw new Error(data.error||'PLC 오류');
         for(var i=0;i<data.values.length;i++)
-            p.values['D'+(chunk.start+i)] = data.values[i] != null ? data.values[i] : 0;
+            p.values['D'+(chunk.start+i)] = data.values[i] ? 1 : (data.values[i] === 0 ? 0 : (data.values[i] != null ? data.values[i] : 0));
 
         p.stats.readOk++;
         if (id === currentId) {
@@ -744,7 +927,8 @@ function flushReadTable() {
             var sep = (!firstChunk && i===0) ? ' chunk-sep' : '';
             firstChunk = false;
             html += '<tr class="'+(changed?'flash':'')+sep+'">'
-                  + '<td class="td-addr">D'+dAddr+'</td>'
+                  + '<td class="td-addr">'+addrLabelByType(dAddr, p.plcType)+'</td>'
+                  + '<td class="td-area">'+modbusAreaBadge(dAddr, p.plcType)+'</td>'
                   + '<td class="td-dec">'+val+'</td>'
                   + '<td class="td-hex">'+hex+'</td>'
                   + '<td class="td-bin">'+bin+'</td>'
@@ -752,7 +936,7 @@ function flushReadTable() {
         }
     });
     document.getElementById('readBody').innerHTML = html ||
-        '<tr><td colspan="5" style="color:#2A4A6A;text-align:center;padding:16px">데이터 없음</td></tr>';
+        '<tr><td colspan="6" style="color:#2A4A6A;text-align:center;padding:16px">데이터 없음</td></tr>';
 }
 
 function buildAllWriteRows() {
@@ -760,17 +944,26 @@ function buildAllWriteRows() {
     var p = plcMap[currentId];
     var html = '';
     p.chunks.forEach(function(chunk, ci){
-        html += '<div class="w-chunk-head">CHUNK '+(ci+1)+'  //  D'+chunk.start+' ~ D'+(chunk.start+chunk.count-1)+'</div>';
+        html += '<div class="w-chunk-head">CHUNK '+(ci+1)+'  //  '+addrLabelByType(chunk.start, p.plcType)+' ~ '+addrLabelByType(chunk.start+chunk.count-1, p.plcType)+'</div>';
         for(var i=0;i<chunk.count;i++){
             var dAddr = chunk.start+i;
             var val   = p.values['D'+dAddr] != null ? p.values['D'+dAddr] : 0;
+            var rdOnly  = isReadOnly(dAddr, p.plcType);
+            var isBit   = isModbusType(p.plcType) && isBitArea(dAddr);
+            var maxVal  = isBit ? 1 : 65535;
+            var inpAttr = rdOnly
+                ? ' disabled style="opacity:.35;cursor:not-allowed"'
+                : ' onkeydown="if(event.key===\'Enter\')doWrite(\''+currentId+'\','+dAddr+')"';
+            var btnHtml = rdOnly
+                ? '<span style="font-size:9px;color:#FF446688;width:52px;text-align:center;flex-shrink:0">READ ONLY</span>'
+                : '<button class="w-btn" onclick="doWrite(\''+currentId+'\','+dAddr+')">WRITE</button>';
             html += '<div class="w-row">'
-                  + '<span class="w-addr">D'+dAddr+'</span>'
+                  + '<span class="w-addr">'+addrLabelByType(dAddr, p.plcType)+'</span>'
+                  + modbusAreaBadge(dAddr, p.plcType)
                   + '<span class="w-cur" id="wcur_'+dAddr+'">'+val+'</span>'
                   + '<span class="w-arrow">→</span>'
-                  + '<input class="w-inp" id="winp_'+dAddr+'" type="number" value="'+val+'" min="0" max="65535"'
-                  + ' onkeydown="if(event.key===\'Enter\')doWrite(\''+currentId+'\','+dAddr+')">'
-                  + '<button class="w-btn" onclick="doWrite(\''+currentId+'\','+dAddr+')">WRITE</button>'
+                  + '<input class="w-inp" id="winp_'+dAddr+'" type="number" value="'+val+'" min="0" max="'+maxVal+'"'+inpAttr+'>'
+                  + btnHtml
                   + '</div>';
         }
     });
@@ -789,16 +982,38 @@ function updateAllWriteCur() {
 
 // ── 쓰기 ──────────────────────────────────────────────────
 function doWrite(plcId, dAddr) {
+    var p = plcMap[plcId];
+    if (!p) return;
+
+    // 2x / 3x 영역은 읽기 전용
+    if (isReadOnly(dAddr, p.plcType)) {
+        clog('WRITE BLOCKED ['+addrLabel(dAddr, plcId)+'] 읽기 전용 영역 (2x/3x)', 'e');
+        setWriteStatus('읽기 전용 영역 (2x/3x)', 'err');
+        return;
+    }
+
     var inp = document.getElementById('winp_'+dAddr);
     if (!inp) return;
     var val = parseInt(inp.value);
-    if (isNaN(val)||val<0||val>65535) { alert('0 ~ 65535 사이 정수'); return; }
-    clog('WRITE ['+plcId+'] D'+dAddr+'='+val, 'w');
 
-    fetch('/sample_pro/plc/write/' + plcId, {
+    // 1x Coil: 0 또는 1만 허용
+    var isBit = isModbusType(p.plcType) && isBitArea(dAddr);
+    if (isBit) {
+        if (val !== 0 && val !== 1) { alert('Coil(1x) 영역은 0 또는 1만 입력 가능합니다'); return; }
+    } else {
+        if (isNaN(val)||val<0||val>65535) { alert('0 ~ 65535 사이 정수'); return; }
+    }
+
+    clog('WRITE ['+plcId+'] '+addrLabel(dAddr, plcId)+'='+val+(isBit?' (BIT)':''), 'w');
+
+    var writeUrl  = isBit ? '/sample_pro/plc/writeBit/' + plcId : '/sample_pro/plc/write/' + plcId;
+    var writeBody = isBit ? JSON.stringify({ address: dAddr, value: val === 1 })
+                          : JSON.stringify({ address: dAddr, value: val });
+
+    fetch(writeUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address: dAddr, value: val })
+        body: writeBody
     })
     .then(r => r.json())
     .then(function(d){
@@ -806,7 +1021,7 @@ function doWrite(plcId, dAddr) {
             plcMap[plcId].stats.writeOk++;
             if (plcId === currentId) {
                 document.getElementById('cntWriteOk').textContent = plcMap[plcId].stats.writeOk;
-                setWriteStatus('D'+dAddr+' ← '+val+'  완료', 'ok');
+                setWriteStatus(addrLabel(dAddr, plcId)+' ← '+val+'  완료', 'ok');
                 plcMap[plcId].values['D'+dAddr] = val;
                 var el = document.getElementById('wcur_'+dAddr);
                 if (el) el.textContent = val;

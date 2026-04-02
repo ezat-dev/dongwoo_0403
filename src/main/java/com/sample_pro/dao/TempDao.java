@@ -1,0 +1,30 @@
+package com.sample_pro.dao;
+
+import com.sample_pro.domain.TempHistory;
+import com.sample_pro.domain.TempTag;
+
+import java.util.List;
+import java.util.Map;
+
+public interface TempDao {
+    void ensureTempTagTable();
+    int countTempTagColumn(String colName);
+    void addTempTagColName();
+    void ensureTempHistoryTable();
+    void ensureTempSnapshotTable();
+
+    List<TempTag> selectTempTagList();
+    TempTag selectTempTagById(int tempId);
+    List<TempTag> selectTempTagsMissingColName();
+    List<String> selectTempColNames();
+    void insertTempTag(TempTag tag);
+    void updateTempTag(TempTag tag);
+    void deleteTempTag(int tempId);
+
+    List<TempHistory> selectTempHistory(Map<String, Object> params);
+
+    int countTempSnapshotColumn(String colName);
+    void renameTempSnapshotColumn(Map<String, Object> params);
+    List<Map<String, Object>> selectTempSnapshot(Map<String, Object> params);
+    List<Map<String, Object>> selectTempSnapshotRange(Map<String, Object> params);
+}

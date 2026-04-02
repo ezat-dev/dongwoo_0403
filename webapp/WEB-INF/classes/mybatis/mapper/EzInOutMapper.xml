@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="EzInOutMapper">
+
+    <resultMap id="companyEmployeeMap" type="com.sample_pro.domain.CompanyEmployee">
+        <id     property="empId"       column="emp_id"/>
+        <result property="deptName"    column="dept_name"/>
+        <result property="empName"     column="emp_name"/>
+        <result property="titleName"   column="title_name"/>
+        <result property="mobileNo"    column="mobile_no"/>
+        <result property="directNo"    column="direct_no"/>
+    </resultMap>
+
+    <resultMap id="ezInOutVisitMap" type="com.sample_pro.domain.EzInOutVisit">
+        <id     property="visitId"         column="visit_id"/>
+        <result property="visitTime"       column="visit_time"/>
+        <result property="visitorName"     column="visitor_name"/>
+        <result property="visitorPhone"    column="visitor_phone"/>
+        <result property="targetEmpId"     column="target_emp_id"/>
+        <result property="targetDeptName"  column="target_dept_name"/>
+        <result property="targetEmpName"   column="target_emp_name"/>
+        <result property="targetTitleName" column="target_title_name"/>
+        <result property="targetMobileNo"  column="target_mobile_no"/>
+        <result property="targetDirectNo"  column="target_direct_no"/>
+        <result property="visitReason"     column="visit_reason"/>
+        <result property="visitReasonEtc"  column="visit_reason_etc"/>
+        <result property="agreeYn"         column="agree_yn"/>
+        <result property="createdAt"       column="created_at"/>
+    </resultMap>
+
+    <update id="ensureVisitTable" statementType="STATEMENT">
+        CREATE TABLE IF NOT EXISTS tb_ez_in_out_visit (
+            visit_id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+            visit_time        VARCHAR(16)  NOT NULL,
+            visitor_name      VARCHAR(100) NOT NULL,
+            visitor_phone     VARCHAR(20)  NOT NULL,
+            target_emp_id     VARCHAR(30)  NOT NULL,
+            target_dept_name  VARCHAR(100),
+            target_emp_name   VARCHAR(100) NOT NULL,
+            target_title_name VARCHAR(100),
+            target_mobile_no  VARCHAR(30),
+            target_direct_no  VARCHAR(30),
+            visit_reason      VARCHAR(50)  NOT NULL,
+            visit_reason_etc  VARCHAR(255),
+            agree_yn          CHAR(1)      NOT NULL DEFAULT 'Y',
+            created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_ez_in_out_visit_created_at (created_at),
+            INDEX idx_ez_in_out_visit_target_emp_id (target_emp_id)
+        )
+    </update>
+
+    <update id="ensureVisitReasonColumns" statementType="STATEMENT">
+        ALTER TABLE tb_ez_in_out_visit
+            ADD COLUMN IF NOT EXISTS visit_reason VARCHAR(50) NOT NULL DEFAULT '단순 방문',
+            ADD COLUMN IF NOT EXISTS visit_reason_etc VARCHAR(255) NULL
+    </update>
+
+    <select id="selectCompanyEmployeeList" resultMap="companyEmployeeMap">
+        SELECT emp_id,
+               COALESCE(dept_name, '')  AS dept_name,
+               COALESCE(emp_name, '')   AS emp_name,
+               COALESCE(title_name, '') AS title_name,
+               COALESCE(mobile_no, '')  AS mobile_no,
+               COALESCE(direct_no, '')  AS direct_no
+        FROM tb_company_employee
+        WHERE COALESCE(emp_name, '') != ''
+        ORDER BY dept_name ASC, emp_name ASC
+    </select>
+
+    <insert id="insertVisit" parameterType="com.sample_pro.domain.EzInOutVisit"
+            useGeneratedKeys="true" keyProperty="visitId">
+        INSERT INTO tb_ez_in_out_visit (
+            visit_time,
+            visitor_name,
+            visitor_phone,
+            target_emp_id,
+            target_dept_name,
+            target_emp_name,
+            target_title_name,
+            target_mobile_no,
+            target_direct_no,
+            visit_reason,
+            visit_reason_etc,
+            agree_yn
+        ) VALUES (
+            #{visitTime},
+            #{visitorName},
+            #{visitorPhone},
+            #{targetEmpId},
+            #{targetDeptName},
+            #{targetEmpName},
+            #{targetTitleName},
+            #{targetMobileNo},
+            #{targetDirectNo},
+            #{visitReason},
+            #{visitReasonEtc},
+            #{agreeYn}
+        )
+    </insert>
+
+    <select id="getVisitById" resultMap="ezInOutVisitMap" parameterType="long">
+        SELECT visit_id,
+               visit_time,
+               visitor_name,
+               visitor_phone,
+               target_emp_id,
+               target_dept_name,
+               target_emp_name,
+               target_title_name,
+               target_mobile_no,
+               target_direct_no,
+               visit_reason,
+               visit_reason_etc,
+               agree_yn,
+               created_at
+        FROM tb_ez_in_out_visit
+        WHERE visit_id = #{visitId}
+    </select>
+
+    <update id="ensurePinTable" statementType="STATEMENT">
+        CREATE TABLE IF NOT EXISTS tb_ez_in_out_pin (
+            idx   INT(11)          NULL DEFAULT NULL,
+            pin_1 INT(11)          NULL DEFAULT NULL,
+            pin_2 INT(11)          NULL DEFAULT NULL
+        ) ENGINE=InnoDB
+    </update>
+
+    <select id="countMatchingPin" resultType="int" parameterType="string">
+        SELECT COUNT(1)
+        FROM tb_ez_in_out_pin
+        WHERE pin_1 = #{value} OR pin_2 = #{value}
+    </select>
+
+    <select id="countMatchingPwNo" resultType="int" parameterType="string">
+        SELECT COUNT(1)
+        FROM tb_company_employee
+        WHERE pw_no = #{value} AND use_yn = 'Y'
+    </select>
+
+    <select id="selectEmployeeByPwNo" resultMap="companyEmployeeMap" parameterType="string">
+        SELECT emp_id,
+               COALESCE(dept_name, '')  AS dept_name,
+               COALESCE(emp_name, '')   AS emp_name,
+               COALESCE(title_name, '') AS title_name,
+               COALESCE(mobile_no, '')  AS mobile_no,
+               COALESCE(direct_no, '')  AS direct_no
+        FROM tb_company_employee
+        WHERE pw_no = #{value} AND use_yn = 'Y'
+        LIMIT 1
+    </select>
+
+</mapper>
