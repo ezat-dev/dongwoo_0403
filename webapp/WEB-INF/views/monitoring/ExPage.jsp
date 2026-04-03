@@ -6,657 +6,694 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>EX PAGE</title>
+<title>PLC 자동 쓰기 테스트</title>
 <link rel="stylesheet" href="<%=ctx%>/css/monitoring/monitor_nav.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
 :root {
-  --bg:      #07090F;
-  --panel:   #0A0D1A;
-  --panel2:  #0D1020;
-  --border:  #1A3A5C;
-  --accent:  #00F0FF;
-  --accent2: #B24BF3;
-  --accent3: #00FF88;
-  --text:    #A8D8F0;
-  --muted:   #3A5A7A;
-  --warn:    #FFB700;
-  --err:     #FF3B5C;
-  --mono:    'Consolas', monospace;
+  --bg:     #07090F;
+  --panel:  #0A0D1A;
+  --panel2: #0D1020;
+  --border: #1A3A5C;
+  --accent: #00F0FF;
+  --purple: #B24BF3;
+  --green:  #00FF88;
+  --text:   #A8D8F0;
+  --muted:  #3A5A7A;
+  --warn:   #FFB700;
+  --err:    #FF3B5C;
+  --mono:   'Consolas', monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow: hidden; }
 body { background: var(--bg); color: var(--text); font-family: var(--mono); display: flex; flex-direction: column; height: 100vh; }
 
-/* ── 좌측 내부 메뉴 ── */
-.layout { display: flex; flex: 1; overflow: hidden; }
-.side-menu {
-  width: 148px; flex-shrink: 0;
-  background: var(--panel2); border-right: 1px solid var(--border);
-  display: flex; flex-direction: column; padding: 12px 0; gap: 2px;
-}
-.side-menu .menu-item {
-  padding: 10px 14px; font-size: 12px; font-weight: bold;
-  color: var(--muted); cursor: pointer;
-  border-left: 3px solid transparent; transition: all .15s; user-select: none;
-}
-.side-menu .menu-item:hover { color: var(--text); background: #111828; }
-.side-menu .menu-item.active { color: var(--accent); border-left-color: var(--accent); background: #001A2A; }
+.main-wrap { display: flex; flex: 1; overflow: hidden; padding: 12px 14px; gap: 12px; }
 
-.content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-.section { display: none; flex: 1; overflow: hidden; }
-.section.active { display: flex; }
-
-/* ════ 섹션1: 메인 ════ */
-.sec-main { flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 40px; }
-.main-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 32px 48px; text-align: center; max-width: 500px; width: 100%; }
-.main-card h2 { font-size: 20px; color: var(--accent); margin-bottom: 10px; }
-.main-card p  { font-size: 12px; color: var(--muted); line-height: 1.9; }
-.badge-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
-.badge { padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold; border: 1px solid; }
-.badge.cyan   { border-color: var(--accent);  color: var(--accent);  }
-.badge.purple { border-color: var(--accent2); color: var(--accent2); }
-.badge.green  { border-color: var(--accent3); color: var(--accent3); }
-
-/* ════ 섹션2: 도형 편집 ════ */
-.sec-shape { flex-direction: row; overflow: hidden; }
-
-.shape-palette {
-  width: 120px; flex-shrink: 0;
-  background: var(--panel2); border-right: 1px solid var(--border);
-  padding: 10px 6px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto;
+/* ══ 좌측 설정 패널 ══ */
+.config-panel {
+  width: 320px; flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 8px;
+  overflow-y: auto; padding-right: 2px;
 }
-.shape-palette .pal-title { font-size: 10px; color: var(--muted); text-align: center; margin-bottom: 2px; }
-.shape-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  padding: 8px 4px; border: 1px solid var(--border); border-radius: 6px;
-  background: var(--panel); cursor: pointer; transition: all .15s;
-  font-size: 10px; color: var(--muted);
-}
-.shape-btn:hover  { border-color: var(--accent); color: var(--text); }
-.shape-btn.active { border-color: var(--accent); background: #001A2A; color: var(--accent); }
-.shape-icon { font-size: 22px; line-height: 1; }
+.config-panel::-webkit-scrollbar { width: 4px; }
+.config-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* 미리보기 */
-.preview-area {
-  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 10px; background: #050710; padding: 16px; position: relative;
-}
-.preview-label { position: absolute; top: 10px; left: 14px; font-size: 10px; color: var(--muted); }
-#shapeCanvas   { border: 1px dashed var(--border); border-radius: 6px; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; }
+.card-title { font-size: 10px; font-weight: bold; letter-spacing: 1.5px; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 1px; }
 
-/* PLC 연동 패널 (미리보기 아래) */
-.plc-inline {
-  width: 100%; max-width: 400px;
-  background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
-  padding: 10px 14px; display: flex; flex-direction: column; gap: 8px;
+label { font-size: 11px; color: var(--muted); }
+select, input[type=number] {
+  width: 100%; background: var(--panel2); border: 1px solid var(--border);
+  color: var(--text); font-family: var(--mono); font-size: 12px;
+  padding: 5px 7px; border-radius: 4px; outline: none; transition: border-color .15s;
 }
-.plc-inline .pi-title { font-size: 11px; color: var(--accent); font-weight: bold; }
-.pi-row { display: flex; align-items: center; gap: 8px; }
-.pi-row label { font-size: 11px; color: var(--muted); width: 60px; flex-shrink: 0; }
-.pi-row select,
-.pi-row input[type="text"],
-.pi-row input[type="number"] {
-  flex: 1; background: var(--panel2); border: 1px solid var(--border);
-  color: var(--text); border-radius: 3px; padding: 4px 7px;
-  font-size: 11px; font-family: var(--mono); outline: none;
-}
-.pi-row select:focus, .pi-row input:focus { border-color: var(--accent); }
-.pi-row select option { background: #0A0D1A; }
-.btn-plc-write {
-  padding: 7px 0; background: #001A2A; border: 1px solid var(--accent);
-  border-radius: 4px; color: var(--accent); font-family: var(--mono);
-  font-size: 12px; font-weight: bold; cursor: pointer; transition: all .15s; letter-spacing: 1px;
-}
-.btn-plc-write:hover { background: #002A3A; box-shadow: 0 0 8px #00F0FF44; }
-.poll-status { font-size: 10px; color: var(--muted); text-align: center; }
-.poll-status.on  { color: var(--accent3); }
-.poll-status.off { color: var(--err); }
+select:focus, input:focus { border-color: var(--accent); }
 
-/* 속성 패널 */
-.prop-panel {
-  width: 210px; flex-shrink: 0;
-  background: var(--panel2); border-left: 1px solid var(--border);
-  padding: 10px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 7px;
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; align-items: end; }
+.row2 .field { display: flex; flex-direction: column; gap: 3px; }
+
+/* ── PLC 다중 선택 ── */
+.plc-add-row { display: flex; gap: 6px; }
+.plc-add-row select { flex: 1; }
+.btn-add-plc {
+  background: none; border: 1px solid var(--accent); color: var(--accent);
+  border-radius: 4px; padding: 5px 10px; font-size: 11px; cursor: pointer;
+  font-family: var(--mono); transition: all .15s; flex-shrink: 0;
 }
-.prop-panel .panel-title { font-size: 11px; font-weight: bold; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-.prop-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; }
-.prop-row label { color: var(--muted); flex-shrink: 0; }
-.prop-row input[type="checkbox"] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
-.prop-row input[type="number"],
-.prop-row input[type="text"]  { background: var(--panel); border: 1px solid var(--border); color: var(--text); border-radius: 3px; padding: 3px 6px; font-size: 11px; font-family: var(--mono); width: 80px; }
-.prop-row input[type="color"] { padding: 1px 3px; width: 46px; height: 22px; cursor: pointer; background: var(--panel); border: 1px solid var(--border); border-radius: 3px; }
-.prop-sec { font-size: 10px; color: var(--accent2); margin-top: 5px; border-top: 1px solid #1A1A3A; padding-top: 5px; }
+.btn-add-plc:hover { background: #001A2A; }
 
-/* ════ 섹션3: PLC 쓰기 테스트 ════ */
-.sec-plc { flex-direction: column; overflow-y: auto; padding: 14px 18px; gap: 12px; }
-.plc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; flex-shrink: 0; }
-.plc-card { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 9px; }
-.plc-card .card-title { font-size: 12px; font-weight: bold; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-.form-row { display: flex; flex-direction: column; gap: 4px; }
-.form-row label { font-size: 11px; color: var(--muted); }
-.form-row select,
-.form-row input[type="text"],
-.form-row input[type="number"] {
-  background: var(--panel2); border: 1px solid var(--border); color: var(--text);
-  border-radius: 3px; padding: 5px 8px; font-size: 11px; font-family: var(--mono); width: 100%; outline: none;
+.plc-tag-list { display: flex; flex-direction: column; gap: 4px; max-height: 160px; overflow-y: auto; }
+.plc-tag-list::-webkit-scrollbar { width: 3px; }
+.plc-tag-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+.plc-tag {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--panel2); border: 1px solid var(--border); border-radius: 5px;
+  padding: 5px 8px; font-size: 11px;
 }
-.form-row select:focus, .form-row input:focus { border-color: var(--accent); }
-.form-row select option { background: #0A0D1A; }
-.btn-write {
-  padding: 8px 0; background: #001A2A; border: 1px solid var(--accent);
-  border-radius: 4px; color: var(--accent); font-family: var(--mono);
-  font-size: 12px; font-weight: bold; cursor: pointer; transition: all .15s; letter-spacing: 1px;
-}
-.btn-write:hover { background: #002A3A; box-shadow: 0 0 8px #00F0FF44; }
+.pt-dot  { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; transition: all .3s; }
+.pt-dot.ok   { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.pt-dot.fail { background: var(--err);   box-shadow: 0 0 6px var(--err); animation: blink .4s infinite; }
+.pt-dot.disc { background: var(--err);   box-shadow: 0 0 8px var(--err); }
+.pt-label { flex: 1; color: var(--text); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.pt-type  { font-size: 9px; color: var(--muted); flex-shrink: 0; }
+.pt-del   { background: none; border: none; color: var(--err); cursor: pointer; font-size: 12px; padding: 0 2px; opacity: .5; transition: opacity .15s; }
+.pt-del:hover { opacity: 1; }
+.plc-empty { font-size: 11px; color: var(--muted); text-align: center; padding: 8px; }
 
-.result-box { background: var(--panel2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; flex-shrink: 0; }
-.result-box .box-title { font-size: 11px; color: var(--accent2); margin-bottom: 6px; }
-.result-line { font-size: 11px; padding: 3px 0; border-bottom: 1px solid #111828; display: flex; gap: 10px; }
-.result-line .r-key { color: var(--muted); width: 100px; flex-shrink: 0; }
-.result-line .r-val { color: var(--text); word-break: break-all; }
-.status-ok  { color: var(--accent3) !important; }
-.status-err { color: var(--err) !important; }
+/* ── 값 목록 ── */
+.value-list { display: flex; flex-direction: column; gap: 5px; }
+.value-row  { display: flex; gap: 5px; align-items: center; }
+.value-row input { flex: 1; }
+.btn-del-val { background: none; border: 1px solid #3A1A2A; color: var(--err); border-radius: 4px; padding: 3px 7px; font-size: 11px; cursor: pointer; transition: all .15s; flex-shrink: 0; font-family: var(--mono); }
+.btn-del-val:hover { background: #3A1A2A; }
+.btn-add-val { background: none; border: 1px dashed var(--border); color: var(--muted); border-radius: 4px; padding: 5px; font-size: 11px; cursor: pointer; transition: all .15s; font-family: var(--mono); width: 100%; text-align: center; }
+.btn-add-val:hover { border-color: var(--accent); color: var(--accent); }
 
-.log-box { background: #030507; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; flex-shrink: 0; max-height: 100px; overflow-y: auto; }
-.log-box .box-title { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
-.log-line { font-size: 10px; line-height: 1.7; font-family: var(--mono); }
-.log-line.ok  { color: var(--accent3); }
-.log-line.err { color: var(--err); }
-.log-line.inf { color: var(--muted); }
+/* ── 인터벌 ── */
+.interval-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.int-btn { background: var(--panel2); border: 1px solid var(--border); color: var(--muted); border-radius: 4px; padding: 6px 3px; font-size: 10px; cursor: pointer; text-align: center; transition: all .15s; font-family: var(--mono); }
+.int-btn:hover  { border-color: var(--accent); color: var(--text); }
+.int-btn.active { border-color: var(--accent); background: #001A2A; color: var(--accent); font-weight: bold; }
 
-.code-section { background: var(--panel2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; flex-shrink: 0; }
-.code-section .box-title { font-size: 11px; color: var(--accent); margin-bottom: 7px; }
-.code-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
-.code-tab { padding: 3px 10px; font-size: 11px; border: 1px solid var(--border); border-radius: 3px; background: var(--panel); color: var(--muted); cursor: pointer; transition: all .15s; font-family: var(--mono); }
-.code-tab.active { border-color: var(--accent); color: var(--accent); background: #001A2A; }
-.code-block { display: none; background: #030507; border: 1px solid #111828; border-radius: 4px; padding: 10px 12px; font-size: 11px; font-family: var(--mono); color: #A8D8F0; white-space: pre; overflow-x: auto; line-height: 1.7; }
-.code-block.active { display: block; }
-.c-key { color: #B24BF3; } .c-str { color: #00FF88; } .c-fn { color: #00F0FF; } .c-cmt { color: #3A5A7A; }
+/* ── 시작/정지 ── */
+.ctrl-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.btn-start { background: linear-gradient(135deg,#003A1A,#005A28); border: 1px solid var(--green); color: var(--green); border-radius: 6px; padding: 10px; font-size: 13px; font-weight: bold; cursor: pointer; font-family: var(--mono); transition: all .15s; }
+.btn-start:hover   { box-shadow: 0 0 14px #00FF8844; }
+.btn-start:disabled { opacity: .3; cursor: not-allowed; box-shadow: none; }
+.btn-stop  { background: linear-gradient(135deg,#3A0010,#5A0018); border: 1px solid var(--err);  color: var(--err);  border-radius: 6px; padding: 10px; font-size: 13px; font-weight: bold; cursor: pointer; font-family: var(--mono); transition: all .15s; }
+.btn-stop:hover    { box-shadow: 0 0 14px #FF3B5C44; }
+.btn-stop:disabled  { opacity: .3; cursor: not-allowed; box-shadow: none; }
+
+/* ══ 우측 패널 ══ */
+.right-panel { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow: hidden; min-width: 0; }
+
+/* 상태 바 */
+.status-bar { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.status-badge { font-size: 12px; font-weight: bold; padding: 4px 12px; border-radius: 20px; border: 1px solid; letter-spacing: 1.5px; min-width: 110px; text-align: center; transition: all .3s; }
+.status-badge.idle       { border-color: var(--muted); color: var(--muted); }
+.status-badge.running    { border-color: var(--green); color: var(--green); box-shadow: 0 0 10px #00FF8844; }
+.status-badge.warning    { border-color: var(--warn);  color: var(--warn);  animation: blink .6s infinite; }
+.status-badge.error      { border-color: var(--err);   color: var(--err);   animation: blink .4s infinite; }
+@keyframes blink { 50% { opacity:.4; } }
+
+/* 전체 미니 통계 */
+.stat-mini { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; gap: 14px; align-items: center; flex-shrink: 0; }
+.sm-item { display: flex; flex-direction: column; gap: 2px; align-items: center; }
+.sm-label { font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+.sm-val { font-size: 18px; font-weight: bold; }
+.sm-val.ok   { color: var(--green); }
+.sm-val.fail { color: var(--err); }
+.sm-val.rate { color: var(--accent); }
+.sm-val.normal { color: var(--text); font-size: 14px; }
+
+/* 순환 값 */
+.cycle-pill { padding: 2px 8px; border-radius: 10px; font-size: 11px; border: 1px solid var(--border); color: var(--muted); transition: all .2s; }
+.cycle-pill.active { border-color: var(--accent); color: var(--accent); background: #001A2A; box-shadow: 0 0 7px #00F0FF33; }
+
+/* PLC별 통계 테이블 */
+.plc-stat-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+.pst-header, .pst-row { display: grid; grid-template-columns: 26px 1fr 80px 55px 55px 55px 65px 75px 75px; }
+.pst-header > div { font-size: 9px; color: var(--muted); padding: 5px 6px; letter-spacing: 1px; text-transform: uppercase; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.pst-header > div:last-child { border-right: none; }
+.pst-row > div { font-size: 11px; padding: 6px 6px; border-right: 1px solid #0D1525; border-bottom: 1px solid #0D1525; display: flex; align-items: center; overflow: hidden; }
+.pst-row > div:last-child { border-right: none; }
+.pst-row:last-child > div { border-bottom: none; }
+.pst-row:hover { background: #0D1525; }
+.pst-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); transition: all .3s; }
+.pst-dot.ok   { background: var(--green); box-shadow: 0 0 5px var(--green); }
+.pst-dot.fail { background: var(--err);   box-shadow: 0 0 5px var(--err); animation: blink .4s infinite; }
+.pst-dot.disc { background: var(--err);   box-shadow: 0 0 8px var(--err); }
+.pst-empty { font-size: 11px; color: var(--muted); text-align: center; padding: 10px; }
+
+/* 로그 */
+.log-panel { flex: 1; overflow: hidden; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; display: flex; flex-direction: column; }
+.log-header { padding: 6px 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.log-title { font-size: 10px; font-weight: bold; color: var(--accent); letter-spacing: 1.5px; }
+.btn-clear { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 4px; padding: 2px 7px; font-size: 10px; cursor: pointer; font-family: var(--mono); transition: all .15s; }
+.btn-clear:hover { border-color: var(--err); color: var(--err); }
+.log-body { flex: 1; overflow-y: auto; padding: 4px 8px; }
+.log-body::-webkit-scrollbar { width: 4px; }
+.log-body::-webkit-scrollbar-thumb { background: var(--border); }
+.log-row { display: flex; gap: 6px; font-size: 10px; padding: 2px 2px; border-bottom: 1px solid #0A0E18; }
+.log-row:hover { background: #0D1525; }
+.log-ts   { color: var(--muted); flex-shrink: 0; width: 68px; }
+.log-plc  { color: var(--purple); flex-shrink: 0; width: 70px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.log-addr { color: var(--accent); flex-shrink: 0; width: 56px; }
+.log-val  { color: var(--text);   flex-shrink: 0; width: 40px; }
+.log-result { flex-shrink: 0; width: 40px; font-weight: bold; }
+.log-result.ok   { color: var(--green); }
+.log-result.fail { color: var(--err); }
+.log-result.info { color: var(--warn); }
+.log-msg { color: var(--muted); flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 </style>
 </head>
 <body>
+<jsp:include page="/WEB-INF/views/include/monitorNav.jsp"/>
 
-<%@ include file="../include/monitorNav.jsp" %>
+<div class="main-wrap">
 
-<div class="layout">
+  <!-- ════ 좌측 설정 패널 ════ -->
+  <div class="config-panel">
 
-  <!-- 좌측 메뉴 -->
-  <div class="side-menu">
-    <div class="menu-item active" data-sec="main">▶ 메인</div>
-    <div class="menu-item"        data-sec="shape">◈ 도형 편집</div>
-    <div class="menu-item"        data-sec="plc">⚡ PLC 쓰기 테스트</div>
-  </div>
+    <!-- PLC 다중 선택 -->
+    <div class="card">
+      <div class="card-title">PLC 목록 <span style="color:var(--muted);font-weight:normal;font-size:9px">(복수)</span></div>
+      <div class="plc-add-row">
+        <select id="selPlcAdd"><option value="">-- 로딩 중 --</option></select>
+        <button class="btn-add-plc" onclick="addPlc()">+ 추가</button>
+      </div>
+      <div class="plc-tag-list" id="plcTagList">
+        <div class="plc-empty">추가된 PLC 없음</div>
+      </div>
+    </div>
 
-  <div class="content">
+    <!-- 주소 범위 -->
+    <div class="card">
+      <div class="card-title">주소 범위</div>
+      <div class="row2">
+        <div class="field"><label>시작 주소</label><input type="number" id="addrStart" value="40001" min="1" max="99999"></div>
+        <div class="field"><label>끝 주소</label><input type="number" id="addrEnd" value="40003" min="1" max="99999"></div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);">
+        영역: <span id="addrAreaInfo" style="color:var(--accent);">4x HOLD (word)</span>
+        &nbsp;|&nbsp; 주소 수: <span id="addrCount" style="color:var(--text);">3</span>
+        <span style="color:var(--muted);font-size:9px"> (max 20)</span>
+      </div>
+    </div>
 
-    <!-- ════ 섹션1: 메인 ════ -->
-    <div class="section sec-main active" id="sec-main">
-      <div class="main-card">
-        <h2>EX PAGE</h2>
-        <p>도형 편집 · PLC 쓰기 · AJAX 코드 확인을 위한 예제 페이지입니다.<br><br>
-           좌측 메뉴에서 원하는 섹션으로 이동하세요.</p>
-        <div class="badge-row">
-          <span class="badge cyan">도형 편집</span>
-          <span class="badge purple">속성 패널</span>
-          <span class="badge green">PLC 쓰기</span>
+    <!-- 값 목록 -->
+    <div class="card">
+      <div class="card-title">쓰기 값 <span style="color:var(--muted);font-weight:normal;font-size:9px">(순환)</span></div>
+      <div class="value-list" id="valueList"></div>
+      <button class="btn-add-val" onclick="addValueRow()">+ 값 추가</button>
+    </div>
+
+    <!-- 인터벌 -->
+    <div class="card">
+      <div class="card-title">인터벌</div>
+      <div class="interval-grid" id="intervalGrid">
+        <div class="int-btn" data-ms="100"   onclick="setIntervalMs(this)">100ms</div>
+        <div class="int-btn" data-ms="250"   onclick="setIntervalMs(this)">250ms</div>
+        <div class="int-btn active" data-ms="500"   onclick="setIntervalMs(this)">500ms</div>
+        <div class="int-btn" data-ms="1000"  onclick="setIntervalMs(this)">1s</div>
+        <div class="int-btn" data-ms="2000"  onclick="setIntervalMs(this)">2s</div>
+        <div class="int-btn" data-ms="5000"  onclick="setIntervalMs(this)">5s</div>
+        <div class="int-btn" data-ms="10000" onclick="setIntervalMs(this)">10s</div>
+        <div class="int-btn" data-ms="30000" onclick="setIntervalMs(this)">30s</div>
+      </div>
+    </div>
+
+    <!-- 시작/정지 -->
+    <div class="card">
+      <div class="ctrl-btns">
+        <button class="btn-start" id="btnStart" onclick="startTest()">&#9654; 시작</button>
+        <button class="btn-stop"  id="btnStop"  onclick="stopTest(null)" disabled>&#9632; 정지</button>
+      </div>
+      <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:2px;" id="stopReason"></div>
+    </div>
+
+  </div><!-- /config-panel -->
+
+  <!-- ════ 우측 패널 ════ -->
+  <div class="right-panel">
+
+    <!-- 상태 바 -->
+    <div class="status-bar" style="flex-shrink:0;">
+      <div class="status-badge idle" id="statusBadge">IDLE</div>
+      <div style="font-size:10px;color:var(--muted);">경과 <span id="elapsedTime" style="color:var(--text);">00:00:00</span></div>
+      <div style="flex:1;"></div>
+      <div style="font-size:10px;color:var(--muted);">현재 값: <span id="curValDisplay" style="color:var(--accent);font-weight:bold;">-</span></div>
+    </div>
+
+    <!-- 전체 통계 + 순환 표시 -->
+    <div class="stat-mini">
+      <div class="sm-item"><div class="sm-label">총 시도</div><div class="sm-val normal" id="statTotal">0</div></div>
+      <div class="sm-item"><div class="sm-label">성공</div><div class="sm-val ok"     id="statOk">0</div></div>
+      <div class="sm-item"><div class="sm-label">실패</div><div class="sm-val fail"   id="statFail">0</div></div>
+      <div class="sm-item"><div class="sm-label">성공률</div><div class="sm-val rate" id="statRate">-</div></div>
+      <div class="sm-item"><div class="sm-label">틱</div><div class="sm-val normal"   id="statTick">0</div></div>
+      <div class="sm-item" style="flex:1;">
+        <div class="sm-label">값 순환</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;" id="cycleDisplay">
+          <span style="font-size:11px;color:var(--muted);">-</span>
         </div>
       </div>
     </div>
 
-    <!-- ════ 섹션2: 도형 편집 ════ -->
-    <div class="section sec-shape" id="sec-shape">
-
-      <!-- 도형 팔레트 -->
-      <div class="shape-palette">
-        <div class="pal-title">도형 선택</div>
-        <div class="shape-btn active" data-shape="rect">   <span class="shape-icon">▭</span>사각형</div>
-        <div class="shape-btn"        data-shape="circle"> <span class="shape-icon">◯</span>원형</div>
-        <div class="shape-btn"        data-shape="triangle"><span class="shape-icon">△</span>삼각형</div>
-        <div class="shape-btn"        data-shape="button"> <span class="shape-icon">▣</span>버튼박스</div>
+    <!-- PLC별 통계 -->
+    <div class="plc-stat-wrap">
+      <div class="pst-header">
+        <div></div>
+        <div>PLC</div>
+        <div>TYPE</div>
+        <div>총시도</div>
+        <div>성공</div>
+        <div>실패</div>
+        <div>성공률</div>
+        <div>연속실패</div>
+        <div>응답(ms)</div>
       </div>
+      <div id="plcStatBody">
+        <div class="pst-empty">PLC를 추가하세요.</div>
+      </div>
+    </div>
 
-      <!-- 미리보기 + PLC 연동 -->
-      <div class="preview-area">
-        <span class="preview-label">PREVIEW</span>
-        <canvas id="shapeCanvas" width="320" height="220"></canvas>
-
-        <!-- PLC 연동 패널 -->
-        <div class="plc-inline">
-          <div class="pi-title">⚡ PLC 연동 — 값 쓰기 / 상태 모니터링</div>
-          <div class="pi-row">
-            <label>PLC 선택</label>
-            <select id="shapePlcSelect">
-              <option value="">-- DB 로딩 중 --</option>
-            </select>
-          </div>
-          <div class="pi-row">
-            <label>주소</label>
-            <input type="text" id="shapeAddress" placeholder="%MW100 또는 10001">
-          </div>
-          <div class="pi-row">
-            <label>쓸 값</label>
-            <input type="number" id="shapeWriteVal" value="1" min="0">
-          </div>
-          <button class="btn-plc-write" id="btnShapeWrite">▶ 주소에 값 쓰기</button>
-          <div class="poll-status" id="pollStatus">● 폴링 대기 중 (주소 입력 후 자동 시작)</div>
+    <!-- 로그 -->
+    <div class="log-panel">
+      <div class="log-header">
+        <div class="log-title">WRITE LOG</div>
+        <button class="btn-clear" onclick="clearLog()">CLEAR</button>
+      </div>
+      <div class="log-body" id="logBody">
+        <div class="log-row">
+          <div class="log-ts">--:--:--</div>
+          <div class="log-plc">SYS</div>
+          <div class="log-result info">INFO</div>
+          <div class="log-msg">PLC를 추가하고 시작을 눌러주세요.</div>
         </div>
       </div>
+    </div>
 
-      <!-- 속성 패널 -->
-      <div class="prop-panel">
-        <div class="panel-title">⚙ 속성</div>
-
-        <div class="prop-sec">표시 / 애니메이션</div>
-        <div class="prop-row"><label>보이기</label>    <input type="checkbox" id="p-visible" checked></div>
-        <div class="prop-row"><label>깜빡임</label>    <input type="checkbox" id="p-blink"></div>
-
-        <div class="prop-sec">변환</div>
-        <div class="prop-row"><label>회전 (°)</label>  <input type="number" id="p-rotate" value="0" min="0" max="360"></div>
-        <div class="prop-row"><label>좌우 뒤집기</label><input type="checkbox" id="p-flipx"></div>
-        <div class="prop-row"><label>상하 뒤집기</label><input type="checkbox" id="p-flipy"></div>
-
-        <div class="prop-sec">색상</div>
-        <div class="prop-row"><label>배경색</label>    <input type="color" id="p-bgcolor"      value="#00F0FF"></div>
-        <div class="prop-row"><label>테두리색</label>   <input type="color" id="p-bordercolor"  value="#1A3A5C"></div>
-        <div class="prop-row"><label>활성화색</label>   <input type="color" id="p-activecolor"  value="#00FF88"></div>
-
-        <div class="prop-sec">텍스트 / 값</div>
-        <div class="prop-row"><label>텍스트 표시</label><input type="checkbox" id="p-showtext" checked></div>
-        <div class="prop-row"><label>Value 입력란</label><input type="checkbox" id="p-showvalue"></div>
-      </div>
-    </div><!-- /sec-shape -->
-
-    <!-- ════ 섹션3: PLC 쓰기 테스트 ════ -->
-    <div class="section sec-plc" id="sec-plc">
-
-      <div class="plc-grid">
-        <div class="plc-card">
-          <div class="card-title">① PLC 선택 (tb_plc)</div>
-          <div class="form-row">
-            <label>PLC 선택 (label)</label>
-            <select id="plcItemSelect">
-              <option value="">-- 로딩 중 --</option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label>주소 (직접 수정 가능)</label>
-            <input type="text" id="plcAddress" placeholder="%MW100">
-          </div>
-        </div>
-        <div class="plc-card">
-          <div class="card-title">② 값 입력 및 쓰기</div>
-          <div class="form-row">
-            <label>Value</label>
-            <input type="number" id="plcValue" value="1" min="0">
-          </div>
-          <button class="btn-write" id="btnWrite">▶ 값 쓰기 (WRITE)</button>
-        </div>
-      </div>
-
-      <div class="result-box">
-        <div class="box-title">마지막 요청 결과</div>
-        <div class="result-line"><span class="r-key">PLC</span>      <span class="r-val" id="r-item">-</span></div>
-        <div class="result-line"><span class="r-key">주소</span>     <span class="r-val" id="r-addr">-</span></div>
-        <div class="result-line"><span class="r-key">값</span>       <span class="r-val" id="r-val">-</span></div>
-        <div class="result-line"><span class="r-key">상태</span>     <span class="r-val" id="r-status">-</span></div>
-        <div class="result-line"><span class="r-key">서버 응답</span><span class="r-val" id="r-resp">-</span></div>
-      </div>
-
-      <div class="log-box">
-        <div class="box-title">▍ 디버그 로그</div>
-        <div id="logArea"></div>
-      </div>
-
-      <div class="code-section">
-        <div class="box-title">AJAX 요청 코드 보기</div>
-        <div class="code-tabs">
-          <div class="code-tab active" data-ctab="jquery">jQuery</div>
-          <div class="code-tab"        data-ctab="fetch">fetch</div>
-        </div>
-        <div class="code-block active" id="code-jquery"></div>
-        <div class="code-block"        id="code-fetch"></div>
-      </div>
-
-    </div><!-- /sec-plc -->
-  </div>
-</div>
+  </div><!-- /right-panel -->
+</div><!-- /main-wrap -->
 
 <script>
-var CTX = '<%=ctx%>';
+var ctx = '<%=ctx%>';
 
-/* ════════════════════════════════════
-   내부 메뉴 SPA 전환
-════════════════════════════════════ */
-$('.side-menu .menu-item').on('click', function () {
-  var sec = $(this).data('sec');
-  $('.menu-item').removeClass('active');
-  $(this).addClass('active');
-  $('.section').removeClass('active');
-  $('#sec-' + sec).addClass('active');
-  if (sec === 'shape') renderShape();
-  if (sec === 'plc')   updateCodeExample();
+/* ══ 전역 상태 ══ */
+var allPlcs    = [];   // DB 전체 PLC 목록
+var selPlcs    = [];   // 테스트에 추가된 PLC [{plcId,label,plcType,ip,port}]
+var plcStats   = {};   // plcId -> {total,ok,fail,streak,maxStreak,lastMs,disc}
+var running    = false;
+var tickTimer  = null;
+var elTimer    = null;
+var valueIndex = 0;
+var intervalMs = 500;
+var gStats     = { total:0, ok:0, fail:0, tick:0 };
+var startTime  = null;
+var DISC_THRESHOLD = 5;
+
+/* ══ 초기화 ══ */
+$(function() {
+    loadPlcList();
+    addValueRow(0);
+    addValueRow(1);
+    addValueRow(100);
+    updateAddrInfo();
+    $('#addrStart, #addrEnd').on('input', updateAddrInfo);
 });
 
-/* ════════════════════════════════════
-   tb_plc DB 목록 로드 (공통)
-════════════════════════════════════ */
-var plcDbList = [];
-
-function loadPlcList(callback) {
-  $.ajax({
-    url: CTX + '/plc/dblist',
-    type: 'GET',
-    dataType: 'json',
-    success: function (res) {
-      if (res.success) {
-        plcDbList = res.data;
-
-        // 도형 편집 섹션 select
-        var $ss = $('#shapePlcSelect').empty().append('<option value="">-- 선택 --</option>');
-        // PLC 쓰기 테스트 섹션 select
-        var $ps = $('#plcItemSelect').empty().append('<option value="">-- 선택 --</option>');
-
-        $.each(plcDbList, function (i, p) {
-          var opt = '<option value="' + p.plcId + '" data-label="' + p.label + '">' + p.label + ' (' + p.ip + ')</option>';
-          $ss.append(opt);
-          $ps.append(opt);
+/* ── DB에서 PLC 목록 로드 ── */
+function loadPlcList() {
+    $.getJSON(ctx + '/plc/dblist', function(data) {
+        allPlcs = (data && data.data) || [];
+        var sel = $('#selPlcAdd').empty();
+        if (!allPlcs.length) { sel.append('<option value="">등록된 PLC 없음</option>'); return; }
+        sel.append('<option value="">-- PLC 선택 --</option>');
+        allPlcs.forEach(function(p) {
+            sel.append('<option value="' + p.plcId + '">' + escHtml(p.label) + ' [' + p.plcType + ']</option>');
         });
-
-        if (callback) callback();
-      }
-    },
-    error: function () {
-      $('#shapePlcSelect').html('<option value="">DB 연결 실패</option>');
-      $('#plcItemSelect').html('<option value="">DB 연결 실패</option>');
-    }
-  });
-}
-
-/* ════════════════════════════════════
-   도형 캔버스
-════════════════════════════════════ */
-var currentShape = 'rect';
-var blinkTimer   = null;
-var blinkState   = true;
-var pollTimer    = null;
-var isActive     = false;   // PLC 값 == 1 이면 true
-
-function getProps() {
-  return {
-    visible    : $('#p-visible').is(':checked'),
-    blink      : $('#p-blink').is(':checked'),
-    rotate     : parseInt($('#p-rotate').val()) || 0,
-    flipX      : $('#p-flipx').is(':checked'),
-    flipY      : $('#p-flipy').is(':checked'),
-    bgColor    : isActive ? $('#p-activecolor').val() : $('#p-bgcolor').val(),
-    borderColor: $('#p-bordercolor').val(),
-    showText   : $('#p-showtext').is(':checked'),
-    showValue  : $('#p-showvalue').is(':checked')
-  };
-}
-
-function renderShape(forceVisible) {
-  var p   = getProps();
-  var cv  = document.getElementById('shapeCanvas');
-  var ctx = cv.getContext('2d');
-  var W = cv.width, H = cv.height;
-  ctx.clearRect(0, 0, W, H);
-
-  var visible = (forceVisible !== undefined) ? forceVisible : p.visible;
-  if (!visible) {
-    ctx.fillStyle = '#0A0D1A'; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#3A5A7A'; ctx.font = '13px Consolas';
-    ctx.textAlign = 'center'; ctx.fillText('[ 숨김 상태 ]', W/2, H/2);
-    return;
-  }
-
-  ctx.save();
-  ctx.translate(W/2, H/2);
-  ctx.rotate((p.rotate * Math.PI) / 180);
-  ctx.scale(p.flipX ? -1 : 1, p.flipY ? -1 : 1);
-
-  ctx.fillStyle   = p.bgColor;
-  ctx.strokeStyle = p.borderColor;
-  ctx.lineWidth   = isActive ? 3 : 2;
-
-  var s = currentShape;
-  if (s === 'rect' || s === 'button') {
-    var rw = s === 'button' ? 130 : 100, rh = s === 'button' ? 48 : 100;
-    roundRect(ctx, -rw/2, -rh/2, rw, rh, s === 'button' ? 8 : 4);
-    ctx.fill(); ctx.stroke();
-    if (p.showText) {
-      ctx.restore(); ctx.save(); ctx.translate(W/2, H/2);
-      ctx.fillStyle = '#07090F'; ctx.font = 'bold 12px Consolas';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(s === 'button' ? (isActive ? '▶  ON' : '▶  OFF') : (isActive ? 'ON' : 'RECT'), 0, 0);
-    }
-  } else if (s === 'circle') {
-    ctx.beginPath(); ctx.arc(0, 0, 65, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-    if (p.showText) {
-      ctx.restore(); ctx.save(); ctx.translate(W/2, H/2);
-      ctx.fillStyle = '#07090F'; ctx.font = 'bold 12px Consolas';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(isActive ? 'ON' : 'CIRC', 0, 0);
-    }
-  } else if (s === 'triangle') {
-    ctx.beginPath(); ctx.moveTo(0,-72); ctx.lineTo(68,58); ctx.lineTo(-68,58); ctx.closePath();
-    ctx.fill(); ctx.stroke();
-    if (p.showText) {
-      ctx.restore(); ctx.save(); ctx.translate(W/2, H/2);
-      ctx.fillStyle = '#07090F'; ctx.font = 'bold 11px Consolas';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(isActive ? 'ON' : 'TRI', 0, 14);
-    }
-  }
-  ctx.restore();
-
-  if (p.showValue) {
-    ctx.fillStyle = '#1A3A5C'; ctx.fillRect(W/2-44, H/2+82, 88, 20);
-    ctx.strokeStyle = '#2A5A7A'; ctx.lineWidth = 1; ctx.strokeRect(W/2-44, H/2+82, 88, 20);
-    ctx.fillStyle = '#00F0FF'; ctx.font = '10px Consolas';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('val: ' + ($('#shapeWriteVal').val()||'0'), W/2, H/2+92);
-  }
-
-  // 활성화 시 글로우 효과
-  if (isActive) {
-    ctx.save();
-    ctx.shadowColor = $('#p-activecolor').val();
-    ctx.shadowBlur  = 24;
-    ctx.strokeStyle = $('#p-activecolor').val();
-    ctx.lineWidth   = 1;
-    if (s === 'circle') { ctx.beginPath(); ctx.arc(W/2, H/2, 68, 0, Math.PI*2); ctx.stroke(); }
-    ctx.restore();
-  }
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
-  ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-  ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
-  ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
-}
-
-$('.shape-btn').on('click', function () {
-  $('.shape-btn').removeClass('active'); $(this).addClass('active');
-  currentShape = $(this).data('shape'); renderShape();
-});
-
-$('#p-visible,#p-blink,#p-flipx,#p-flipy,#p-showtext,#p-showvalue').on('change', function () { restartBlink(); renderShape(); });
-$('#p-rotate,#p-bgcolor,#p-bordercolor,#p-activecolor').on('input', function () { renderShape(); });
-$('#shapeWriteVal').on('input', function () { renderShape(); });
-
-function restartBlink() {
-  if (blinkTimer) clearInterval(blinkTimer);
-  if ($('#p-blink').is(':checked') && $('#p-visible').is(':checked')) {
-    blinkTimer = setInterval(function () { blinkState = !blinkState; renderShape(blinkState); }, 500);
-  }
-}
-
-/* ════════════════════════════════════
-   도형 편집 — PLC 쓰기
-════════════════════════════════════ */
-$('#btnShapeWrite').on('click', function () {
-  var plcId   = $('#shapePlcSelect').val();
-  var address = $('#shapeAddress').val().trim();
-  var value   = parseInt($('#shapeWriteVal').val()) || 0;
-
-  if (!address) { $('#pollStatus').text('⚠ 주소를 입력하세요.').removeClass('on off'); return; }
-
-  var payload = { address: parseInt(address) || 0, value: value };
-  var url = plcId ? CTX + '/plc/write/' + plcId : CTX + '/plc/write';
-
-  $.ajax({
-    url: url, type: 'POST', contentType: 'application/json',
-    data: JSON.stringify(payload),
-    success: function (res) {
-      if (res && res.success) {
-        $('#pollStatus').text('✔ 쓰기 성공 — 폴링 중...').addClass('on').removeClass('off');
-        startPoll(plcId, address);
-      } else {
-        $('#pollStatus').text('✘ 쓰기 실패: ' + (res.error||'')).addClass('off').removeClass('on');
-      }
-    },
-    error: function (xhr) {
-      $('#pollStatus').text('✘ HTTP 오류: ' + xhr.status).addClass('off').removeClass('on');
-    }
-  });
-});
-
-/* ── 주소 값 폴링 (1이면 도형 활성화) ── */
-function startPoll(plcId, address) {
-  if (pollTimer) clearInterval(pollTimer);
-  var addr = parseInt(address) || 0;
-  var url  = plcId
-    ? CTX + '/plc/read/' + plcId + '?start=' + addr + '&count=1'
-    : CTX + '/plc/read?start=' + addr + '&count=1';
-
-  pollTimer = setInterval(function () {
-    $.ajax({
-      url: url, type: 'GET', dataType: 'json',
-      success: function (res) {
-        if (res && res.success && res.values && res.values.length > 0) {
-          var val = res.values[0];
-          var wasActive = isActive;
-          isActive = (val === 1);
-          if (wasActive !== isActive) renderShape();
-          $('#pollStatus')
-            .text('● 폴링 중 — 현재값: ' + val + (isActive ? '  [활성화]' : '  [비활성]'))
-            .toggleClass('on', isActive).toggleClass('off', !isActive);
-        }
-      }
+    }).fail(function() {
+        $('#selPlcAdd').html('<option value="">로드 실패</option>');
+        addLog('SYS', '', '', 'INFO', '/plc/dblist 로드 실패');
     });
-  }, 1000);
 }
 
-/* 주소 입력하면 자동 폴링 시작 */
-$('#shapeAddress').on('change', function () {
-  var addr = $(this).val().trim();
-  if (addr) startPoll($('#shapePlcSelect').val(), addr);
-  else { if (pollTimer) clearInterval(pollTimer); }
-});
-
-/* ════════════════════════════════════
-   PLC 쓰기 테스트 섹션
-════════════════════════════════════ */
-$('#plcItemSelect').on('change', function () {
-  updateCodeExample();
-});
-$('#plcAddress,#plcValue').on('input', updateCodeExample);
-
-$('#btnWrite').on('click', function () {
-  var plcId   = $('#plcItemSelect').val();
-  var label   = $('#plcItemSelect option:selected').data('label') || plcId || '-';
-  var address = $('#plcAddress').val().trim();
-  var value   = $('#plcValue').val();
-
-  if (!address) { addLog('err', '주소를 입력하세요.'); return; }
-
-  var payload = { address: parseInt(address) || 0, value: parseInt(value) || 0 };
-  var url = plcId ? CTX + '/plc/write/' + plcId : CTX + '/plc/write';
-
-  $('#r-item').text(label); $('#r-addr').text(address); $('#r-val').text(value);
-  $('#r-status').text('요청 중...').attr('class','r-val');
-  addLog('inf', '→ POST ' + url + '  ' + JSON.stringify(payload));
-
-  $.ajax({
-    url: url, type: 'POST', contentType: 'application/json',
-    data: JSON.stringify(payload),
-    success: function (res) {
-      if (res && res.success) {
-        $('#r-status').text('✔ 성공').addClass('status-ok');
-        addLog('ok', '← 성공: ' + JSON.stringify(res));
-      } else {
-        $('#r-status').text('✘ 실패').addClass('status-err');
-        addLog('err', '← 실패: ' + JSON.stringify(res));
-      }
-      $('#r-resp').text(JSON.stringify(res));
-    },
-    error: function (xhr) {
-      var msg = xhr.status + ' ' + xhr.statusText;
-      $('#r-status').text('✘ 오류').addClass('status-err');
-      $('#r-resp').text(msg);
-      addLog('err', '← HTTP 오류: ' + msg);
+/* ── PLC 추가 ── */
+function addPlc() {
+    var id = $('#selPlcAdd').val();
+    if (!id) return;
+    if (selPlcs.find(function(p){ return p.plcId === id; })) {
+        addLog('SYS', '', '', 'INFO', '이미 추가된 PLC: ' + id);
+        return;
     }
-  });
-});
-
-function addLog(type, msg) {
-  var time = new Date().toTimeString().substr(0,8);
-  $('#logArea').prepend('<div class="log-line '+type+'">['+time+'] '+msg+'</div>');
-  var lines = $('#logArea .log-line');
-  if (lines.length > 30) lines.last().remove();
+    var p = allPlcs.find(function(x){ return x.plcId === id; });
+    if (!p) return;
+    selPlcs.push(p);
+    plcStats[id] = { total:0, ok:0, fail:0, streak:0, maxStreak:0, lastMs:'-', disc:false };
+    $('#selPlcAdd').val('');
+    renderPlcTags();
+    renderPlcStatTable();
+    updateAddrInfo();
 }
 
-/* ════════════════════════════════════
-   AJAX 코드 예시
-════════════════════════════════════ */
-function updateCodeExample() {
-  var plcId = $('#plcItemSelect').val() || 'plc1';
-  var label = $('#plcItemSelect option:selected').data('label') || plcId;
-  var addr  = $('#plcAddress').val() || '%MW100';
-  var val   = $('#plcValue').val()   || '1';
-  var url   = CTX + '/plc/write' + (plcId ? '/' + plcId : '');
-
-  var jq = '<span class="c-cmt">// jQuery AJAX — PLC: ' + label + '</span>\n'
-    + '<span class="c-fn">$.ajax</span>({\n'
-    + '  <span class="c-key">url</span>        : <span class="c-str">\'' + url + '\'</span>,\n'
-    + '  <span class="c-key">type</span>       : <span class="c-str">\'POST\'</span>,\n'
-    + '  <span class="c-key">contentType</span>: <span class="c-str">\'application/json\'</span>,\n'
-    + '  <span class="c-key">data</span>       : <span class="c-fn">JSON.stringify</span>({ <span class="c-key">address</span>: <span class="c-str">\'' + addr + '\'</span>, <span class="c-key">value</span>: <span class="c-str">\'' + val + '\'</span> }),\n'
-    + '  <span class="c-key">success</span>: res => <span class="c-fn">console</span>.log(res),\n'
-    + '  <span class="c-key">error</span>  : xhr => <span class="c-fn">console</span>.error(xhr.statusText)\n'
-    + '});';
-
-  var ft = '<span class="c-cmt">// fetch — PLC: ' + label + '</span>\n'
-    + '<span class="c-fn">fetch</span>(<span class="c-str">\'' + url + '\'</span>, {\n'
-    + '  <span class="c-key">method</span> : <span class="c-str">\'POST\'</span>,\n'
-    + '  <span class="c-key">headers</span>: { <span class="c-str">\'Content-Type\'</span>: <span class="c-str">\'application/json\'</span> },\n'
-    + '  <span class="c-key">body</span>   : <span class="c-fn">JSON.stringify</span>({ <span class="c-key">address</span>: <span class="c-str">\'' + addr + '\'</span>, <span class="c-key">value</span>: <span class="c-str">\'' + val + '\'</span> })\n'
-    + '})\n'
-    + '.<span class="c-fn">then</span>(r => r.<span class="c-fn">json</span>())\n'
-    + '.<span class="c-fn">then</span>(res => <span class="c-fn">console</span>.log(res))\n'
-    + '.<span class="c-fn">catch</span>(err => <span class="c-fn">console</span>.error(err));';
-
-  $('#code-jquery').html(jq);
-  $('#code-fetch').html(ft);
+/* ── PLC 제거 ── */
+function removePlc(id) {
+    if (running) { addLog('SYS','','','INFO','실행 중에는 PLC를 제거할 수 없습니다.'); return; }
+    selPlcs = selPlcs.filter(function(p){ return p.plcId !== id; });
+    delete plcStats[id];
+    renderPlcTags();
+    renderPlcStatTable();
 }
 
-$('.code-tab').on('click', function () {
-  var tab = $(this).data('ctab');
-  $('.code-tab').removeClass('active'); $(this).addClass('active');
-  $('.code-block').removeClass('active'); $('#code-' + tab).addClass('active');
-});
+/* ── PLC 태그 렌더링 ── */
+function renderPlcTags() {
+    var list = $('#plcTagList').empty();
+    if (!selPlcs.length) { list.append('<div class="plc-empty">추가된 PLC 없음</div>'); return; }
+    selPlcs.forEach(function(p) {
+        var tag = $('<div class="plc-tag"></div>');
+        tag.append('<div class="pt-dot" id="dot_' + p.plcId + '"></div>');
+        tag.append('<div class="pt-label">' + escHtml(p.label) + '</div>');
+        tag.append('<div class="pt-type">'  + escHtml(p.plcType) + '</div>');
+        tag.append('<button class="pt-del" onclick="removePlc(\'' + escHtml(p.plcId) + '\')">&#10005;</button>');
+        list.append(tag);
+    });
+}
 
-/* ════════════════════════════════════
-   초기화
-════════════════════════════════════ */
-$(function () {
-  loadPlcList(function () { updateCodeExample(); });
-  renderShape();
-});
+/* ── PLC 통계 테이블 렌더링 ── */
+function renderPlcStatTable() {
+    var body = $('#plcStatBody').empty();
+    if (!selPlcs.length) { body.append('<div class="pst-empty">PLC를 추가하세요.</div>'); return; }
+    selPlcs.forEach(function(p) {
+        var st   = plcStats[p.plcId] || {};
+        var rate = st.total > 0 ? ((st.ok / st.total) * 100).toFixed(1) + '%' : '-';
+        var dotCls = st.disc ? 'disc' : (st.streak > 0 ? 'fail' : (st.ok > 0 ? 'ok' : ''));
+        var row = $('<div class="pst-row" id="prow_' + p.plcId + '"></div>');
+        row.append('<div><div class="pst-dot ' + dotCls + '" id="pdot_' + p.plcId + '"></div></div>');
+        row.append('<div style="color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(p.label) + '</div>');
+        row.append('<div style="color:var(--muted);font-size:10px;">' + escHtml(p.plcType) + '</div>');
+        row.append('<div id="pst_total_'  + p.plcId + '" style="color:var(--text);">'    + (st.total  || 0) + '</div>');
+        row.append('<div id="pst_ok_'     + p.plcId + '" style="color:var(--green);">'   + (st.ok     || 0) + '</div>');
+        row.append('<div id="pst_fail_'   + p.plcId + '" style="color:var(--err);">'     + (st.fail   || 0) + '</div>');
+        row.append('<div id="pst_rate_'   + p.plcId + '" style="color:var(--accent);">'  + rate             + '</div>');
+        row.append('<div id="pst_streak_' + p.plcId + '" style="color:var(--muted);">'   + (st.streak || 0) + '</div>');
+        row.append('<div id="pst_ms_'     + p.plcId + '" style="color:var(--text);">'    + (st.lastMs || '-') + '</div>');
+        body.append(row);
+    });
+}
+
+/* ══ 주소 영역 헬퍼 ══ */
+function isModbusType(t) { return t && t.toLowerCase().indexOf('modbus') >= 0; }
+function isBitArea(addr) { return (addr>=1&&addr<=9999)||(addr>=10001&&addr<=19999)||(addr>=20001&&addr<=29999); }
+function getModbusArea(addr) {
+    if (addr>=1    &&addr<=9999)  return {label:'0x COIL', bit:true,  ro:false};
+    if (addr>=10001&&addr<=19999) return {label:'1x COIL', bit:true,  ro:false};
+    if (addr>=20001&&addr<=29999) return {label:'2x DI',   bit:true,  ro:true };
+    if (addr>=30001&&addr<=39999) return {label:'3x INPUT',bit:false, ro:true };
+    if (addr>=40001&&addr<=49999) return {label:'4x HOLD', bit:false, ro:false};
+    return {label:'RAW', bit:false, ro:false};
+}
+
+function updateAddrInfo() {
+    var s = parseInt($('#addrStart').val()) || 0;
+    var e = parseInt($('#addrEnd').val())   || s;
+    if (e < s) e = s;
+    $('#addrCount').text(Math.min(e - s + 1, 20));
+    var modPLC = selPlcs.find(function(p){ return isModbusType(p.plcType); });
+    if (modPLC) {
+        var a = getModbusArea(s);
+        $('#addrAreaInfo').text(a.label + (a.bit ? ' (bit)' : ' (word)') + (a.ro ? ' ⚠ READ ONLY' : ''));
+    } else {
+        $('#addrAreaInfo').text('Word');
+    }
+}
+
+/* ══ 값 목록 ══ */
+function addValueRow(def) {
+    var val = (def !== undefined) ? def : '';
+    var row = $('<div class="value-row"></div>');
+    row.append('<input type="number" class="val-input" placeholder="값" value="' + val + '">');
+    row.append('<button class="btn-del-val" onclick="removeValueRow(this)">&#10005;</button>');
+    $('#valueList').append(row);
+    updateCycleDisplay();
+}
+function removeValueRow(btn) {
+    if ($('#valueList .value-row').length <= 1) return;
+    $(btn).closest('.value-row').remove();
+    updateCycleDisplay();
+}
+function getValues() {
+    var v = [];
+    $('#valueList .val-input').each(function() { var s = $(this).val().trim(); if (s !== '') v.push(Number(s)); });
+    return v;
+}
+
+/* ══ 순환 값 표시 ══ */
+function updateCycleDisplay() {
+    var vals = getValues();
+    var d = $('#cycleDisplay').empty();
+    if (!vals.length) { d.append('<span style="font-size:11px;color:var(--muted);">-</span>'); return; }
+    vals.forEach(function(v, i) {
+        d.append('<div class="cycle-pill' + (i === (valueIndex % vals.length) ? ' active' : '') + '" id="cpill_' + i + '">' + v + '</div>');
+    });
+}
+function highlightPill(idx) {
+    var vals = getValues();
+    if (!vals.length) return;
+    $('#cycleDisplay .cycle-pill').removeClass('active');
+    $('#cpill_' + (idx % vals.length)).addClass('active');
+}
+
+/* ══ 인터벌 ══ */
+function setIntervalMs(el) {
+    $('#intervalGrid .int-btn').removeClass('active');
+    $(el).addClass('active');
+    intervalMs = parseInt($(el).data('ms'));
+    if (running) { clearInterval(tickTimer); tickTimer = setInterval(doTick, intervalMs); }
+}
+
+/* ══ 시작 / 정지 ══ */
+function startTest() {
+    if (!selPlcs.length) { addLog('SYS', '', '', 'INFO', 'PLC를 1개 이상 추가하세요.'); return; }
+    var start = parseInt($('#addrStart').val());
+    var end   = parseInt($('#addrEnd').val());
+    if (isNaN(start) || start < 1) { addLog('SYS', '', '', 'INFO', '시작 주소를 확인하세요.'); return; }
+    if (isNaN(end) || end < start) end = start;
+    if (!getValues().length) { addLog('SYS', '', '', 'INFO', '값을 입력하세요.'); return; }
+
+    // Modbus 읽기전용 영역 차단
+    for (var i = 0; i < selPlcs.length; i++) {
+        if (isModbusType(selPlcs[i].plcType)) {
+            var area = getModbusArea(start);
+            if (area.ro) { addLog('SYS', '', '', 'INFO', '⚠ ' + area.label + ' 읽기 전용 - 쓰기 불가'); return; }
+        }
+    }
+
+    running = true;
+    valueIndex = 0;
+    gStats = { total:0, ok:0, fail:0, tick:0 };
+    selPlcs.forEach(function(p) {
+        plcStats[p.plcId] = { total:0, ok:0, fail:0, streak:0, maxStreak:0, lastMs:'-', disc:false };
+    });
+    startTime = Date.now();
+    $('#stopReason').text('');
+    setStatus('running', 'RUNNING');
+    $('#btnStart').prop('disabled', true);
+    $('#btnStop').prop('disabled', false);
+    renderPlcStatTable();
+
+    var addrCnt = Math.min(end - start + 1, 20);
+    addLog('SYS', '', '', 'INFO',
+        '▶ 시작 | PLC ' + selPlcs.length + '대 | 범위:' + start + '~' + (start + addrCnt - 1) + ' | ' + intervalMs + 'ms');
+
+    elTimer   = setInterval(updateElapsed, 1000);
+    doTick();
+    tickTimer = setInterval(doTick, intervalMs);
+}
+
+function stopTest(reason) {
+    if (!running) return;
+    running = false;
+    clearInterval(tickTimer); clearInterval(elTimer);
+    tickTimer = null; elTimer = null;
+    var msg = reason || '수동 정지';
+    addLog('SYS', '', '', 'INFO', '■ 정지 | ' + msg);
+    setStatus('idle', 'STOPPED');
+    $('#btnStart').prop('disabled', false);
+    $('#btnStop').prop('disabled', true);
+    $('#stopReason').text(msg);
+    selPlcs.forEach(function(p) { refreshDot(p.plcId); });
+}
+
+/* ══ 메인 틱 ══ */
+function doTick() {
+    var start   = parseInt($('#addrStart').val());
+    var end     = parseInt($('#addrEnd').val());
+    if (isNaN(end) || end < start) end = start;
+    var addrCnt = Math.min(end - start + 1, 20);
+
+    var vals = getValues();
+    if (!vals.length) return;
+
+    var curVal = vals[valueIndex % vals.length];
+    highlightPill(valueIndex);
+    $('#curValDisplay').text(curVal);
+    valueIndex++;
+    gStats.tick++;
+    $('#statTick').text(gStats.tick);
+
+    var addrs = [];
+    for (var i = 0; i < addrCnt; i++) addrs.push(start + i);
+
+    // 모든 PLC에 병렬 쓰기 (각 PLC 내부는 순차)
+    selPlcs.forEach(function(p) {
+        var st = plcStats[p.plcId];
+        if (!st || st.disc) return;  // 끊긴 PLC 스킵
+        writeSequential(p, addrs, curVal, 0);
+    });
+}
+
+/* ── PLC 한 대의 주소 목록을 순차 쓰기 ── */
+function writeSequential(plc, addrs, val, idx) {
+    if (idx >= addrs.length) return;
+    var addr  = addrs[idx];
+    var isBit = isModbusType(plc.plcType) && isBitArea(addr);
+    var url   = ctx + (isBit ? '/plc/writeBit/' : '/plc/write/') + plc.plcId;
+    var t0    = Date.now();
+
+    $.ajax({
+        url: url, type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ address: addr, value: val }),
+        timeout: 5000,
+        success: function(res) {
+            var elapsed = Date.now() - t0;
+            if (res && res.success === false) {
+                onResult(plc, addr, val, isBit, false, elapsed, res.error || 'C# 오류');
+            } else {
+                onResult(plc, addr, val, isBit, true, elapsed, '');
+            }
+            writeSequential(plc, addrs, val, idx + 1);
+        },
+        error: function(xhr, status, err) {
+            var msg = status + (err ? ' / ' + err : '') +
+                (xhr.responseText ? ' → ' + xhr.responseText.substring(0, 60) : '');
+            onResult(plc, addr, val, isBit, false, Date.now() - t0, msg);
+            writeSequential(plc, addrs, val, idx + 1);  // 실패해도 다음 주소 계속
+        }
+    });
+}
+
+/* ── 결과 처리 ── */
+function onResult(plc, addr, val, isBit, ok, ms, msg) {
+    var st = plcStats[plc.plcId];
+    if (!st) return;
+
+    st.total++; gStats.total++;
+    if (ok) {
+        st.ok++; gStats.ok++;
+        st.streak = 0;
+        st.lastMs = ms;
+    } else {
+        st.fail++; gStats.fail++;
+        st.streak++;
+        if (st.streak > st.maxStreak) st.maxStreak = st.streak;
+    }
+
+    // 연속 실패 임계값 → 끊김 처리
+    if (!st.disc && st.streak >= DISC_THRESHOLD) {
+        st.disc = true;
+        addLog(plc.label, addr, val, 'FAIL',
+            '⚠ 통신 끊김 감지 (연속 실패 ' + st.streak + '회) - ' + plc.plcId);
+        // 전체 PLC 끊김 시 자동 정지
+        if (selPlcs.every(function(p){ return plcStats[p.plcId] && plcStats[p.plcId].disc; })) {
+            stopTest('전체 PLC 통신 끊김');
+        }
+    }
+
+    updatePlcRow(plc.plcId, st);
+    updateGlobalStats();
+    refreshDot(plc.plcId);
+
+    // 로그: OK는 첫 번째 주소만 기록 (로그 과부하 방지), FAIL은 항상
+    if (!ok || addr === parseInt($('#addrStart').val())) {
+        addLog(plc.label, addr, val, ok ? 'OK' : 'FAIL', ok ? '(' + ms + 'ms)' : msg);
+    }
+}
+
+/* ── PLC 행 데이터 업데이트 ── */
+function updatePlcRow(id, st) {
+    var rate = st.total > 0 ? ((st.ok / st.total) * 100).toFixed(1) + '%' : '-';
+    var rateColor = parseFloat(rate) >= 99 ? 'var(--green)' : parseFloat(rate) >= 90 ? 'var(--warn)' : 'var(--err)';
+    var streakColor = st.streak >= DISC_THRESHOLD ? 'var(--err)' : st.streak > 0 ? 'var(--warn)' : 'var(--muted)';
+    $('#pst_total_'  + id).text(st.total);
+    $('#pst_ok_'     + id).text(st.ok);
+    $('#pst_fail_'   + id).text(st.fail);
+    $('#pst_rate_'   + id).text(rate).css('color', rateColor);
+    $('#pst_streak_' + id).text(st.streak).css('color', streakColor);
+    $('#pst_ms_'     + id).text(st.lastMs !== '-' ? st.lastMs + 'ms' : '-');
+}
+
+function refreshDot(id) {
+    var st = plcStats[id]; if (!st) return;
+    var cls = st.disc ? 'disc' : (st.streak > 0 ? 'fail' : (st.ok > 0 ? 'ok' : ''));
+    $('#dot_'  + id).removeClass('ok fail disc').addClass(cls);
+    $('#pdot_' + id).removeClass('ok fail disc').addClass(cls);
+}
+
+function updateGlobalStats() {
+    $('#statTotal').text(gStats.total);
+    $('#statOk').text(gStats.ok);
+    $('#statFail').text(gStats.fail);
+    var rate    = gStats.total > 0 ? ((gStats.ok / gStats.total) * 100).toFixed(1) + '%' : '-';
+    var rateNum = parseFloat(rate);
+    $('#statRate').text(rate).css('color', rateNum >= 99 ? 'var(--green)' : rateNum >= 90 ? 'var(--warn)' : 'var(--err)');
+
+    if (running) {
+        var anyDisc    = selPlcs.some(function(p){ return plcStats[p.plcId] && plcStats[p.plcId].disc; });
+        var anyStreak  = selPlcs.some(function(p){ return plcStats[p.plcId] && plcStats[p.plcId].streak > 0; });
+        if (anyDisc)   setStatus('error',   'ERROR');
+        else if (anyStreak) setStatus('warning', 'WARNING');
+        else           setStatus('running', 'RUNNING');
+    }
+}
+
+function setStatus(cls, text) {
+    $('#statusBadge').removeClass('idle running warning error').addClass(cls).text(text);
+}
+
+function updateElapsed() {
+    if (!startTime) return;
+    var s = Math.floor((Date.now() - startTime) / 1000);
+    $('#elapsedTime').text(pad2(Math.floor(s/3600)) + ':' + pad2(Math.floor((s%3600)/60)) + ':' + pad2(s%60));
+}
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+/* ══ 로그 ══ */
+var logCount = 0, MAX_LOG = 600;
+function addLog(plcLabel, addr, val, result, msg) {
+    var now = new Date();
+    var ts  = pad2(now.getHours()) + ':' + pad2(now.getMinutes()) + ':' + pad2(now.getSeconds());
+    var body = $('#logBody');
+    if (logCount >= MAX_LOG) { body.find('.log-row:last').remove(); } else { logCount++; }
+    var rc  = result === 'OK' ? 'ok' : result === 'FAIL' ? 'fail' : 'info';
+    var row = $('<div class="log-row"></div>')
+        .append('<div class="log-ts">'  + ts + '</div>')
+        .append('<div class="log-plc">' + escHtml(String(plcLabel || '').substring(0, 10)) + '</div>')
+        .append('<div class="log-addr">' + (addr !== '' && addr !== undefined ? 'A:' + addr : '') + '</div>')
+        .append('<div class="log-val">'  + (val  !== '' && val  !== undefined ? 'V:' + val  : '') + '</div>')
+        .append('<div class="log-result ' + rc + '">' + result + '</div>')
+        .append('<div class="log-msg">' + escHtml(String(msg)) + '</div>');
+    body.prepend(row);
+}
+function clearLog() { $('#logBody').empty(); logCount = 0; addLog('SYS','','','INFO','로그 초기화'); }
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+$(document).on('input', '.val-input', function() { updateCycleDisplay(); });
 </script>
 </body>
 </html>

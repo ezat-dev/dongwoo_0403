@@ -52,20 +52,21 @@ public class PlcService
             await tcp.ConnectAsync(PlcIp, PlcPort);
             using var ns = tcp.GetStream();
 
-            int    byteAddress     = startD * 2;
-            string device          = $"%DB{byteAddress}";
-            byte[] deviceAscii     = Encoding.ASCII.GetBytes(device);
-            ushort deviceLen       = (ushort)deviceAscii.Length;
-            ushort byteCountToRead = (ushort)(count * 2);
+            // Sub-cmd 0x0000 (Continuous Direct Variable Read) + %DW{word_addr} 포맷
+            // Sub-cmd 0x0014 (Individual) 은 변수 하나씩 이름으로 읽는 방식으로
+            // 뒤에 byte count 필드가 없어 복수 워드 읽기에 사용 불가.
+            string device      = $"%DW{startD}";
+            byte[] deviceAscii = Encoding.ASCII.GetBytes(device);
+            ushort deviceLen   = (ushort)deviceAscii.Length;
 
             var body = new List<byte>();
-            body.AddRange(new byte[] { 0x54, 0x00 });
-            body.AddRange(new byte[] { 0x14, 0x00 });
-            body.AddRange(new byte[] { 0x00, 0x00 });
-            body.AddRange(new byte[] { 0x01, 0x00 });
-            body.AddRange(BitConverter.GetBytes(deviceLen));
-            body.AddRange(deviceAscii);
-            body.AddRange(BitConverter.GetBytes(byteCountToRead));
+            body.AddRange(new byte[] { 0x54, 0x00 });                    // Read command
+            body.AddRange(new byte[] { 0x00, 0x00 });                    // Sub-cmd: Continuous (Direct Variable)
+            body.AddRange(new byte[] { 0x00, 0x00 });                    // Reserved
+            body.AddRange(BitConverter.GetBytes((ushort)0x0002));        // Data type: WORD
+            body.AddRange(BitConverter.GetBytes((ushort)count));         // Word count
+            body.AddRange(BitConverter.GetBytes(deviceLen));             // Variable name length
+            body.AddRange(deviceAscii);                                  // Variable name
 
             int id = Interlocked.Increment(ref _invokeId) & 0xFFFF;
             byte[] packet = BuildFenetHeader(body.ToArray(), (ushort)id);
@@ -503,9 +504,10 @@ public class PlcService
     // ════════════════════════════════════════════════════════
     private static ushort[] LsParseResponse(byte[] body, ushort requestedWordCount)
     {
-        if (body.Length < 12) throw new Exception("응답 바디가 너무 짧습니다.");
+        if (body.Length < 8)  throw new Exception($"응답 바디가 너무 짧습니다. ({body.Length}바이트)");
         ushort errCode = BitConverter.ToUInt16(body, 6);
         if (errCode != 0) throw new Exception($"PLC READ 에러: 0x{errCode:X4}");
+        if (body.Length < 12) throw new Exception($"응답 바디 부족: {body.Length}바이트 (최소 12 필요)");
 
         ushort actualByteCount = BitConverter.ToUInt16(body, 10);
         int dataOffset = body.Length - actualByteCount;

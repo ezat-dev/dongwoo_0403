@@ -887,7 +887,7 @@ function fetchNextChunk(id) {
     .then(function(data){
         if(!data.success) throw new Error(data.error||'PLC 오류');
         for(var i=0;i<data.values.length;i++)
-            p.values['D'+(chunk.start+i)] = data.values[i] ? 1 : (data.values[i] === 0 ? 0 : (data.values[i] != null ? data.values[i] : 0));
+            p.values['D'+(chunk.start+i)] = data.values[i] != null ? data.values[i] : 0;
 
         p.stats.readOk++;
         if (id === currentId) {

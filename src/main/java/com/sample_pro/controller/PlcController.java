@@ -17,27 +17,74 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * PLC 통신 컨트롤러
+ *
+ * 브라우저(AJAX) → 이 컨트롤러(Spring) → C# API 서버(localhost:5050) → 실제 PLC 장비
+ * 로 이어지는 3단계 프록시 구조.
+ *
+ * 지원 PLC 기종 (기종 구분은 C# 쪽에서 plcType 컬럼 보고 자동 분기):
+ *   - LS XGT     : FEnet 프로토콜
+ *   - Mitsubishi : MC Protocol 3E Binary
+ *   - Modbus TCP : 표준 Modbus TCP (워드/비트 구분 있음)
+ *
+ * 엔드포인트 구조:
+ *   - /plc/xxx        : default PLC 1대 전용 (하위 호환용)
+ *   - /plc/xxx/{id}   : tb_plc 테이블에 등록된 PLC를 id로 지정
+ */
 @Controller
 @RequestMapping("/plc")
 public class PlcController {
 
+    /** C# API 서버 주소 (같은 서버에서 포트 5050으로 실행 중) */
     private static final String CSHARP = "http://localhost:5050";
+
+    /** C# API 서버로 HTTP 요청을 보내는 Spring 내장 HTTP 클라이언트 */
     private final RestTemplate rest = new RestTemplate();
 
+    /**
+     * MariaDB tb_plc 테이블 조회용 DAO.
+     * /plc/dblist 엔드포인트에서 등록된 PLC 목록을 가져올 때 사용.
+     */
     @Autowired
     private PlcConfigDao plcConfigDao;
 
-    // â”€â”€ íŽ˜ì´ì§€ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    // ══════════════════════════════════════════════════════════════
+    //  페이지
+    // ══════════════════════════════════════════════════════════════
+
+    /**
+     * PLC 모니터링 화면 반환.
+     * GET /plc/PlcReadWrite → PlcReadWrite.jsp
+     */
     @RequestMapping(value = "/PlcReadWrite", method = RequestMethod.GET)
     public String page(Model model) {
         return "/monitoring/PlcReadWrite.jsp";
     }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-    //  ê¸°ì¡´ ì—”ë“œí¬ì¸íŠ¸ (í•˜ìœ„í˜¸í™˜ â€“ default PLC)
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-    // â”€â”€ GET /plc/read?start=&count= â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ══════════════════════════════════════════════════════════════
+    //  기존 엔드포인트 (하위 호환 — default PLC 1대)
+    //  C# PlcRegistry의 "default" 인스턴스로 고정 연결됨.
+    //  PLC가 1대일 때 또는 기본 PLC에 빠르게 접근할 때 사용.
+    // ══════════════════════════════════════════════════════════════
+
+    /**
+     * default PLC 워드 읽기.
+     * GET /plc/read?start=10000&count=100
+     *
+     * @param start 읽기 시작 주소 (기본값 10000)
+     * @param count 읽을 워드 개수 (1~300, 기본값 100)
+     * @return { success, start, values: [숫자배열] }
+     *
+     * Modbus 주소 범위별 동작:
+     *   0x(1~9999)   → 비트 영역이므로 에러 발생, /readBits 사용할 것
+     *   1x(10001~)   → 비트 영역이므로 에러 발생, /readBits 사용할 것
+     *   3x(30001~)   → FC04 Input Register 읽기
+     *   4x(40001~)   → FC03 Holding Register 읽기
+     *   RAW(0~)      → FC03 Holding Register offset 읽기
+     */
     @RequestMapping(value = "/read", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> read(
@@ -55,11 +102,21 @@ public class PlcController {
             return ResponseEntity.ok(res);
         } catch (Exception e) {
             System.out.println(">>> [READ ERR] " + e.getMessage());
-            return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage());
+            return err("C# API 연결 실패: " + e.getMessage());
         }
     }
 
-    // â”€â”€ POST /plc/write â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /**
+     * default PLC 워드 쓰기.
+     * POST /plc/write
+     * Body: { "address": 10000, "value": 123 }
+     *
+     * @param body address(주소), value(쓸 값 0~65535)
+     * @return { success: true } 또는 { success: false, error: "..." }
+     *
+     * Modbus일 경우 4x(40001~) 또는 RAW 주소만 가능.
+     * 비트 영역(0x/1x)에 쓰려면 /writeBit 사용할 것.
+     */
     @RequestMapping(value = "/write", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> write(@RequestBody Map<String, Integer> body) {
@@ -70,44 +127,72 @@ public class PlcController {
             return ResponseEntity.ok(res);
         } catch (Exception e) {
             System.out.println(">>> [WRITE ERR] " + e.getMessage());
-            return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage());
+            return err("C# API 연결 실패: " + e.getMessage());
         }
     }
 
-    // â”€â”€ GET /plc/config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /**
+     * default PLC 접속 설정 조회.
+     * GET /plc/config
+     *
+     * @return { ip, port, plcType, label }
+     */
     @RequestMapping(value = "/config", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> getConfig() {
         try {
             return ResponseEntity.ok(rest.getForObject(CSHARP + "/api/plc/config", Map.class));
-        } catch (Exception e) { return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage()); }
+        } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
-    // â”€â”€ POST /plc/config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /**
+     * default PLC 접속 설정 변경.
+     * POST /plc/config
+     * Body: { "ip": "192.168.1.10", "port": 2004, "plcType": "LS", "label": "1호기" }
+     *
+     * plcType 허용값: "LS" | "MITSUBISHI" | "MODBUS_TCP"
+     * 서버 재시작 없이 접속 대상 PLC를 바꿀 때 사용.
+     */
     @RequestMapping(value = "/config", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> setConfig(@RequestBody Map<String, Object> body) {
         System.out.println(">>> [CONFIG] " + body);
         try {
             return ResponseEntity.ok(postJson(CSHARP + "/api/plc/config", body));
-        } catch (Exception e) { return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage()); }
+        } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
-    // â”€â”€ GET /plc/ping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /**
+     * default PLC TCP 연결 테스트 (ping).
+     * GET /plc/ping
+     *
+     * @return { success: true, message: "192.168.1.10:2004 connected" }
+     *         연결 실패 시 { success: false, message: "..." }
+     */
     @RequestMapping(value = "/ping", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> ping() {
         try {
             return ResponseEntity.ok(rest.getForObject(CSHARP + "/api/plc/ping", Map.class));
-        } catch (Exception e) { return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage()); }
+        } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-    //  ì‹ ê·œ â€“ ë‹¤ì¤‘ PLC
-    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-    // â”€â”€ GET /plc/list â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    // ── GET /plc/dblist  (MariaDB tb_plc) ──────────────────────────────────
+    // ══════════════════════════════════════════════════════════════
+    //  다중 PLC — tb_plc 테이블에 등록된 PLC를 id로 구분
+    //  URL의 {id} = tb_plc.plc_id (PK)
+    //  C#이 plc_id로 DB 조회 → plcType 확인 → 해당 프로토콜로 통신
+    // ══════════════════════════════════════════════════════════════
+
+    /**
+     * MariaDB tb_plc 테이블에서 PLC 목록 조회 (enabled=1만).
+     * GET /plc/dblist
+     *
+     * 화면의 PLC 선택 드롭다운을 채울 때 사용.
+     * /plc/list 와 달리 Java가 직접 DB에서 읽어옴 (C# 거치지 않음).
+     *
+     * @return { success: true, data: [ {plcId, ip, port, plcType, label}, ... ] }
+     */
     @RequestMapping(value = "/dblist", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> dbList() {
@@ -122,27 +207,51 @@ public class PlcController {
         }
     }
 
-    // ── GET /plc/list ───────────────────────────────────────────────────────
+    /**
+     * C# 메모리에 올라온 PLC 목록 조회.
+     * GET /plc/list
+     *
+     * C# PlcRepository(= tb_plc)에 등록된 PLC 전체를 반환.
+     * /dblist 와 데이터 출처는 같지만 C# 서버를 통해 가져옴.
+     *
+     * @return [ {id, ip, port, plcType, label, enabled}, ... ]
+     */
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> list() {
         try {
             return ResponseEntity.ok(rest.getForObject(CSHARP + "/api/plc/list", Object.class));
-        } catch (Exception e) { return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage()); }
+        } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
-    // â”€â”€ POST /plc/add â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    // Body: { "id":"plc2", "ip":"192.168.1.10", "port":2004, "plcType":"LS", "label":"2í˜¸ê¸°" }
+    /**
+     * 새 PLC 등록.
+     * POST /plc/add
+     * Body: { "id":"ls1", "ip":"192.168.1.10", "port":2004, "plcType":"LS", "label":"1호기" }
+     *
+     * C#이 tb_plc 테이블에 INSERT(또는 UPDATE)하고 메모리에도 등록.
+     * 이후 /read/ls1, /write/ls1 등 id 기반 엔드포인트로 접근 가능.
+     *
+     * plcType 기본 포트: LS=2004, MITSUBISHI=6004, MODBUS_TCP=502
+     */
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> add(@RequestBody Map<String, Object> body) {
         System.out.println(">>> [ADD] " + body);
         try {
             return ResponseEntity.ok(postJson(CSHARP + "/api/plc/add", body));
-        } catch (Exception e) { return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage()); }
+        } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
-    // â”€â”€ DELETE /plc/remove/{id} â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /**
+     * 등록된 PLC 삭제.
+     * DELETE /plc/remove/{id}
+     *
+     * C#이 tb_plc 테이블에서 해당 id 행을 삭제하고 메모리에서도 제거.
+     * 이후 해당 id로 read/write 요청 시 "PLC not found" 에러 반환.
+     *
+     * @param id 삭제할 PLC의 plc_id (예: "ls1", "mits1")
+     */
     @RequestMapping(value = "/remove/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> remove(@PathVariable String id) {
@@ -152,10 +261,23 @@ public class PlcController {
             Map<String, Object> r = new HashMap<>();
             r.put("success", true);
             return ResponseEntity.ok(r);
-        } catch (Exception e) { return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage()); }
+        } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
-    // â”€â”€ GET /plc/read/{id}?start=&count= â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /**
+     * 특정 PLC 워드 읽기.
+     * GET /plc/read/{id}?start=10000&count=100
+     *
+     * C#이 plc_id로 tb_plc 조회 → plcType 확인 → 해당 프로토콜로 읽기.
+     *   LS        → FEnet으로 D레지스터 읽기
+     *   MITSUBISHI → MC 3E로 D레지스터 읽기
+     *   MODBUS_TCP → FC03/FC04로 워드 읽기 (비트 영역이면 에러)
+     *
+     * @param id    tb_plc.plc_id (예: "ls1", "mits1", "modbus1")
+     * @param start 읽기 시작 주소 (기본값 10000)
+     * @param count 읽을 워드 개수 (1~300, 기본값 100)
+     * @return { success, start, values: [숫자배열] }
+     */
     @RequestMapping(value = "/read/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> readById(
@@ -171,10 +293,24 @@ public class PlcController {
         try {
             Map<?, ?> res = rest.getForObject(url, Map.class);
             return ResponseEntity.ok(res);
-        } catch (Exception e) { return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage()); }
+        } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
-    // â”€â”€ POST /plc/write/{id} â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /**
+     * 특정 PLC 워드 쓰기.
+     * POST /plc/write/{id}
+     * Body: { "address": 5000, "value": 1 }
+     *
+     * C#이 plc_id로 tb_plc 조회 → plcType 확인 → 해당 프로토콜로 쓰기.
+     *   LS        → FEnet으로 D레지스터 1워드 쓰기
+     *   MITSUBISHI → MC 3E로 D레지스터 1워드 쓰기
+     *   MODBUS_TCP → FC06(단일 레지스터 쓰기), 실패 시 FC10으로 자동 재시도
+     *
+     * Modbus 비트 영역(0x/1x Coil)에 쓰려면 /writeBit/{id} 사용할 것.
+     *
+     * @param id   tb_plc.plc_id
+     * @param body address(주소), value(쓸 값 0~65535)
+     */
     @RequestMapping(value = "/write/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> writeById(
@@ -183,25 +319,46 @@ public class PlcController {
         System.out.println(">>> [WRITE/" + id + "] addr=" + body.get("address") + " <- " + body.get("value"));
         try {
             return ResponseEntity.ok(postJson(CSHARP + "/api/plc/write/" + id, body));
-        } catch (Exception e) { return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage()); }
+        } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
-    // â”€â”€ GET /plc/ping/{id} â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /**
+     * 특정 PLC TCP 연결 테스트 (ping).
+     * GET /plc/ping/{id}
+     *
+     * tb_plc에 등록된 ip:port 로 TCP 소켓 연결을 시도하고 성공 여부를 반환.
+     * 실제 PLC 통신은 하지 않고 네트워크 연결 가능 여부만 확인.
+     *
+     * @param id tb_plc.plc_id
+     * @return { success: true, message: "192.168.1.10:2004 connected" }
+     */
     @RequestMapping(value = "/ping/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> pingById(@PathVariable String id) {
         System.out.println(">>> [PING/" + id + "]");
         try {
             return ResponseEntity.ok(rest.getForObject(CSHARP + "/api/plc/ping/" + id, Map.class));
-        } catch (Exception e) { return err("C# API ì—°ê²° ì‹¤íŒ¨: " + e.getMessage()); }
+        } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
-    // â”€â”€ ê³µí†µ ì—ëŸ¬ ì‘ë‹µ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
     // ══════════════════════════════════════════════════════════════
-    //  비트 (Coil / Discrete Input) — MODBUS_TCP 전용
+    //  비트 읽기/쓰기 — MODBUS_TCP 전용
+    //  Modbus 비트 영역:
+    //    0x (1~9999)    : Coil — FC01 읽기 / FC05 쓰기 (읽기+쓰기)
+    //    1x (10001~19999): Coil — FC01 읽기 / FC05 쓰기 (읽기+쓰기)
+    //    2x (20001~29999): Discrete Input — FC02 읽기 전용
+    //  LS/Mitsubishi는 비트 읽기/쓰기 미지원, 호출 시 C#에서 에러 반환.
     // ══════════════════════════════════════════════════════════════
 
-    // ── GET /plc/readBits?start=&count= ─────────────────────────
+    /**
+     * default PLC 비트 읽기.
+     * GET /plc/readBits?start=10001&count=100
+     *
+     * @param start 읽기 시작 주소 (기본값 10001, 0x/1x/2x 비트 주소)
+     * @param count 읽을 비트 개수 (1~2000, 기본값 100)
+     * @return { success, start, values: [true/false 배열] }
+     */
     @RequestMapping(value = "/readBits", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> readBits(
@@ -223,8 +380,17 @@ public class PlcController {
         }
     }
 
-    // ── POST /plc/writeBit ──────────────────────────────────────
-    // Body: { "address": 10001, "value": true }
+    /**
+     * default PLC 비트 쓰기 (Coil 전용).
+     * POST /plc/writeBit
+     * Body: { "address": 10001, "value": true }
+     *
+     * Modbus FC05 (Write Single Coil) 사용.
+     * value=true → 0xFF00, value=false → 0x0000 으로 변환되어 전송됨.
+     * 2x Discrete Input 주소는 읽기 전용이므로 에러 반환.
+     *
+     * @param body address(0x/1x Coil 주소), value(true/false)
+     */
     @RequestMapping(value = "/writeBit", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> writeBit(@RequestBody Map<String, Object> body) {
@@ -239,7 +405,15 @@ public class PlcController {
         }
     }
 
-    // ── GET /plc/readBits/{id}?start=&count= ────────────────────
+    /**
+     * 특정 PLC 비트 읽기.
+     * GET /plc/readBits/{id}?start=10001&count=100
+     *
+     * @param id    tb_plc.plc_id (MODBUS_TCP 타입만 동작)
+     * @param start 읽기 시작 주소 (기본값 10001)
+     * @param count 읽을 비트 개수 (1~2000, 기본값 100)
+     * @return { success, start, values: [true/false 배열] }
+     */
     @RequestMapping(value = "/readBits/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> readBitsById(
@@ -258,7 +432,14 @@ public class PlcController {
         } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
-    // ── POST /plc/writeBit/{id} ─────────────────────────────────
+    /**
+     * 특정 PLC 비트 쓰기 (Coil 전용).
+     * POST /plc/writeBit/{id}
+     * Body: { "address": 10001, "value": true }
+     *
+     * @param id   tb_plc.plc_id (MODBUS_TCP 타입만 동작)
+     * @param body address(0x/1x Coil 주소), value(true/false)
+     */
     @RequestMapping(value = "/writeBit/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> writeBitById(
@@ -270,6 +451,18 @@ public class PlcController {
         } catch (Exception e) { return err("C# API 연결 실패: " + e.getMessage()); }
     }
 
+
+    // ══════════════════════════════════════════════════════════════
+    //  내부 유틸 메서드
+    // ══════════════════════════════════════════════════════════════
+
+    /**
+     * 에러 응답 생성 헬퍼.
+     * 모든 엔드포인트에서 예외 발생 시 동일한 형태로 반환.
+     *
+     * @param msg 에러 메시지
+     * @return { success: false, error: "메시지" }
+     */
     private ResponseEntity<?> err(String msg) {
         Map<String, Object> m = new HashMap<>();
         m.put("success", false);
@@ -277,6 +470,14 @@ public class PlcController {
         return ResponseEntity.ok(m);
     }
 
+    /**
+     * JSON POST 요청 헬퍼.
+     * Content-Type: application/json 헤더를 붙여 C# API 서버로 POST 전송.
+     *
+     * @param url  요청 대상 URL (C# API 서버 주소)
+     * @param body 요청 바디 (Map 또는 POJO → Jackson이 JSON으로 직렬화)
+     * @return C# 서버의 응답 JSON (Map 형태)
+     */
     private Map<?, ?> postJson(String url, Object body) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -284,4 +485,3 @@ public class PlcController {
         return rest.exchange(url, HttpMethod.POST, entity, Map.class).getBody();
     }
 }
-
