@@ -1,7 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%
-    String ctx = request.getContextPath();
-%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -88,8 +85,9 @@ html, body { height: 100%; font-family: 'Segoe UI','Malgun Gothic',sans-serif; b
 
 /* 배지 */
 .badge {
-  display: inline-block; padding: 2px 8px;
+  display: inline-flex; align-items: center; padding: 2px 8px;
   border-radius: 20px; font-size: 11px; font-weight: 600;
+  white-space: nowrap;
 }
 .badge-ok    { background: #F0FFF4; color: var(--green);  border: 1px solid #9AE6B4; }
 .badge-warn  { background: #FFFAF0; color: var(--orange); border: 1px solid #FBD38D; }

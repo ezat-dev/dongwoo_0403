@@ -31,6 +31,11 @@ public class TempDaoImpl implements TempDao {
     }
 
     @Override
+    public void addEquipIdColumn() {
+        sqlSession.update("TempMapper.addEquipIdColumn");
+    }
+
+    @Override
     public void ensureTempHistoryTable() {
         sqlSession.update("TempMapper.ensureTempHistoryTable");
     }

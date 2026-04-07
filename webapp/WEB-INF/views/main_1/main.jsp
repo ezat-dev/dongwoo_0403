@@ -1,7 +1,4 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%
-    String ctx = request.getContextPath();
-%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -172,59 +169,62 @@ html, body { height: 100%; font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
   <nav class="sidebar" id="sidebar">
 
     <div class="sb-logo">
-      <img src="<%=ctx%>/img/동우 로고 디자인.png" alt="로고">
+      <img src="${pageContext.request.contextPath}/img/동우 로고 디자인.png" alt="로고">
     </div>
 
     <div class="sb-body">
 
       <!-- 모니터링 -->
-      <div class="sb-group-title">모니터링</div>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/equip/monitor','설비 모니터링',this);return false;">
-        <div class="sb-icon">🖥️</div><span class="sb-label">설비 모니터링</span>
+      <div class="sb-group-title">통신 모니터링</div>
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/main/monitor','메인 모니터링',this);return false;">
+        <div class="sb-icon">🧭</div><span class="sb-label">메인 모니터링</span>
       </a>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/equip/detail','설비 상세',this);return false;">
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/equip/monitor','설비 모니터링',this);return false;">
+        <div class="sb-icon">🖥️</div><span class="sb-label">통신 모니터링</span>
+      </a>
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/equip/detail','설비 상세',this);return false;">
         <div class="sb-icon">🔍</div><span class="sb-label">설비 상세</span>
       </a>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/trend','트렌드',this);return false;">
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/trend','트렌드',this);return false;">
         <div class="sb-icon">📈</div><span class="sb-label">트렌드</span>
       </a>
 
       <!-- 알람 -->
       <div class="sb-group-title">알람</div>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/alarm/history','알람 이력',this);return false;">
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/alarm/history','알람 이력',this);return false;">
         <div class="sb-icon">🔔</div><span class="sb-label">알람 이력</span><span class="sb-badge" id="alarmBadge">0</span>
       </a>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/alarm/ranking','알람 랭킹',this);return false;">
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/alarm/ranking','알람 랭킹',this);return false;">
         <div class="sb-icon">🏆</div><span class="sb-label">알람 랭킹</span>
       </a>
 
       <!-- 보정현황 -->
       <div class="sb-group-title">보정현황</div>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/calib/status','보정현황',this);return false;">
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/calib/status','보정현황',this);return false;">
         <div class="sb-icon">🌡️</div><span class="sb-label">보정현황</span>
       </a>
 
       <!-- 점검 -->
       <div class="sb-group-title">점검</div>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/inspect/daily','일상점검일지',this);return false;">
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/inspect/daily','일상점검일지',this);return false;">
         <div class="sb-icon">📋</div><span class="sb-label">일상점검일지</span>
       </a>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/inspect/fproof','F/PROOF',this);return false;">
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/inspect/fproof','F/PROOF',this);return false;">
         <div class="sb-icon">🛡️</div><span class="sb-label">F/PROOF</span>
       </a>
 
       <!-- 자재 -->
       <div class="sb-group-title">자재</div>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/spare/parts','스페어파트',this);return false;">
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/spare/parts','스페어파트',this);return false;">
         <div class="sb-icon">🔩</div><span class="sb-label">스페어파트</span>
       </a>
 
       <!-- 시스템 -->
       <div class="sb-group-title">시스템</div>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/user/manage','사용자 관리',this);return false;">
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/user/manage','사용자 관리',this);return false;">
         <div class="sb-icon">👤</div><span class="sb-label">사용자 관리</span>
       </a>
-      <a class="sb-item" href="#" onclick="go('<%=ctx%>/main_1/user/permission','권한 부여',this);return false;">
+      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/user/permission','권한 부여',this);return false;">
         <div class="sb-icon">🔐</div><span class="sb-label">권한 부여</span>
       </a>
 
@@ -248,15 +248,15 @@ html, body { height: 100%; font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
       <div class="topbar-right">
         <div class="topbar-date" id="topbarDate"></div>
         <div class="user-chip">
-          <div class="user-avatar">U</div>
-          <span class="user-name">사용자</span>
+          <div class="user-avatar" id="userAvatar">U</div>
+          <span class="user-name" id="userName">사용자</span>
         </div>
-        <button class="btn-logout" onclick="location.href='<%=ctx%>/main_1/login'">로그아웃</button>
+        <button class="btn-logout" onclick="doLogout()">로그아웃</button>
       </div>
     </header>
 
     <div class="frame-wrap">
-      <iframe id="pageFrame" src="<%=ctx%>/main_1/equip/monitor"></iframe>
+      <iframe id="pageFrame" src="${pageContext.request.contextPath}/main_1/equip/monitor"></iframe>
     </div>
   </div>
 
@@ -279,8 +279,28 @@ function updateDate() {
 }
 function pad(n){ return String(n).padStart(2,'0'); }
 updateDate(); setInterval(updateDate, 10000);
-// 첫 번째 메뉴 활성화
 document.querySelector('.sb-item').classList.add('active');
+
+/* 로그인 유저 이름 로드 */
+fetch('${pageContext.request.contextPath}/emp/me')
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(d.success && d.data){
+      var name = d.data.emp_name || d.data.id || '사용자';
+      document.getElementById('userName').textContent = name;
+      document.getElementById('userAvatar').textContent = name.charAt(0);
+    }
+  });
+
+function doLogout(){
+  fetch('${pageContext.request.contextPath}/user/logout', {method:'POST'})
+    .catch(function(){})
+    .finally(function(){
+      location.href = '${pageContext.request.contextPath}/main_1/login';
+    });
+}
 </script>
 </body>
 </html>
+
+

@@ -11,6 +11,14 @@ import com.sample_pro.domain.Users;
 
 public interface UserService {
 
+	List<Map<String, Object>> empList();
+	void empInsert(Map<String, Object> params);
+	void empUpdate(Map<String, Object> params);
+	void empToggle(int empId);
+	void empDelete(int empId);
+
+	Map<String, Object> empLoginCheck(String id, String pwNo);
+
 	Users userLoginCheck(Users users);
 
 	Permission userLoginPermission(Users loginUser);

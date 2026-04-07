@@ -24,6 +24,9 @@ public class TempServiceImpl implements TempService {
         if (tempDao.countTempTagColumn("col_name") == 0) {
             tempDao.addTempTagColName();
         }
+        if (tempDao.countTempTagColumn("equip_id") == 0) {
+            tempDao.addEquipIdColumn();
+        }
         tempDao.ensureTempHistoryTable();
         tempDao.ensureTempSnapshotTable();
 

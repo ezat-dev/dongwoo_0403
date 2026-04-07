@@ -6,6 +6,7 @@ public class TempTag {
     private String address;
     private String plcId;
     private String colName;
+    private String equipId;
     private int enabled;
     private String createdAt;
     private String updatedAt;
@@ -48,6 +49,14 @@ public class TempTag {
 
     public void setColName(String colName) {
         this.colName = colName;
+    }
+
+    public String getEquipId() {
+        return equipId;
+    }
+
+    public void setEquipId(String equipId) {
+        this.equipId = equipId;
     }
 
     public int getEnabled() {

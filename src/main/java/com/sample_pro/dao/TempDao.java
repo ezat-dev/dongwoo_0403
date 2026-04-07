@@ -10,6 +10,7 @@ public interface TempDao {
     void ensureTempTagTable();
     int countTempTagColumn(String colName);
     void addTempTagColName();
+    void addEquipIdColumn();
     void ensureTempHistoryTable();
     void ensureTempSnapshotTable();
 

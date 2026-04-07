@@ -11,6 +11,7 @@
         <result property="address"   column="address"/>
         <result property="plcId"     column="plc_id"/>
         <result property="colName"   column="col_name"/>
+        <result property="equipId"   column="equip_id"/>
         <result property="enabled"   column="enabled"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
@@ -55,6 +56,11 @@
         ADD COLUMN col_name VARCHAR(120) NOT NULL DEFAULT ''
     </update>
 
+    <update id="addEquipIdColumn" statementType="STATEMENT">
+        ALTER TABLE tb_temp_tag
+        ADD COLUMN equip_id VARCHAR(20) NULL DEFAULT NULL
+    </update>
+
     <update id="ensureTempHistoryTable" statementType="STATEMENT">
         CREATE TABLE IF NOT EXISTS tb_temp_history (
             history_id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -78,7 +84,7 @@
 
     <!-- Temp tags -->
     <select id="selectTempTagList" resultMap="tempTagMap">
-        SELECT temp_id, tag_name, address, plc_id, col_name, enabled,
+        SELECT temp_id, tag_name, address, plc_id, col_name, equip_id, enabled,
                DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
                DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at
         FROM   tb_temp_tag
@@ -86,7 +92,7 @@
     </select>
 
     <select id="selectTempTagById" parameterType="int" resultMap="tempTagMap">
-        SELECT temp_id, tag_name, address, plc_id, col_name, enabled,
+        SELECT temp_id, tag_name, address, plc_id, col_name, equip_id, enabled,
                DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
                DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at
         FROM   tb_temp_tag
@@ -95,7 +101,7 @@
     </select>
 
     <select id="selectTempTagsMissingColName" resultMap="tempTagMap">
-        SELECT temp_id, tag_name, address, plc_id, col_name, enabled,
+        SELECT temp_id, tag_name, address, plc_id, col_name, equip_id, enabled,
                DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
                DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at
         FROM   tb_temp_tag
@@ -108,11 +114,12 @@
 
     <insert id="insertTempTag" parameterType="com.sample_pro.domain.TempTag"
             useGeneratedKeys="true" keyProperty="tempId">
-        INSERT INTO tb_temp_tag (tag_name, address, plc_id, col_name, enabled)
-        VALUES (#{tagName}, #{address}, #{plcId}, #{colName}, #{enabled})
+        INSERT INTO tb_temp_tag (tag_name, address, plc_id, col_name, equip_id, enabled)
+        VALUES (#{tagName}, #{address}, #{plcId}, #{colName}, #{equipId}, #{enabled})
         ON DUPLICATE KEY UPDATE
             tag_name = VALUES(tag_name),
             col_name = VALUES(col_name),
+            equip_id = VALUES(equip_id),
             enabled  = VALUES(enabled)
     </insert>
 
@@ -122,6 +129,7 @@
                address  = #{address},
                plc_id   = #{plcId},
                col_name = #{colName},
+               equip_id = #{equipId},
                enabled  = #{enabled}
         WHERE  temp_id = #{tempId}
     </update>

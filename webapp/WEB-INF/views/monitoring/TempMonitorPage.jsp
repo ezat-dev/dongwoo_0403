@@ -396,6 +396,25 @@ body::after {
   transition: width .1s linear;
 }
 
+/* ══ EQUIP FILTER TABS ══ */
+.equip-bar {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--cyan-border);
+  background: var(--bg-deep);
+}
+.equip-tab {
+  padding: 3px 10px; border-radius: 3px;
+  border: 1px solid rgba(0,240,255,.2);
+  background: transparent;
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 1px; color: var(--text-s);
+  cursor: pointer; transition: all .15s;
+}
+.equip-tab:hover  { border-color: var(--cyan); color: var(--text-p); }
+.equip-tab.active { border-color: var(--cyan); background: rgba(0,240,255,.1); color: var(--cyan); box-shadow: 0 0 6px rgba(0,240,255,.3); }
+
 /* ══ HIGHCHARTS overrides (theme) ══ */
 .highcharts-background      { fill: transparent !important; }
 .highcharts-grid-line       { stroke: rgba(0,240,255,.08) !important; }
@@ -446,6 +465,25 @@ body::after {
 
   <!-- ══ RIGHT ══ -->
   <section class="panel-right">
+
+    <!-- 설비 필터 탭 -->
+    <div class="equip-bar" id="equipBar">
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-s);letter-spacing:2px;margin-right:4px">EQUIP</span>
+      <button class="equip-tab active" onclick="setEquip('ALL',this)">ALL</button>
+      <button class="equip-tab" onclick="setEquip('BCF1',this)">BCF1</button>
+      <button class="equip-tab" onclick="setEquip('BCF2',this)">BCF2</button>
+      <button class="equip-tab" onclick="setEquip('BCF3',this)">BCF3</button>
+      <button class="equip-tab" onclick="setEquip('BCF4',this)">BCF4</button>
+      <button class="equip-tab" onclick="setEquip('BCF5',this)">BCF5</button>
+      <button class="equip-tab" onclick="setEquip('BCF6',this)">BCF6</button>
+      <button class="equip-tab" onclick="setEquip('BCF7',this)">BCF7</button>
+      <button class="equip-tab" onclick="setEquip('BCF8',this)">BCF8</button>
+      <button class="equip-tab" onclick="setEquip('BCF9',this)">BCF9</button>
+      <button class="equip-tab" onclick="setEquip('BCF10',this)">BCF10</button>
+      <button class="equip-tab" onclick="setEquip('BCF11',this)">BCF11</button>
+      <button class="equip-tab" onclick="setEquip('BCF12',this)">BCF12</button>
+    </div>
+
     <div class="toolbar">
       <div class="tb-section">
         <span class="tb-label yellow">RANGE</span>
@@ -498,8 +536,9 @@ body::after {
 
 <script>
 const base = '<%=ctx%>';
-let tagList  = [];
-let chart    = null;
+let tagList   = [];
+let curEquip  = 'ALL';
+let chart     = null;
 
 /* ── 색상 팔레트 (Highcharts용) ── */
 const PALETTE = [
@@ -566,6 +605,15 @@ function loadTags() {
     });
 }
 
+/* ── 설비 필터 ── */
+function setEquip(eq, btn) {
+  curEquip = eq;
+  document.querySelectorAll('.equip-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderTagList();
+  applyRange();
+}
+
 function renderTagList() {
   const wrap = document.getElementById('tagList');
   if (!tagList.length) {
@@ -574,16 +622,18 @@ function renderTagList() {
   }
   let html = '';
   tagList.forEach((t, idx) => {
+    // equipId 필터: ALL이면 전부, 아니면 해당 설비만
+    if (curEquip !== 'ALL' && (t.equipId || '') !== curEquip) return;
     const color = PALETTE[idx % PALETTE.length];
     html +=
       '<div class="tag-item active" data-id="' + t.tempId + '" onclick="onTagClick(event,' + t.tempId + ')">' +
         '<input type="checkbox" id="tag_' + t.tempId + '" checked>' +
         '<div class="tag-dot" style="background:' + color + '; color:' + color + ';"></div>' +
-        '<div class="tag-name">' + esc(t.tagName) + '</div>' +
-        '<div class="tag-addr">' + esc(t.address || '') + '</div>' +
+        '<div class="tag-name">' + esc(t.colName || t.tagName) + '</div>' +
+        '<div class="tag-addr">' + esc(t.tagName || '') + '</div>' +
       '</div>';
   });
-  wrap.innerHTML = html;
+  wrap.innerHTML = html || '<div class="folder-empty">[ NO TAGS ]</div>';
 }
 
 function onTagClick(e, tempId) {
@@ -616,7 +666,8 @@ function selectAll(flag) {
 function filterTagList() {
   const q = (document.getElementById('tagSearch').value || '').toLowerCase();
   document.querySelectorAll('#tagList .tag-item').forEach(it => {
-    const name = (it.querySelector('.tag-name')?.textContent || '').toLowerCase();
+    const name = (it.querySelector('.tag-name')?.textContent || '').toLowerCase()
+               + (it.querySelector('.tag-addr')?.textContent || '').toLowerCase();
     it.style.display = name.includes(q) ? '' : 'none';
   });
 }

@@ -42,9 +42,10 @@ public class EzInOutController {
     // PLC C# API 주소
     private static final String CSHARP_API            = "http://localhost:5050";
 
-    // PIN 성공 → D13000 = 1
-    private static final int    PLC_DOOR_PIN_ADDRESS  = 13000;
-    private static final int    PLC_DOOR_PIN_VALUE    = 1;
+    // PIN 성공 → 정문 D13000 / 후문 D13002 = 1
+    private static final int    PLC_DOOR_FRONT_ADDRESS = 13000;
+    private static final int    PLC_DOOR_BACK_ADDRESS  = 13002;
+    private static final int    PLC_DOOR_PIN_VALUE     = 1;
 
     // 카톡 문열기 버튼 → D13001 = 1
     private static final int    PLC_DOOR_TAKE_ADDRESS = 13001;
@@ -192,7 +193,12 @@ public class EzInOutController {
             return ResponseEntity.ok(error("잠금 상태입니다. " + remainSec + "초 후 다시 시도해 주세요."));
         }
 
-        String pin = trim(body.get("pin"));
+        String pin  = trim(body.get("pin"));
+        String gate = trim(body.get("gate")); // "front" | "back"
+        boolean isFront = !"back".equals(gate);
+        String visitReason = isFront ? "정문 출입" : "후문 출입";
+        int plcAddress     = isFront ? PLC_DOOR_FRONT_ADDRESS : PLC_DOOR_BACK_ADDRESS;
+
         if (pin.isEmpty())          return ResponseEntity.ok(error("PIN을 입력해 주세요."));
         if (!pin.matches("\\d{6}")) return ResponseEntity.ok(error("PIN은 숫자 6자리입니다."));
 
@@ -233,7 +239,7 @@ public class EzInOutController {
                     visit.setTargetTitleName(emp.getTitleName());
                     visit.setTargetMobileNo(emp.getMobileNo());
                     visit.setTargetDirectNo(emp.getDirectNo());
-                    visit.setVisitReason("PIN_IN");
+                    visit.setVisitReason(visitReason);
                     visit.setVisitReasonEtc("");
                     visit.setAgreeYn("Y");
 
@@ -244,9 +250,9 @@ public class EzInOutController {
                 }
             }
 
-            // D13000 <- 1
-            String plcResult = writePlc(PLC_DOOR_PIN_ADDRESS, PLC_DOOR_PIN_VALUE);
-            System.out.println(">>> [PIN OK] D" + PLC_DOOR_PIN_ADDRESS + "=1 → " + plcResult);
+            // 정문 D13000 / 후문 D13002 <- 1
+            String plcResult = writePlc(plcAddress, PLC_DOOR_PIN_VALUE);
+            System.out.println(">>> [PIN OK] " + visitReason + " D" + plcAddress + "=1 → " + plcResult);
 
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("success", true);

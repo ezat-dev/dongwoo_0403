@@ -22,6 +22,32 @@ public class UserDaoImpl implements UserDao{
 	    private SqlSession sqlSession;
 	
 	@Override
+	public List<Map<String, Object>> empList() {
+		return sqlSession.selectList("users.empList");
+	}
+	@Override
+	public void empInsert(Map<String, Object> params) {
+		sqlSession.insert("users.empInsert", params);
+	}
+	@Override
+	public void empUpdate(Map<String, Object> params) {
+		sqlSession.update("users.empUpdate", params);
+	}
+	@Override
+	public void empToggle(Map<String, Object> params) {
+		sqlSession.update("users.empToggle", params);
+	}
+	@Override
+	public void empDelete(Map<String, Object> params) {
+		sqlSession.delete("users.empDelete", params);
+	}
+
+	@Override
+	public Map<String, Object> empLoginCheck(Map<String, Object> params) {
+		return sqlSession.selectOne("users.empLoginCheck", params);
+	}
+
+	@Override
 	public Users userLoginCheck(Users users) {
 		return sqlSession.selectOne("users.userLoginCheck", users);
 	}

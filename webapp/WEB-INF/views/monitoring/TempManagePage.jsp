@@ -509,7 +509,25 @@ table tbody td:first-child {
             <span class="form-label">PLC</span>
             <select class="sel" id="plcSelect"></select>
           </div>
-          <div class="form-field" style="max-width:130px;">
+          <div class="form-field" style="max-width:120px;">
+            <span class="form-label">설비 (Equip)</span>
+            <select class="sel" id="equipId">
+              <option value="">-- 미지정 --</option>
+              <option value="BCF1">BCF1</option>
+              <option value="BCF2">BCF2</option>
+              <option value="BCF3">BCF3</option>
+              <option value="BCF4">BCF4</option>
+              <option value="BCF5">BCF5</option>
+              <option value="BCF6">BCF6</option>
+              <option value="BCF7">BCF7</option>
+              <option value="BCF8">BCF8</option>
+              <option value="BCF9">BCF9</option>
+              <option value="BCF10">BCF10</option>
+              <option value="BCF11">BCF11</option>
+              <option value="BCF12">BCF12</option>
+            </select>
+          </div>
+          <div class="form-field" style="max-width:100px;">
             <span class="form-label">Enabled</span>
             <select class="sel" id="enabled">
               <option value="1">ON</option>
@@ -536,6 +554,7 @@ table tbody td:first-child {
                   <th>Name</th>
                   <th>Address</th>
                   <th>PLC</th>
+                  <th>설비</th>
                   <th>Enabled</th>
                 </tr>
               </thead>
@@ -641,6 +660,7 @@ function renderTags(list) {
       '<td><div class="tag-cell"><div class="tag-dot-sm" style="background:' + color + ';box-shadow:0 0 5px ' + color + ';"></div>' + esc(t.tagName) + '</div></td>' +
       '<td style="color:var(--text-s)">' + esc(t.address) + '</td>' +
       '<td style="color:var(--purple)">' + esc(t.plcId) + '</td>' +
+      '<td style="color:var(--amber)">' + esc(t.equipId || '—') + '</td>' +
       '<td><div class="toggle-wrap"><input type="checkbox" class="toggle" ' + (t.enabled===1?'checked':'') + ' onclick="toggleUse(event,' + t.tempId + ')"></div></td>';
     tr.onclick = function(e) {
       if (e.target.classList.contains('toggle')) return;
@@ -692,6 +712,7 @@ function fillForm(t) {
   document.getElementById('tagName').value = t.tagName || '';
   document.getElementById('address').value = t.address || '';
   document.getElementById('plcSelect').value = t.plcId || '';
+  document.getElementById('equipId').value = t.equipId || '';
   document.getElementById('enabled').value = t.enabled || 1;
   document.getElementById('editMode').textContent = '— EDITING  #' + t.tempId + ' —';
 }
@@ -700,6 +721,7 @@ function clearForm() {
   document.getElementById('tempId').value = '';
   document.getElementById('tagName').value = '';
   document.getElementById('address').value = '';
+  document.getElementById('equipId').value = '';
   document.getElementById('enabled').value = 1;
   document.getElementById('editMode').textContent = '— NEW —';
   document.querySelectorAll('#tagTable tbody tr').forEach(r => r.classList.remove('selected'));
@@ -711,6 +733,7 @@ function addTag() {
     tagName: document.getElementById('tagName').value.trim(),
     address: document.getElementById('address').value.trim(),
     plcId: document.getElementById('plcSelect').value,
+    equipId: document.getElementById('equipId').value || null,
     enabled: parseInt(document.getElementById('enabled').value)
   };
   if (!tag.tagName) { toast('Tag Name required', true); return; }
@@ -729,6 +752,7 @@ function updateTag() {
     tagName: document.getElementById('tagName').value.trim(),
     address: document.getElementById('address').value.trim(),
     plcId: document.getElementById('plcSelect').value,
+    equipId: document.getElementById('equipId').value || null,
     enabled: parseInt(document.getElementById('enabled').value)
   };
   jsonFetch(base + '/temp/tag/update', { method: 'POST', body: JSON.stringify(tag) })
@@ -809,7 +833,7 @@ function toggleUse(e, tempId) {
       if (!t) return;
       return jsonFetch(base + '/temp/tag/update', {
         method: 'POST',
-        body: JSON.stringify({ ...t, enabled: checked })
+        body: JSON.stringify({ tempId: t.tempId, tagName: t.tagName, address: t.address, plcId: t.plcId, colName: t.colName, equipId: t.equipId || null, enabled: checked })
       });
     })
     .then(res => {

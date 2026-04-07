@@ -49,6 +49,93 @@ public class UserController {
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	
 	
+	/* ── 직원 목록 조회 ── */
+	@RequestMapping(value = "/emp/list", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> empList() {
+		Map<String, Object> r = new HashMap<>();
+		try { r.put("success", true);  r.put("data", userService.empList()); }
+		catch(Exception e) { r.put("success", false); r.put("message", e.getMessage()); }
+		return r;
+	}
+
+	/* ── 직원 저장 (INSERT / UPDATE) ── */
+	@RequestMapping(value = "/emp/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> empSave(@RequestBody Map<String, Object> body) {
+		Map<String, Object> r = new HashMap<>();
+		try {
+			Object empId = body.get("emp_id");
+			if (empId == null || empId.toString().trim().isEmpty()) userService.empInsert(body);
+			else userService.empUpdate(body);
+			r.put("success", true);
+		} catch(Exception e) { r.put("success", false); r.put("message", e.getMessage()); }
+		return r;
+	}
+
+	/* ── 직원 활성/비활성 토글 ── */
+	@RequestMapping(value = "/emp/toggle", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> empToggle(@RequestBody Map<String, Object> body) {
+		Map<String, Object> r = new HashMap<>();
+		try { userService.empToggle(Integer.parseInt(body.get("emp_id").toString())); r.put("success", true); }
+		catch(Exception e) { r.put("success", false); r.put("message", e.getMessage()); }
+		return r;
+	}
+
+	/* ── 직원 삭제 ── */
+	@RequestMapping(value = "/emp/delete", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> empDelete(@RequestBody Map<String, Object> body) {
+		Map<String, Object> r = new HashMap<>();
+		try { userService.empDelete(Integer.parseInt(body.get("emp_id").toString())); r.put("success", true); }
+		catch(Exception e) { r.put("success", false); r.put("message", e.getMessage()); }
+		return r;
+	}
+
+	/* ── 현재 로그인 직원 정보 ── */
+	@RequestMapping(value = "/emp/me", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> empMe(HttpSession session) {
+		Map<String, Object> r = new HashMap<>();
+		Object emp = session.getAttribute("loginEmp");
+		r.put("success", emp != null);
+		if (emp != null) r.put("data", emp);
+		return r;
+	}
+
+	/* ── 로그아웃 ── */
+	@RequestMapping(value = "/user/logout", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> logout(HttpSession session) {
+		session.invalidate();
+		Map<String, Object> r = new HashMap<>();
+		r.put("success", true);
+		return r;
+	}
+
+	@RequestMapping(value = "/user/login", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> empLogin(
+			@RequestParam String user_id,
+			@RequestParam String user_pw,
+			HttpSession session) {
+		Map<String, Object> rtnMap = new HashMap<>();
+		if (user_id == null || user_id.trim().isEmpty()) {
+			rtnMap.put("success", false); rtnMap.put("message", "아이디를 입력하세요."); return rtnMap;
+		}
+		if (user_pw == null || user_pw.trim().isEmpty()) {
+			rtnMap.put("success", false); rtnMap.put("message", "비밀번호를 입력하세요."); return rtnMap;
+		}
+		Map<String, Object> emp = userService.empLoginCheck(user_id.trim(), user_pw);
+		if (emp == null) {
+			rtnMap.put("success", false); rtnMap.put("message", "아이디 또는 비밀번호가 올바르지 않습니다."); return rtnMap;
+		}
+		session.setAttribute("loginEmp", emp);
+		rtnMap.put("success", true);
+		return rtnMap;
+	}
+
 	/*-----인원 및 안전관리-----*/
 	//사용자 로그인 관리
 	@RequestMapping(value = "/user/login/check", method = RequestMethod.POST) 

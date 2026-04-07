@@ -591,6 +591,58 @@
         /* ============================================
            푸터
         ============================================ */
+        /* ============================================
+           정문/후문 슬라이드 토글
+        ============================================ */
+        .gate-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .gate-switch {
+            position: relative;
+            display: flex;
+            background: #eef1f7;
+            border: 1.5px solid var(--border);
+            border-radius: 999px;
+            padding: 4px;
+            gap: 0;
+            width: 220px;
+        }
+        .gate-switch-thumb {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: linear-gradient(135deg, var(--navy-mid), var(--navy-light));
+            border-radius: 999px;
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 2px 8px rgba(13,27,62,0.22);
+        }
+        .gate-switch.back .gate-switch-thumb {
+            transform: translateX(calc(100% + 0px));
+        }
+        .gate-option {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+            border-radius: 999px;
+            transition: color 0.2s;
+            color: var(--text-muted);
+            user-select: none;
+        }
+        .gate-switch.front .gate-option.opt-front,
+        .gate-switch.back  .gate-option.opt-back {
+            color: #fff;
+        }
+
         .footer {
             margin-top: 28px;
             text-align: center;
@@ -655,6 +707,15 @@
         <div class="pin-title">
             <h2>보안 PIN 인증</h2>
             <p>등록된 6자리 PIN을 입력하세요</p>
+        </div>
+
+        <!-- 정문/후문 슬라이드 토글 -->
+        <div class="gate-toggle">
+            <div class="gate-switch front" id="gateSwitch">
+                <div class="gate-switch-thumb"></div>
+                <div class="gate-option opt-front" onclick="setGate('front')">🚪 정문</div>
+                <div class="gate-option opt-back"  onclick="setGate('back')">🚗 후문</div>
+            </div>
         </div>
 
         <!-- PIN 상태 뷰 (정상 / 잠김 / 성공) -->
@@ -761,6 +822,14 @@
     var PIN_LENGTH   = 6;
     var MAX_ATTEMPTS = 5;
     var LOCK_SECONDS = 300; // 5분
+
+    var currentGate = 'front'; // 'front' | 'back'
+
+    function setGate(gate) {
+        currentGate = gate;
+        var sw = document.getElementById('gateSwitch');
+        sw.className = 'gate-switch ' + gate;
+    }
 
     var pinValue    = '';
     var attempts    = parseInt(sessionStorage.getItem('pin_attempts') || '0', 10);
@@ -882,7 +951,7 @@
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ pin: pinValue })
+            body: JSON.stringify({ pin: pinValue, gate: currentGate })
         })
         .then(function(res) {
             if (!res.ok) throw new Error('서버 오류');
