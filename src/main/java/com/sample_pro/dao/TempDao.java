@@ -1,6 +1,7 @@
 package com.sample_pro.dao;
 
 import com.sample_pro.domain.TempHistory;
+import com.sample_pro.domain.TempMemo;
 import com.sample_pro.domain.TempTag;
 
 import java.util.List;
@@ -28,4 +29,8 @@ public interface TempDao {
     void renameTempSnapshotColumn(Map<String, Object> params);
     List<Map<String, Object>> selectTempSnapshot(Map<String, Object> params);
     List<Map<String, Object>> selectTempSnapshotRange(Map<String, Object> params);
+
+    List<TempMemo> selectMemoList(Map<String, Object> params);
+    void insertMemo(TempMemo memo);
+    void deleteMemo(int tcCnt);
 }

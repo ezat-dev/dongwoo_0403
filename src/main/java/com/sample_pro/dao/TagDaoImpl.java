@@ -16,7 +16,7 @@ public class TagDaoImpl implements TagDao {
     @Resource(name = "session")
     private SqlSession sqlSession;
 
-    // ── 폴더 ─────────────────────────────────────────────
+    // 폴더
 
     @Override
     public List<Folder> selectFolderList() {
@@ -38,7 +38,7 @@ public class TagDaoImpl implements TagDao {
         sqlSession.delete("TagMapper.deleteTagsByFolderId", folderId);
     }
 
-    // ── 태그 ─────────────────────────────────────────────
+    // 태그
 
     @Override
     public List<Tag> selectTagList(int folderId) {

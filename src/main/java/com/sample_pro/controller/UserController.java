@@ -49,7 +49,7 @@ public class UserController {
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	
 	
-	/* ── 직원 목록 조회 ── */
+	/* 직원 목록 조회 */
 	@RequestMapping(value = "/emp/list", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> empList() {
@@ -59,7 +59,7 @@ public class UserController {
 		return r;
 	}
 
-	/* ── 직원 저장 (INSERT / UPDATE) ── */
+	/* 직원 저장 (INSERT / UPDATE) */
 	@RequestMapping(value = "/emp/save", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> empSave(@RequestBody Map<String, Object> body) {
@@ -73,7 +73,7 @@ public class UserController {
 		return r;
 	}
 
-	/* ── 직원 활성/비활성 토글 ── */
+	/* 직원 활성/비활성 토글 */
 	@RequestMapping(value = "/emp/toggle", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> empToggle(@RequestBody Map<String, Object> body) {
@@ -83,7 +83,7 @@ public class UserController {
 		return r;
 	}
 
-	/* ── 직원 삭제 ── */
+	/* 직원 삭제 */
 	@RequestMapping(value = "/emp/delete", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> empDelete(@RequestBody Map<String, Object> body) {
@@ -93,7 +93,7 @@ public class UserController {
 		return r;
 	}
 
-	/* ── 현재 로그인 직원 정보 ── */
+	/* 현재 로그인 직원 정보 */
 	@RequestMapping(value = "/emp/me", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> empMe(HttpSession session) {
@@ -104,7 +104,7 @@ public class UserController {
 		return r;
 	}
 
-	/* ── 로그아웃 ── */
+	/* 로그아웃 */
 	@RequestMapping(value = "/user/logout", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public Map<String, Object> logout(HttpSession session) {

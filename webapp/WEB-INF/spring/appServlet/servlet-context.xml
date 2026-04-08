@@ -22,7 +22,27 @@
 	</beans:bean>
 	
 	<context:component-scan base-package="com.sample_pro.controller" />
-	
-	
-	
+
+	<interceptors>
+		<interceptor>
+			<mapping path="/**"/>
+			<!-- 로그인 관련 -->
+			<exclude-mapping path="/main_1/login"/>
+			<exclude-mapping path="/user/login"/>
+			<exclude-mapping path="/user/login/check"/>
+			<exclude-mapping path="/user/login/log"/>
+			<exclude-mapping path="/user/login/menuSetting"/>
+			<exclude-mapping path="/user/login/menuSave"/>
+			<exclude-mapping path="/user/login/menuList"/>
+			<!-- 정적 리소스 -->
+			<exclude-mapping path="/resources/**"/>
+			<exclude-mapping path="/js/**"/>
+			<exclude-mapping path="/css/**"/>
+			<exclude-mapping path="/images/**"/>
+			<!-- 루트 -->
+			<exclude-mapping path="/"/>
+			<beans:bean class="com.sample_pro.interceptor.LoginInterceptor"/>
+		</interceptor>
+	</interceptors>
+
 </beans:beans>

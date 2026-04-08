@@ -1,8 +1,10 @@
 package com.sample_pro.controller;
 
 import com.sample_pro.domain.TempHistory;
+import com.sample_pro.domain.TempMemo;
 import com.sample_pro.domain.TempTag;
 import com.sample_pro.service.TempService;
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -131,6 +133,64 @@ public class TempController {
             return ResponseEntity.ok(tempService.getTempSnapshotRange(from, to));
         } catch (Exception e) {
             return ResponseEntity.ok(err("Temp snapshot range failed: " + e.getMessage()));
+        }
+    }
+
+    @RequestMapping(value = "/memo/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> memoList(
+            @RequestParam("from") String from,
+            @RequestParam("to") String to) {
+        try {
+            return ResponseEntity.ok(tempService.getMemoList(from, to));
+        } catch (Exception e) {
+            return ResponseEntity.ok(err("Memo list failed: " + e.getMessage()));
+        }
+    }
+
+    @RequestMapping(value = "/memo/insert", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> memoInsert(@RequestBody TempMemo memo, HttpSession session) {
+        try {
+            if (memo.getTcName() == null || memo.getTcName().trim().isEmpty())
+                return ResponseEntity.ok(err("메모 제목을 입력하세요"));
+            if (memo.getTcRegtime() == null || memo.getTcRegtime().trim().isEmpty()) {
+                String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+                memo.setTcRegtime(now);
+            }
+            // 세션에서 로그인 유저 정보 주입 (loginEmp Map 우선, 없으면 loginUser)
+            @SuppressWarnings("unchecked")
+            java.util.Map<String, Object> loginEmp =
+                (java.util.Map<String, Object>) session.getAttribute("loginEmp");
+            if (loginEmp != null) {
+                Object empId   = loginEmp.get("emp_id");
+                Object empName = loginEmp.get("emp_name");
+                if (empId   != null) { try { memo.setTcUserCode(Integer.parseInt(empId.toString())); } catch (Exception ignored) {} }
+                if (empName != null) memo.setTcUserName(empName.toString());
+            } else {
+                com.sample_pro.domain.Users loginUser =
+                    (com.sample_pro.domain.Users) session.getAttribute("loginUser");
+                if (loginUser != null) {
+                    try { memo.setTcUserCode(Integer.parseInt(loginUser.getUser_code())); } catch (Exception ignored) {}
+                    memo.setTcUserName(loginUser.getUser_name());
+                }
+            }
+            tempService.insertMemo(memo);
+            return ResponseEntity.ok(ok());
+        } catch (Exception e) {
+            return ResponseEntity.ok(err("Memo insert failed: " + e.getMessage()));
+        }
+    }
+
+    @RequestMapping(value = "/memo/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> memoDelete(@RequestBody Map<String, Object> body) {
+        try {
+            int tcCnt = Integer.parseInt(body.get("tcCnt").toString());
+            tempService.deleteMemo(tcCnt);
+            return ResponseEntity.ok(ok());
+        } catch (Exception e) {
+            return ResponseEntity.ok(err("Memo delete failed: " + e.getMessage()));
         }
     }
 

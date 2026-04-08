@@ -14,7 +14,7 @@ public class TagServiceImpl implements TagService {
     @Autowired
     private TagDao tagDao;
 
-    // ── 폴더 ─────────────────────────────────────────────
+    // 폴더
 
     @Override
     public List<Folder> getFolderList() {
@@ -34,7 +34,7 @@ public class TagServiceImpl implements TagService {
         tagDao.deleteFolder(folderId);          // 폴더 삭제
     }
 
-    // ── 태그 ─────────────────────────────────────────────
+    // 태그
 
     @Override
     public List<Tag> getTagList(int folderId) {

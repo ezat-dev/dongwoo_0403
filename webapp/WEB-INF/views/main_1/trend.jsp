@@ -171,6 +171,49 @@
 .btn-zoom-reset.visible { display: inline-block; }
 .alt-hint { font-size: 10px; color: var(--muted); padding: 2px 8px; border: 1px dashed var(--border); border-radius: 4px; }
 
+/* 메모 바 */
+.memo-bar {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 10px; padding: 7px 12px; box-shadow: var(--shadow);
+  display: none; flex-wrap: wrap; align-items: center; gap: 6px;
+  flex-shrink: 0;
+}
+.memo-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 16px;
+  border: 1px solid rgba(128,90,213,.4);
+  background: rgba(128,90,213,.08);
+  font-size: 11px; font-weight: 600; color: #553C9A;
+  cursor: pointer; transition: all .13s; user-select: none;
+}
+.memo-pill:hover { background: rgba(128,90,213,.18); }
+.memo-pill.hidden { opacity: .4; text-decoration: line-through; }
+.memo-pill-dot { width: 7px; height: 7px; border-radius: 50%; background: #805AD5; flex-shrink: 0; }
+.memo-pill-del { margin-left: 3px; color: var(--muted); font-size: 14px; line-height: 1; cursor: pointer; font-weight: 400; }
+.memo-pill-del:hover { color: var(--red); }
+
+/* 메모 모달 */
+.memo-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  z-index: 1000; display: none; align-items: center; justify-content: center;
+}
+.memo-modal {
+  background: var(--white); border-radius: 14px;
+  padding: 24px 28px; width: 380px; max-width: 94vw;
+  box-shadow: 0 8px 40px rgba(0,0,0,.2);
+}
+.memo-modal-hd { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+.memo-field { margin-bottom: 13px; }
+.memo-field label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+.memo-field input, .memo-field textarea {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+  border-radius: 7px; font-size: 13px; outline: none;
+  transition: border-color .13s; box-sizing: border-box; font-family: inherit;
+}
+.memo-field input:focus, .memo-field textarea:focus { border-color: var(--primary); }
+.memo-field textarea { resize: vertical; min-height: 70px; }
+.memo-modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+
 /* readability override */
 body { font-family: 'Pretendard','Noto Sans KR','Segoe UI',sans-serif; }
 .kpi-card-val { font-family: 'Segoe UI','Noto Sans KR',sans-serif; font-variant-numeric: tabular-nums; }
@@ -246,8 +289,12 @@ body { font-family: 'Pretendard','Noto Sans KR','Segoe UI',sans-serif; }
           </svg>
         </span>
         <button class="btn-primary" onclick="reloadChart()">↺ 갱신</button>
+        <button class="btn-outline btn-sm" onclick="openMemoModal()" style="border-color:rgba(128,90,213,.5);color:#553C9A">+ 메모</button>
         <span style="margin-left:auto;font-size:11px;color:var(--muted)" id="periodLabel">최근 24시간</span>
       </div>
+
+      <!-- 메모 바 -->
+      <div class="memo-bar" id="memoBar"></div>
 
       <!-- 메인 차트 -->
       <div class="chart-box" id="mainChartBox">
@@ -259,6 +306,30 @@ body { font-family: 'Pretendard','Noto Sans KR','Segoe UI',sans-serif; }
         <div class="refresh-bar"><div class="refresh-bar-inner" id="refreshBar"></div></div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- 메모 추가 모달 -->
+<div class="memo-overlay" id="memoOverlay" onclick="if(event.target===this)closeMemoModal()">
+  <div class="memo-modal">
+    <div class="memo-modal-hd">메모 추가</div>
+    <div class="memo-field">
+      <label>시간 (자동 입력)</label>
+      <input type="text" id="memoTimeVal" readonly style="background:var(--bg);color:var(--muted);cursor:default">
+    </div>
+    <div class="memo-field">
+      <label>제목 <span style="color:var(--muted);font-weight:400">(최대 10자)</span></label>
+      <input type="text" id="memoName" maxlength="10" placeholder="메모 제목을 입력하세요"
+             onkeydown="if(event.key==='Enter')saveMemo()">
+    </div>
+    <div class="memo-field">
+      <label>내용 <span style="color:var(--muted);font-weight:400">(최대 100자)</span></label>
+      <textarea id="memoDesc" maxlength="100" placeholder="메모 내용을 입력하세요 (선택)"></textarea>
+    </div>
+    <div class="memo-modal-btns">
+      <button class="btn-outline btn-sm" onclick="closeMemoModal()">취소</button>
+      <button class="btn-primary btn-sm" onclick="saveMemo()">저장</button>
     </div>
   </div>
 </div>
@@ -278,6 +349,10 @@ var isCustom   = false;
 var mainChart  = null;
 var countdown  = 15;
 var countTimer = null;
+var memos      = [];
+var memoVisible = {};
+var curFrom    = '';
+var curTo      = '';
 
 var COLORS = [
   '#3182CE','#E53E3E','#38A169','#DD6B20',
@@ -383,14 +458,98 @@ function loadTags() {
     .then(function(d){
       console.log('[trend] /temp/cols response', d);
       tags = Array.isArray(d) ? d : [];
+      if (!tags.length) { loadDemoChart(); return; }
       initDefaultSelection();
       renderTagList();
       reloadChart();
     })
     .catch(function(){
-      document.getElementById('tagList').innerHTML =
-        '<div style="text-align:center;padding:20px;color:var(--red);font-size:12px">태그 로드 실패</div>';
+      loadDemoChart();
     });
+}
+
+/* ── 데모 차트 (태그/DB 없을 때 1시간 샘플 데이터) ── */
+function loadDemoChart() {
+  document.getElementById('tagList').innerHTML =
+    '<div style="text-align:center;padding:14px;color:var(--muted);font-size:11px">등록된 태그 없음</div>';
+
+  var now  = Date.now();
+  var hour = 3600 * 1000;
+  var STEP = 60 * 1000; // 1분 간격
+  var COUNT = 61;
+
+  // 자연스러운 랜덤워크 생성
+  function makeWalk(base, amp, noise) {
+    var data = [], v = base;
+    for (var i = 0; i < COUNT; i++) {
+      v += (Math.random() - 0.49) * amp;
+      v = Math.max(base - amp * 3, Math.min(base + amp * 3, v));
+      v += (Math.random() - 0.5) * noise;
+      data.push([now - hour + i * STEP, parseFloat(v.toFixed(2))]);
+    }
+    return data;
+  }
+
+  var demoSeries = [
+    { name: '침탄온도-PV',   data: makeWalk(920, 3, 1.5), color: COLORS[0], lineWidth: 2 },
+    { name: '침탄온도-SV',   data: makeWalk(930, 1, 0.5), color: COLORS[1], lineWidth: 2, dashStyle: 'Dash' },
+    { name: '분위기-PV',     data: makeWalk(0.85, 0.03, 0.01), color: COLORS[2], lineWidth: 2 },
+    { name: '압력-PV',       data: makeWalk(12.5, 0.8, 0.3), color: COLORS[3], lineWidth: 2 }
+  ];
+
+  // KPI 카드 생성
+  var kpiHtml = '';
+  demoSeries.forEach(function(s, i) {
+    var vals = s.data.map(function(p){ return p[1]; });
+    var last = vals[vals.length - 1];
+    var avg  = vals.reduce(function(a,b){return a+b;},0) / vals.length;
+    var mn   = Math.min.apply(null, vals);
+    var mx   = Math.max.apply(null, vals);
+    kpiHtml += '<div class="kpi-card" style="border-top-color:'+s.color+'">'
+      + '<div class="kpi-card-lbl">'+s.name+'</div>'
+      + '<div class="kpi-card-val" style="color:'+s.color+'">'+last.toFixed(1)+'</div>'
+      + '<div class="kpi-card-sub">'
+      + '<span>avg <b>'+avg.toFixed(1)+'</b></span>'
+      + '<span class="kpi-sub-mn">&#8595;'+mn.toFixed(1)+'</span>'
+      + '<span class="kpi-sub-mx">&#8593;'+mx.toFixed(1)+'</span>'
+      + '</div></div>';
+  });
+  document.getElementById('kpiCards').innerHTML = kpiHtml;
+
+  if (mainChart) { mainChart.destroy(); mainChart = null; }
+
+  mainChart = Highcharts.chart('mainChart', {
+    chart: {
+      type: 'spline', animation: { duration: 600 },
+      zoomType: 'x',
+      panning: { enabled: true, type: 'x' }, panKey: 'shift',
+      style: { fontFamily:"'Segoe UI','Malgun Gothic',sans-serif" },
+      height: null,
+      events: { selection: function(){ document.getElementById('btnZoomReset').classList.add('visible'); } },
+      resetZoomButton: { theme: { display: 'none' } }
+    },
+    title: { text: null },
+    xAxis: {
+      type: 'datetime',
+      labels: { format: '{value:%H:%M}', style: { fontSize:'11px' } },
+      crosshair: true
+    },
+    yAxis: [
+      { title: { text: null }, labels: { style: { fontSize:'11px' } }, gridLineColor: '#F0F4F8' },
+    ],
+    tooltip: {
+      shared: true, xDateFormat: '%H:%M',
+      pointFormat: '<span style="color:{series.color}">&#9679;</span> {series.name}: <b>{point.y:.2f}</b><br/>',
+      borderRadius: 8
+    },
+    legend: { enabled: true, itemStyle: { fontSize:'12px', fontWeight:'600' } },
+    plotOptions: { spline: { turboThreshold: 10000, marker: { enabled: false } } },
+    credits: { enabled: false },
+    series: demoSeries
+  });
+
+  setTimeout(function(){ if(mainChart) mainChart.reflow(); }, 50);
+  startCountdown();
 }
 function initDefaultSelection() {
   // 기본: ALL 탭 유지 + 첫 설비(ALL 다음) 태그 2개 선택
@@ -545,6 +704,8 @@ function reloadChart() {
     toStr    = toSqlDateTime(now);
   }
 
+  curFrom = fromStr;
+  curTo   = toStr;
   console.log('[trend] range', { from: fromStr, to: toStr });
   animateRefreshBar(800);
 
@@ -558,7 +719,7 @@ function reloadChart() {
       if (!Array.isArray(rows)) rows = [];
       buildKpiCards(selList, rows);
       buildMainChart(selList, rows);
-      // 실시간 카운트다운 리셋
+      loadMemos(curFrom, curTo);
       if (!isCustom) startCountdown();
     })
     .catch(function(){
@@ -798,6 +959,131 @@ function showAvgResult(selList, rows, t0, t1) {
 }
 
 function tagIdxOf(t) { var i = tags.indexOf(t); return i >= 0 ? i : 0; }
+
+/* ── 메모 ── */
+function openMemoModal() {
+  var now = new Date();
+  var p = function(n){ return String(n).padStart(2,'0'); };
+  var ts = now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())
+          +' '+p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds());
+  document.getElementById('memoTimeVal').value = ts;
+  document.getElementById('memoName').value = '';
+  document.getElementById('memoDesc').value = '';
+  document.getElementById('memoOverlay').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('memoName').focus(); }, 50);
+}
+
+function closeMemoModal() {
+  document.getElementById('memoOverlay').style.display = 'none';
+}
+
+function saveMemo() {
+  var name    = document.getElementById('memoName').value.trim();
+  var desc    = document.getElementById('memoDesc').value.trim();
+  var regtime = document.getElementById('memoTimeVal').value;
+  if (!name) { alert('메모 제목을 입력하세요'); return; }
+  fetch(base + '/temp/memo/insert', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tcName: name, tcDesc: desc, tcRegtime: regtime, tcUserCode: 0 })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.success === false) { alert(d.error || '저장 실패'); return; }
+    closeMemoModal();
+    loadMemos(curFrom, curTo);
+  })
+  .catch(function(){ alert('저장 실패'); });
+}
+
+function loadMemos(from, to) {
+  if (!from || !to) return;
+  fetch(base + '/temp/memo/list?from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!Array.isArray(d)) return;
+      memos = d;
+      d.forEach(function(m){
+        if (memoVisible[m.tcCnt] === undefined) memoVisible[m.tcCnt] = true;
+      });
+      renderMemoPills();
+      applyMemosToChart();
+    })
+    .catch(function(){});
+}
+
+function renderMemoPills() {
+  var bar = document.getElementById('memoBar');
+  if (!memos.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  var html = '<span style="font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;margin-right:2px">메모</span>';
+  memos.forEach(function(m){
+    var vis = memoVisible[m.tcCnt] !== false;
+    html += '<span class="memo-pill'+(vis?'':' hidden')+'" onclick="toggleMemo('+m.tcCnt+')">'
+          + '<span class="memo-pill-dot"></span>'
+          + esc(m.tcName||'')
+          + '<span class="memo-pill-del" title="삭제" onclick="event.stopPropagation();deleteMemo('+m.tcCnt+')">&#x00D7;</span>'
+          + '</span>';
+  });
+  bar.innerHTML = html;
+}
+
+function applyMemosToChart() {
+  if (!mainChart) return;
+  var axis = mainChart.xAxis[0];
+  // 기존 메모 plotLine 전부 제거
+  (axis.plotLinesAndBands || []).slice().forEach(function(b){
+    if (b.id && String(b.id).indexOf('memo-') === 0) axis.removePlotLine(b.id);
+  });
+  // 보이는 메모만 추가
+  memos.forEach(function(m){
+    if (memoVisible[m.tcCnt] === false) return;
+    var ts = parseTs(m.tcRegtime);
+    if (!ts) return;
+    axis.addPlotLine({
+      id: 'memo-' + m.tcCnt,
+      value: ts,
+      color: '#805AD5',
+      width: 1.5,
+      dashStyle: 'ShortDash',
+      zIndex: 5,
+      label: {
+        useHTML: true,
+        text: '<span style="display:inline-block;background:#805AD5;color:#fff;font-size:10px;font-weight:700;padding:4px 8px;border-radius:5px;line-height:1.6;box-shadow:0 2px 6px rgba(128,90,213,.35)">'
+            + esc(m.tcName||'')
+            + (m.tcDesc ? '<br><span style="font-weight:400;font-size:9px;opacity:.92">' + esc(m.tcDesc) + '</span>' : '')
+            + (m.tcUserName ? '<br><span style="font-weight:500;font-size:9px;opacity:.75">&#128100; ' + esc(m.tcUserName) + '</span>' : '')
+            + '</span>',
+        rotation: 0,
+        align: 'left',
+        x: 3,
+        y: 14
+      }
+    });
+  });
+}
+
+function toggleMemo(tcCnt) {
+  memoVisible[tcCnt] = (memoVisible[tcCnt] === false);
+  renderMemoPills();
+  applyMemosToChart();
+}
+
+function deleteMemo(tcCnt) {
+  if (!confirm('메모를 삭제하시겠습니까?')) return;
+  fetch(base + '/temp/memo/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tcCnt: tcCnt })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.success === false) { alert(d.error || '삭제 실패'); return; }
+    delete memoVisible[tcCnt];
+    loadMemos(curFrom, curTo);
+  })
+  .catch(function(){ alert('삭제 실패'); });
+}
 
 /* ── 초기화 ── */
 initRange();

@@ -2,6 +2,7 @@ package com.sample_pro.service;
 
 import com.sample_pro.dao.TempDao;
 import com.sample_pro.domain.TempHistory;
+import com.sample_pro.domain.TempMemo;
 import com.sample_pro.domain.TempTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -102,6 +103,26 @@ public class TempServiceImpl implements TempService {
         p.put("from", from);
         p.put("to", to);
         return tempDao.selectTempSnapshotRange(p);
+    }
+
+    @Override
+    public List<TempMemo> getMemoList(String from, String to) {
+        Map<String, Object> p = new HashMap<>();
+        p.put("from", from);
+        p.put("to", to);
+        return tempDao.selectMemoList(p);
+    }
+
+    @Override
+    @Transactional
+    public void insertMemo(TempMemo memo) {
+        tempDao.insertMemo(memo);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMemo(int tcCnt) {
+        tempDao.deleteMemo(tcCnt);
     }
 
     private void renameSnapshotColumnIfExists(String oldCol, String newCol) {

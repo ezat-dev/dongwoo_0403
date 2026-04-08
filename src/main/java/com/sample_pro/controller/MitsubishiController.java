@@ -33,7 +33,7 @@ public class MitsubishiController {
         restTemplate.postForObject(url, cfg, Map.class);
     }
 
-    // ── 읽기  GET  /sample_pro/plc/mits/read?start=10000&count=4
+    // 읽기  GET  /sample_pro/plc/mits/read?start=10000&count=4
     @RequestMapping(value = "/read", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<?> read(
@@ -58,7 +58,7 @@ public class MitsubishiController {
         }
     }
 
-    // ── 쓰기  POST /sample_pro/plc/mits/write   body: {"address":10000,"value":123}
+    // 쓰기  POST /sample_pro/plc/mits/write   body: {"address":10000,"value":123}
     @RequestMapping(value = "/write", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<?> write(@RequestBody Map<String, Object> body) {

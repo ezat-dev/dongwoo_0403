@@ -1,6 +1,7 @@
 package com.sample_pro.dao;
 
 import com.sample_pro.domain.TempHistory;
+import com.sample_pro.domain.TempMemo;
 import com.sample_pro.domain.TempTag;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
@@ -103,5 +104,20 @@ public class TempDaoImpl implements TempDao {
     @Override
     public List<Map<String, Object>> selectTempSnapshotRange(Map<String, Object> params) {
         return sqlSession.selectList("TempMapper.selectTempSnapshotRange", params);
+    }
+
+    @Override
+    public List<TempMemo> selectMemoList(Map<String, Object> params) {
+        return sqlSession.selectList("TempMapper.selectMemoList", params);
+    }
+
+    @Override
+    public void insertMemo(TempMemo memo) {
+        sqlSession.insert("TempMapper.insertMemo", memo);
+    }
+
+    @Override
+    public void deleteMemo(int tcCnt) {
+        sqlSession.update("TempMapper.deleteMemo", tcCnt);
     }
 }

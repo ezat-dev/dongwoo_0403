@@ -1,6 +1,7 @@
 package com.sample_pro.service;
 
 import com.sample_pro.domain.TempHistory;
+import com.sample_pro.domain.TempMemo;
 import com.sample_pro.domain.TempTag;
 
 import java.util.List;
@@ -16,4 +17,8 @@ public interface TempService {
 
     List<Map<String, Object>> getTempSnapshot(int limit);
     List<Map<String, Object>> getTempSnapshotRange(String from, String to);
+
+    List<TempMemo> getMemoList(String from, String to);
+    void insertMemo(TempMemo memo);
+    void deleteMemo(int tcCnt);
 }

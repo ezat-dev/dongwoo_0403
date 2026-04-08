@@ -128,7 +128,7 @@ public class TagController {
         }
     }
 
-    // ── 공통 응답 헬퍼 ───────────────────────────────────
+    // 공통 응답 헬퍼
     private Map<String, Object> ok() {
         Map<String, Object> m = new HashMap<>();
         m.put("success", true);
