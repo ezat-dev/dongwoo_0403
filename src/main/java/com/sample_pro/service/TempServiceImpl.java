@@ -48,6 +48,13 @@ public class TempServiceImpl implements TempService {
         String colName = buildUniqueColName(tag.getTagName(), null);
         tag.setColName(colName);
         tempDao.insertTempTag(tag);
+        
+        // temp_snapshot 테이블에 컬럼 추가
+        try {
+            tempDao.addTempSnapshotColumn(colName);
+        } catch (Exception e) {
+            // 컬럼이 이미 존재할 수 있음 - 무시
+        }
     }
 
     @Override
@@ -173,8 +180,10 @@ public class TempServiceImpl implements TempService {
 
     private String toSafeColumnBase(String tagName) {
         String s = tagName == null ? "" : tagName.trim().toLowerCase();
-        s = s.replaceAll("[^a-z0-9]+", "_");
-        s = s.replaceAll("^_+|_+$", "");
+        // 한글 및 특수문자를 영어로 변환
+        s = s.replaceAll("[가-힣]+", "");  // 한글 제거
+        s = s.replaceAll("[^a-z0-9]+", "_");  // 특수문자를 _로
+        s = s.replaceAll("^_+|_+$", "");  // 앞뒤 _ 제거
         if (s.isEmpty()) s = "tag";
         if (!Character.isLetter(s.charAt(0))) s = "t_" + s;
         return "tag_" + s;

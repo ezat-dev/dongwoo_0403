@@ -18,7 +18,7 @@
       <div class="page-title">사용자 관리</div>
       <div class="page-sub">tb_company_employee · 전체 <strong id="totalCnt">0</strong>명</div>
     </div>
-    <button class="btn-primary" onclick="openModal()">➕ 사용자 추가</button>
+    <button class="btn-primary" onclick="openModal()" data-perm="add">➕ 사용자 추가</button>
   </div>
 
   <div class="card">
@@ -102,6 +102,9 @@ function loadList(){
 
 /* ── 렌더링 ── */
 function renderTable(){
+  var _p = (window.__PERMS && window.__PERMS['user/manage']) || {};
+  var canEdit = _p.canEdit !== 'N';
+  var canDel  = _p.canDel  !== 'N';
   var q   = document.getElementById('searchQ').value.trim().toLowerCase();
   var use = document.getElementById('filterUse').value;
   var list = empData.filter(function(r){
@@ -131,9 +134,9 @@ function renderTable(){
       + '<td style="font-size:11px;color:var(--muted)">'+ esc(r.reg_date) +'</td>'
       + '<td><span class="badge '+(active?'badge-ok':'badge-off')+'">'+(active?'활성':'비활성')+'</span></td>'
       + '<td style="display:flex;gap:4px">'
-      +   '<button class="btn-outline btn-sm" onclick="openEdit('+ r.emp_id +')">수정</button>'
-      +   '<button class="btn-outline btn-sm" style="color:var(--orange);border-color:var(--orange)" onclick="toggleEmp('+ r.emp_id +')">'+(active?'비활성화':'활성화')+'</button>'
-      +   '<button class="btn-danger btn-sm" onclick="deleteEmp('+ r.emp_id +', \''+ esc(r.emp_name) +'\')">삭제</button>'
+      +   (canEdit ? '<button class="btn-outline btn-sm" onclick="openEdit('+ r.emp_id +')">수정</button>' : '')
+      +   (canEdit ? '<button class="btn-outline btn-sm" style="color:var(--orange);border-color:var(--orange)" onclick="toggleEmp('+ r.emp_id +')">'+(active?'비활성화':'활성화')+'</button>' : '')
+      +   (canDel  ? '<button class="btn-danger btn-sm" onclick="deleteEmp('+ r.emp_id +', \''+ esc(r.emp_name) +'\')">삭제</button>' : '')
       + '</td>'
       + '</tr>';
   });

@@ -39,6 +39,8 @@
 			<exclude-mapping path="/js/**"/>
 			<exclude-mapping path="/css/**"/>
 			<exclude-mapping path="/images/**"/>
+			<!-- ez_in_out (방문록/출퇴근) -->
+			<exclude-mapping path="/ez_in_out/**"/>
 			<!-- 루트 -->
 			<exclude-mapping path="/"/>
 			<beans:bean class="com.sample_pro.interceptor.LoginInterceptor"/>

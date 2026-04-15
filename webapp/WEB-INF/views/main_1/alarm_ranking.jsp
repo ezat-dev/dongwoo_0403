@@ -63,9 +63,9 @@
   </div>
 
   <div class="period-tab">
-    <button class="tab-btn active" onclick="setPeriod('day',this)">오늘</button>
+    <button class="tab-btn" onclick="setPeriod('day',this)">오늘</button>
     <button class="tab-btn" onclick="setPeriod('week',this)">이번 주</button>
-    <button class="tab-btn" onclick="setPeriod('month',this)">이번 달</button>
+    <button class="tab-btn active" onclick="setPeriod('month',this)">이번 달</button>
     <button class="tab-btn" onclick="setPeriod('all',this)">전체</button>
   </div>
 
@@ -127,7 +127,7 @@
 <script>
 var base    = '${pageContext.request.contextPath}';
 var rawData = [];       // history API 전체
-var curPeriod = 'day';
+var curPeriod = 'month';
 var charts  = {};
 
 var LV_LABEL = {1:'위험',2:'경고',3:'주의',4:'정보'};

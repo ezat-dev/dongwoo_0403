@@ -22,5 +22,10 @@
     <mapper resource="mybatis/mapper/TempMapper.xml"/>
     <mapper resource="mybatis/mapper/EzInOutMapper.xml"/>
     <mapper resource="mybatis/mapper/PlcConfigMapper.xml"/>
+    <mapper resource="mybatis/mapper/PermMapper.xml"/>
+    <mapper resource="mybatis/mapper/InspectMapper.xml"/>
+    <mapper resource="mybatis/mapper/CalibMapper.xml"/>
+    <mapper resource="mybatis/mapper/PartsMapper.xml"/>
+    <mapper resource="mybatis/mapper/EzInOutAttendMapper.xml"/>
   </mappers>
 </configuration>

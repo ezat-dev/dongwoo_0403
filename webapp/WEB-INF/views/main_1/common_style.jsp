@@ -1,7 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
-    if (session.getAttribute("loginEmp") == null && session.getAttribute("loginUser") == null) {
-        response.sendRedirect(request.getContextPath() + "/main_1/login");
+    String uri = request.getRequestURI();
+    boolean isEzAttendPage = uri != null && (uri.endsWith("/ez_in_out/attend/list") || uri.endsWith("/ez_in_out/attend/record-list"));
+    if (!isEzAttendPage && session.getAttribute("loginEmp") == null && session.getAttribute("loginUser") == null) {
+        String loginUrl = request.getContextPath() + "/main_1/login";
+%>
+<!DOCTYPE html><html><head><script>
+window.top.location.replace('<%=loginUrl%>');
+</script></head><body></body></html>
+<%
         return;
     }
 %>
@@ -115,3 +122,37 @@ html, body { height: 100%; font-family: 'Segoe UI','Malgun Gothic',sans-serif; b
 /* 구분선 */
 .divider { height: 1px; background: var(--border); margin: 16px 0; }
 </style>
+<script>
+(function(){
+  var base = (window.location.pathname.split('/sample_pro')[0] || '') + '/sample_pro';
+  // 현재 페이지 URL 추출 (예: 'trend', 'equip/monitor')
+  var path = window.location.pathname;
+  var idx  = path.indexOf('/main_1/');
+  if(idx < 0) return;  // main_1 페이지가 아니면 스킵
+  var pageUrl = path.substring(idx + 8);  // '/main_1/' 이후
+
+  fetch(base + '/perm/my')
+    .then(function(r){ return r.json(); })
+    .then(function(perms){
+      window.__PERMS = perms || {};
+      var p = perms[pageUrl];
+      if(!p) return;  // DB에 없으면 전체 허용
+
+      // 화면 숨김 (canView=N)
+      if(p.canView === 'N'){
+        document.body.innerHTML =
+          '<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:12px;color:#718096">'
+          + '<div style="font-size:48px">🔒</div>'
+          + '<div style="font-size:18px;font-weight:700">접근 권한이 없습니다</div>'
+          + '<div style="font-size:13px">관리자에게 권한을 요청하세요</div>'
+          + '</div>';
+        return;
+      }
+      // 버튼 숨김
+      if(p.canAdd  === 'N') document.querySelectorAll('[data-perm="add"]').forEach(function(el){ el.style.display='none'; });
+      if(p.canEdit === 'N') document.querySelectorAll('[data-perm="edit"]').forEach(function(el){ el.style.display='none'; });
+      if(p.canDel  === 'N') document.querySelectorAll('[data-perm="del"]').forEach(function(el){ el.style.display='none'; });
+    })
+    .catch(function(){});
+})();
+</script>

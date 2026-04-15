@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  ── DDL (MariaDB) ────────────────────────────────────────────────────────────
+
+  (1) 카드 마스터 테이블
+  CREATE TABLE tb_ez_in_out_card_master (
+    id          INT          AUTO_INCREMENT PRIMARY KEY,
+    card_code   VARCHAR(20)  NOT NULL UNIQUE  COMMENT '카드코드 (D61~D64 HEX 합산)',
+    emp_name    VARCHAR(50)  NOT NULL         COMMENT '사원명',
+    use_yn      CHAR(1)      DEFAULT 'Y'      COMMENT '사용여부',
+    remark      VARCHAR(200)                  COMMENT '비고',
+    created_at  DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='출퇴근 카드 마스터';
+
+  INSERT INTO tb_ez_in_out_card_master (card_code, emp_name) VALUES
+  ('73054C46', '대표이사'),
+  ('50582427', '전무이사'),
+  ('DB64EADF', '관리본부장(실장)'),
+  ('FBBA58E0', '김대후'),
+  ('50802F27', '노형기'),
+  ('E41C07FF', '노규환'),
+  ('1064B722', '박해웅'),
+  ('AE5C872E', '이병진'),
+  ('64D4A4FE', '김주성'),
+  ('FB463CE0', '고현진'),
+  ('3490D7E5', '엄태환'),
+  ('10B7C5AD', '최민혁'),
+  ('A06B2F27', '유봉균');
+
+  (2) 출퇴근 기록 테이블
+  CREATE TABLE tb_ez_in_out_list_page (
+    id             INT          AUTO_INCREMENT PRIMARY KEY,
+    in_out_gubun   TINYINT      NOT NULL                   COMMENT '구분: 1=출근 2=외근 3=퇴근',
+    in_out_name    VARCHAR(10)                             COMMENT '출근/외근/퇴근',
+    plc_d45_value  INT          DEFAULT 0                  COMMENT 'D45 원본값',
+    plc_d46_value  INT          DEFAULT 0                  COMMENT 'D46 원본값',
+    d61_value      VARCHAR(10)                             COMMENT 'D61 HEX',
+    d62_value      VARCHAR(10)                             COMMENT 'D62 HEX',
+    d63_value      VARCHAR(10)                             COMMENT 'D63 HEX',
+    d64_value      VARCHAR(10)                             COMMENT 'D64 HEX',
+    card_code      VARCHAR(20)                             COMMENT '카드코드 (D61~D64 합산)',
+    emp_name       VARCHAR(50)                             COMMENT '사원명',
+    reg_date       DATETIME                                COMMENT '기록일시',
+    save_yn        CHAR(1)      DEFAULT 'Y'                COMMENT '저장여부',
+    remark         VARCHAR(200)                            COMMENT '비고',
+    created_at     DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    updated_at     DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_reg_date   (reg_date),
+    INDEX idx_card_code  (card_code),
+    INDEX idx_in_out_gubun (in_out_gubun)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='출퇴근 PLC 기록';
+
+  ────────────────────────────────────────────────────────────────────────────
+-->
+
+<mapper namespace="EzInOutAttendMapper">
+
+    <!-- ── 카드 마스터 resultMap ── -->
+    <resultMap id="cardMasterMap" type="com.sample_pro.domain.EzInOutCardMaster">
+        <id     property="id"        column="id"/>
+        <result property="cardCode"  column="card_code"/>
+        <result property="empName"   column="emp_name"/>
+        <result property="useYn"     column="use_yn"/>
+        <result property="remark"    column="remark"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- ── 출퇴근 기록 resultMap ── -->
+    <resultMap id="recordMap" type="com.sample_pro.domain.EzInOutRecord">
+        <id     property="id"           column="id"/>
+        <result property="inOutGubun"   column="in_out_gubun"/>
+        <result property="inOutName"    column="in_out_name"/>
+        <result property="plcD45Value"  column="plc_d45_value"/>
+        <result property="plcD46Value"  column="plc_d46_value"/>
+        <result property="d61Value"     column="d61_value"/>
+        <result property="d62Value"     column="d62_value"/>
+        <result property="d63Value"     column="d63_value"/>
+        <result property="d64Value"     column="d64_value"/>
+        <result property="cardCode"     column="card_code"/>
+        <result property="empName"      column="emp_name"/>
+        <result property="regDate"      column="reg_date"/>
+        <result property="saveYn"       column="save_yn"/>
+        <result property="remark"       column="remark"/>
+        <result property="createdAt"    column="created_at"/>
+        <result property="updatedAt"    column="updated_at"/>
+    </resultMap>
+
+    <!-- ── 카드 마스터 전체 목록 ── -->
+    <select id="selectCardMasterList" resultMap="cardMasterMap">
+        SELECT id, card_code, emp_name, use_yn, remark, created_at, updated_at
+        FROM   tb_ez_in_out_card_master
+        WHERE  use_yn = 'Y'
+        ORDER  BY emp_name
+    </select>
+
+    <!-- ── 카드 마스터 조회 (use_yn='Y' 만) ── -->
+    <select id="selectCardMasterByCode" parameterType="string" resultMap="cardMasterMap">
+        SELECT id, card_code, emp_name, use_yn, remark, created_at, updated_at
+        FROM   tb_ez_in_out_card_master
+        WHERE  card_code = #{cardCode}
+          AND  use_yn    = 'Y'
+        LIMIT 1
+    </select>
+
+    <!--
+      ── 중복 저장 방지 체크 ──
+      동일 card_code + in_out_gubun 이 최근 #{seconds}초 이내에 이미 저장되었으면 count > 0
+    -->
+    <select id="countRecentDuplicate" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM   tb_ez_in_out_list_page
+        WHERE  card_code     = #{cardCode}
+          AND  in_out_gubun  = #{inOutGubun}
+          AND  created_at   >= DATE_SUB(NOW(), INTERVAL #{seconds} SECOND)
+    </select>
+
+    <!-- ── 출퇴근 기록 insert ── -->
+    <insert id="insertRecord" parameterType="com.sample_pro.domain.EzInOutRecord">
+        INSERT INTO tb_ez_in_out_list_page
+            (in_out_gubun, in_out_name, plc_d45_value, plc_d46_value,
+             d61_value, d62_value, d63_value, d64_value,
+             card_code, emp_name, reg_date, save_yn, remark)
+        VALUES
+            (#{inOutGubun}, #{inOutName}, #{plcD45Value}, #{plcD46Value},
+             #{d61Value}, #{d62Value}, #{d63Value}, #{d64Value},
+             #{cardCode}, #{empName}, #{regDate}, #{saveYn}, #{remark})
+    </insert>
+
+    <!-- ── 기간+사원 조건 조회 ── -->
+    <select id="selectRecordsByCondition" parameterType="map" resultMap="recordMap">
+        SELECT id, in_out_gubun, in_out_name, plc_d45_value, plc_d46_value,
+               d61_value, d62_value, d63_value, d64_value,
+               card_code, emp_name,
+               DATE_FORMAT(reg_date,    '%Y-%m-%d %H:%i:%s') AS reg_date,
+               DATE_FORMAT(created_at,  '%Y-%m-%d %H:%i:%s') AS created_at,
+               save_yn, remark
+        FROM   tb_ez_in_out_list_page
+        <where>
+            <if test="fromDt != null and fromDt != ''">
+                AND DATE(reg_date) &gt;= #{fromDt}
+            </if>
+            <if test="toDt != null and toDt != ''">
+                AND DATE(reg_date) &lt;= #{toDt}
+            </if>
+            <if test="empName != null and empName != ''">
+                AND emp_name = #{empName}
+            </if>
+        </where>
+        ORDER BY reg_date DESC
+    </select>
+
+    <!-- ── 기간 내 기록 있는 사원 목록 (좌측 명단) ── -->
+    <select id="selectEmpListInPeriod" parameterType="map" resultType="map">
+        SELECT   emp_name                                     AS empName,
+                 card_code                                    AS cardCode,
+                 COUNT(*)                                     AS totalCnt,
+                 SUM(CASE WHEN in_out_gubun=1 THEN 1 ELSE 0 END) AS inCnt,
+                 SUM(CASE WHEN in_out_gubun=2 THEN 1 ELSE 0 END) AS outCnt,
+                 SUM(CASE WHEN in_out_gubun=3 THEN 1 ELSE 0 END) AS leaveCnt,
+                 MAX(DATE_FORMAT(reg_date,'%Y-%m-%d %H:%i')) AS lastTime
+        FROM     tb_ez_in_out_list_page
+        <where>
+            <if test="fromDt != null and fromDt != ''">
+                AND DATE(reg_date) &gt;= #{fromDt}
+            </if>
+            <if test="toDt != null and toDt != ''">
+                AND DATE(reg_date) &lt;= #{toDt}
+            </if>
+        </where>
+        GROUP BY emp_name, card_code
+        ORDER BY emp_name
+    </select>
+
+    <!-- ── 전체 엑셀 다운로드용 (사원명·날짜 정렬) ── -->
+    <select id="selectAllRecordsForExcel" parameterType="map" resultMap="recordMap">
+        SELECT id, in_out_gubun, in_out_name, plc_d45_value, plc_d46_value,
+               d61_value, d62_value, d63_value, d64_value,
+               card_code, emp_name,
+               DATE_FORMAT(reg_date,   '%Y-%m-%d %H:%i:%s') AS reg_date,
+               DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+               save_yn, remark
+        FROM   tb_ez_in_out_list_page
+        <where>
+            <if test="fromDt != null and fromDt != ''">
+                AND DATE(reg_date) &gt;= #{fromDt}
+            </if>
+            <if test="toDt != null and toDt != ''">
+                AND DATE(reg_date) &lt;= #{toDt}
+            </if>
+        </where>
+        ORDER BY emp_name, reg_date
+    </select>
+
+    <!-- ── 하루 1줄 그룹핑 (리스트/엑셀용) ── -->
+    <select id="selectDailyRecords" parameterType="map" resultType="map">
+        SELECT
+            emp_name                                                                 AS empName,
+            card_code                                                                AS cardCode,
+            DATE_FORMAT(DATE(reg_date), '%Y-%m-%d')                                 AS workDate,
+            MAX(CASE WHEN in_out_gubun = 1 THEN DATE_FORMAT(reg_date,'%H:%i') END)  AS inTime,
+            MAX(CASE WHEN in_out_gubun = 2 THEN DATE_FORMAT(reg_date,'%H:%i') END)  AS extTime,
+            MAX(CASE WHEN in_out_gubun = 3 THEN DATE_FORMAT(reg_date,'%H:%i') END)  AS outTime
+        FROM   tb_ez_in_out_list_page
+        <where>
+            <if test="fromDt != null and fromDt != ''">AND DATE(reg_date) &gt;= #{fromDt}</if>
+            <if test="toDt   != null and toDt   != ''">AND DATE(reg_date) &lt;= #{toDt}</if>
+            <if test="empName != null and empName != ''">AND emp_name = #{empName}</if>
+        </where>
+        GROUP BY emp_name, card_code, DATE(reg_date)
+        ORDER BY
+            <choose>
+                <when test="orderBy != null and orderBy == 'emp'">emp_name, workDate</when>
+                <otherwise>workDate DESC, emp_name</otherwise>
+            </choose>
+    </select>
+
+    <!-- ── 최근 이력 N건 ── -->
+    <select id="selectRecentRecords" parameterType="int" resultMap="recordMap">
+        SELECT id, in_out_gubun, in_out_name, plc_d45_value, plc_d46_value,
+               d61_value, d62_value, d63_value, d64_value,
+               card_code, emp_name,
+               DATE_FORMAT(reg_date, '%Y-%m-%d %H:%i:%s') AS reg_date,
+               save_yn, remark,
+               DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at
+        FROM   tb_ez_in_out_list_page
+        ORDER  BY id DESC
+        LIMIT  #{limit}
+    </select>
+
+</mapper>

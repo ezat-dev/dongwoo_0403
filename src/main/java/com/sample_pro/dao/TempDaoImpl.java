@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,13 @@ public class TempDaoImpl implements TempDao {
     @Override
     public void ensureTempSnapshotTable() {
         sqlSession.update("TempMapper.ensureTempSnapshotTable");
+    }
+
+    @Override
+    public void addTempSnapshotColumn(String colName) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("colName", colName);
+        sqlSession.update("TempMapper.addTempSnapshotColumn", param);
     }
 
     @Override

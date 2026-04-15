@@ -10,11 +10,11 @@
 [INFO] 
 [INFO] --- resources:3.4.0:resources (default-resources) @ web ---
 [WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
-[INFO] Copying 13 resources from src\main\resources to target\classes
+[INFO] Copying 18 resources from src\main\resources to target\classes
 [INFO] 
 [INFO] --- compiler:3.10.1:compile (default-compile) @ web ---
 [INFO] Changes detected - recompiling the module!
-[INFO] Compiling 52 source files to D:\sts_pro\sample_pro\target\classes
+[INFO] Compiling 86 source files to D:\sts_pro\sample_pro\target\classes
 [INFO] 
 [INFO] --- resources:3.4.0:testResources (default-testResources) @ web ---
 [WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
@@ -34,6 +34,6 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  4.981 s
-[INFO] Finished at: 2026-04-08T11:38:47+09:00
+[INFO] Total time:  6.293 s
+[INFO] Finished at: 2026-04-15T09:22:25+09:00
 [INFO] ------------------------------------------------------------------------

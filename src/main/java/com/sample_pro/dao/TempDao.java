@@ -14,6 +14,7 @@ public interface TempDao {
     void addEquipIdColumn();
     void ensureTempHistoryTable();
     void ensureTempSnapshotTable();
+    void addTempSnapshotColumn(String colName);
 
     List<TempTag> selectTempTagList();
     TempTag selectTempTagById(int tempId);

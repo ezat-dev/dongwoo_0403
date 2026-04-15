@@ -289,7 +289,7 @@ body { font-family: 'Pretendard','Noto Sans KR','Segoe UI',sans-serif; }
           </svg>
         </span>
         <button class="btn-primary" onclick="reloadChart()">↺ 갱신</button>
-        <button class="btn-outline btn-sm" onclick="openMemoModal()" style="border-color:rgba(128,90,213,.5);color:#553C9A">+ 메모</button>
+        <button class="btn-outline btn-sm" onclick="openMemoModal()" style="border-color:rgba(128,90,213,.5);color:#553C9A" data-perm="add">+ 메모</button>
         <span style="margin-left:auto;font-size:11px;color:var(--muted)" id="periodLabel">최근 24시간</span>
       </div>
 
@@ -468,109 +468,34 @@ function loadTags() {
     });
 }
 
-/* ── 데모 차트 (태그/DB 없을 때 1시간 샘플 데이터) ── */
+/* ── 태그 없을 때 빈 안내 ── */
 function loadDemoChart() {
   document.getElementById('tagList').innerHTML =
-    '<div style="text-align:center;padding:14px;color:var(--muted);font-size:11px">등록된 태그 없음</div>';
-
-  var now  = Date.now();
-  var hour = 3600 * 1000;
-  var STEP = 60 * 1000; // 1분 간격
-  var COUNT = 61;
-
-  // 자연스러운 랜덤워크 생성
-  function makeWalk(base, amp, noise) {
-    var data = [], v = base;
-    for (var i = 0; i < COUNT; i++) {
-      v += (Math.random() - 0.49) * amp;
-      v = Math.max(base - amp * 3, Math.min(base + amp * 3, v));
-      v += (Math.random() - 0.5) * noise;
-      data.push([now - hour + i * STEP, parseFloat(v.toFixed(2))]);
-    }
-    return data;
-  }
-
-  var demoSeries = [
-    { name: '침탄온도-PV',   data: makeWalk(920, 3, 1.5), color: COLORS[0], lineWidth: 2 },
-    { name: '침탄온도-SV',   data: makeWalk(930, 1, 0.5), color: COLORS[1], lineWidth: 2, dashStyle: 'Dash' },
-    { name: '분위기-PV',     data: makeWalk(0.85, 0.03, 0.01), color: COLORS[2], lineWidth: 2 },
-    { name: '압력-PV',       data: makeWalk(12.5, 0.8, 0.3), color: COLORS[3], lineWidth: 2 }
-  ];
-
-  // KPI 카드 생성
-  var kpiHtml = '';
-  demoSeries.forEach(function(s, i) {
-    var vals = s.data.map(function(p){ return p[1]; });
-    var last = vals[vals.length - 1];
-    var avg  = vals.reduce(function(a,b){return a+b;},0) / vals.length;
-    var mn   = Math.min.apply(null, vals);
-    var mx   = Math.max.apply(null, vals);
-    kpiHtml += '<div class="kpi-card" style="border-top-color:'+s.color+'">'
-      + '<div class="kpi-card-lbl">'+s.name+'</div>'
-      + '<div class="kpi-card-val" style="color:'+s.color+'">'+last.toFixed(1)+'</div>'
-      + '<div class="kpi-card-sub">'
-      + '<span>avg <b>'+avg.toFixed(1)+'</b></span>'
-      + '<span class="kpi-sub-mn">&#8595;'+mn.toFixed(1)+'</span>'
-      + '<span class="kpi-sub-mx">&#8593;'+mx.toFixed(1)+'</span>'
-      + '</div></div>';
-  });
-  document.getElementById('kpiCards').innerHTML = kpiHtml;
-
+    '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">등록된 태그가 없습니다.<br>태그 관리 페이지에서 태그를 먼저 등록하세요.</div>';
+  document.getElementById('kpiCards').innerHTML = '';
   if (mainChart) { mainChart.destroy(); mainChart = null; }
-
-  mainChart = Highcharts.chart('mainChart', {
-    chart: {
-      type: 'spline', animation: { duration: 600 },
-      zoomType: 'x',
-      panning: { enabled: true, type: 'x' }, panKey: 'shift',
-      style: { fontFamily:"'Segoe UI','Malgun Gothic',sans-serif" },
-      height: null,
-      events: { selection: function(){ document.getElementById('btnZoomReset').classList.add('visible'); } },
-      resetZoomButton: { theme: { display: 'none' } }
-    },
-    title: { text: null },
-    xAxis: {
-      type: 'datetime',
-      labels: { format: '{value:%H:%M}', style: { fontSize:'11px' } },
-      crosshair: true
-    },
-    yAxis: [
-      { title: { text: null }, labels: { style: { fontSize:'11px' } }, gridLineColor: '#F0F4F8' },
-    ],
-    tooltip: {
-      shared: true, xDateFormat: '%H:%M',
-      pointFormat: '<span style="color:{series.color}">&#9679;</span> {series.name}: <b>{point.y:.2f}</b><br/>',
-      borderRadius: 8
-    },
-    legend: { enabled: true, itemStyle: { fontSize:'12px', fontWeight:'600' } },
-    plotOptions: { spline: { turboThreshold: 10000, marker: { enabled: false } } },
-    credits: { enabled: false },
-    series: demoSeries
-  });
-
-  setTimeout(function(){ if(mainChart) mainChart.reflow(); }, 50);
   startCountdown();
 }
 function initDefaultSelection() {
-  // 기본: ALL 탭 유지 + 첫 설비(ALL 다음) 태그 2개 선택
-  curEquip = 'ALL';
-  var allBtn = document.querySelector('.equip-btn');
-  document.querySelectorAll('.equip-btn').forEach(function(b){ b.classList.remove('active'); });
-  if (allBtn) allBtn.classList.add('active');
-
-  Object.keys(selTags).forEach(function(k){ selTags[k] = false; });
+  // 태그에서 첫 번째 설비 찾기
   var firstEquip = null;
   tags.forEach(function(t){
     var eq = getEquipFromTag(t);
     if (eq && !firstEquip) firstEquip = eq;
   });
-  var cnt = 0;
-  if (firstEquip) {
-    tags.forEach(function(t){
-      var eq = getEquipFromTag(t);
-      if (eq === firstEquip && cnt < 2) { selTags[t.colName] = true; cnt++; }
-    });
-  }
+
+  // 첫 번째 설비 탭 활성화 (ALL 제외)
+  curEquip = firstEquip || 'ALL';
+  document.querySelectorAll('.equip-btn').forEach(function(b){ b.classList.remove('active'); });
+  var targetBtn = document.querySelector('.equip-btn[onclick*="\''+curEquip+'\'"]');
+  if (!targetBtn) targetBtn = document.querySelector('.equip-btn'); // fallback: ALL
+  if (targetBtn) targetBtn.classList.add('active');
+
+  // 해당 설비 태그 전체 선택
+  Object.keys(selTags).forEach(function(k){ selTags[k] = false; });
+  tags.forEach(function(t){
+    if (getEquipFromTag(t) === curEquip) selTags[t.colName] = true;
+  });
 }
 
 /* ── 설비 필터 ── */
@@ -616,20 +541,21 @@ function renderTagList() {
   var q = (document.getElementById('tagSearch').value || '').toLowerCase();
   var html = '';
   tags.forEach(function(t, i) {
-    var name = t.tagName || t.colName;
+    var displayName = t.trendName || t.tagName || t.colName;
+    var subName     = t.colName || t.tagName;
     var teq  = getEquipFromTag(t);
     // 설비 필터
     if (curEquip !== 'ALL' && teq !== curEquip) return;
     // 검색 필터
-    if (q && !name.toLowerCase().includes(q) && !(t.address||'').toLowerCase().includes(q)) return;
+    if (q && !displayName.toLowerCase().includes(q) && !subName.toLowerCase().includes(q) && !(t.address||'').toLowerCase().includes(q)) return;
     var isSel = selTags[t.colName];
     var color = COLORS[i % COLORS.length];
     html += '<div class="tag-item'+(isSel?' sel':'')+'" id="ti_'+t.colName+'"'
           + ' onclick="toggleTag(\''+t.colName+'\')">'
           + '<div class="tag-dot" style="background:'+color+'"></div>'
           + '<div style="flex:1;min-width:0">'
-          + '  <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.colName||name)+'</div>'
-          + '  <div style="font-size:10px;color:var(--muted)">'+esc(name)+'</div>'
+          + '  <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(displayName)+'</div>'
+          + '  <div style="font-size:10px;color:var(--muted)">'+esc(subName)+'</div>'
           + '</div></div>';
   });
   document.getElementById('tagList').innerHTML = html ||
@@ -761,7 +687,7 @@ function buildKpiCards(selList, rows) {
     }).filter(function(v){ return !isNaN(v); });
 
     var color = COLORS[tagIdxOf(t)];
-    var name  = esc(t.colName || t.tagName);   // 한글 colName 우선
+    var name  = esc(t.trendName || t.tagName || t.colName);
 
     if (!vals.length) {
       html += '<div class="kpi-card" style="border-top-color:'+color+'">'
@@ -801,7 +727,7 @@ function buildMainChart(selList, rows) {
       if (!isNaN(v)) data.push([ts, v]);
     });
     return {
-      name: t.colName || t.tagName,   // 한글 colName 우선
+      name: t.trendName || t.tagName || t.colName,
       data: data, color: color, lineWidth: 2,
       marker: { enabled: data.length < 80, radius: 3 },
       states: { hover: { lineWidth: 3 } }
@@ -1022,7 +948,7 @@ function renderMemoPills() {
     html += '<span class="memo-pill'+(vis?'':' hidden')+'" onclick="toggleMemo('+m.tcCnt+')">'
           + '<span class="memo-pill-dot"></span>'
           + esc(m.tcName||'')
-          + '<span class="memo-pill-del" title="삭제" onclick="event.stopPropagation();deleteMemo('+m.tcCnt+')">&#x00D7;</span>'
+          + ((!window.__PERMS || !window.__PERMS['trend'] || window.__PERMS['trend'].canDel !== 'N') ? '<span class="memo-pill-del" title="삭제" onclick="event.stopPropagation();deleteMemo('+m.tcCnt+')">&#x00D7;</span>' : '')
           + '</span>';
   });
   bar.innerHTML = html;

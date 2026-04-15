@@ -1,4 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+    if (session.getAttribute("loginEmp") == null && session.getAttribute("loginUser") == null) {
+        String loginUrl = request.getContextPath() + "/main_1/login";
+%>
+<!DOCTYPE html><html><head><script>
+window.top.location.replace('<%=loginUrl%>');
+</script></head><body></body></html>
+<%
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>

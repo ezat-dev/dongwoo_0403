@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  ── DDL (MariaDB) ────────────────────────────────────────────────────────────
+
+  CREATE TABLE tb_parts (
+    part_no        VARCHAR(20)  NOT NULL  PRIMARY KEY  COMMENT '부품번호',
+    part_name      VARCHAR(100) NOT NULL               COMMENT '품명',
+    category       VARCHAR(50)  NOT NULL               COMMENT '카테고리(히터/열전대/O2센서/팬모터/필터/밸브/기타)',
+    equipment      VARCHAR(100)                        COMMENT '적용설비',
+    unit           VARCHAR(10)  DEFAULT 'EA'           COMMENT '단위',
+    min_stock      INT          DEFAULT 0              COMMENT '최소재고',
+    replace_cycle  INT          DEFAULT 0              COMMENT '교체주기(개월), 0=없음',
+    created_at     DATETIME     DEFAULT CURRENT_TIMESTAMP
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+  CREATE TABLE tb_stock_history (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    part_no     VARCHAR(20)  NOT NULL               COMMENT '부품번호',
+    type        VARCHAR(5)   NOT NULL               COMMENT 'IN(입고) / OUT(사용)',
+    qty         INT          NOT NULL DEFAULT 1     COMMENT '수량',
+    equipment   VARCHAR(100)                        COMMENT '사용 설비',
+    work_desc   VARCHAR(200)                        COMMENT '작업내용',
+    user_name   VARCHAR(50)                         COMMENT '담당자',
+    created_at  DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_part_no  (part_no),
+    INDEX idx_created  (created_at)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+  ── 예시 데이터 ─────────────────────────────────────────────────────────────
+
+  INSERT INTO tb_parts VALUES
+  ('HT-001','히터 엘리먼트 3kW','히터',  '열처리로 전계열',  'EA',2,6, NOW()),
+  ('HT-002','히터 엘리먼트 5kW','히터',  '열처리로 3·4호기', 'EA',2,6, NOW()),
+  ('TC-001','K형 열전대 1100°C','열전대','열처리로 전계열',  'EA',4,12,NOW()),
+  ('TC-002','K형 열전대 600°C', '열전대','세척기 계열',      'EA',2,12,NOW()),
+  ('O2-001','지르코니아 O2 센서','O2센서','열처리로 전계열', 'EA',2,24,NOW()),
+  ('FN-001','순환팬 모터',       '팬모터','열처리로 1·2호기','EA',1,36,NOW()),
+  ('VV-001','가스 조절 밸브',    '밸브',  '열처리로 전계열',  'EA',1,24,NOW()),
+  ('FL-001','오일 필터(세척기)', '필터',  '세척기 계열',      'EA',2,3, NOW()),
+  ('FL-002','에어 필터(냉각)',   '필터',  '냉각장치 계열',    'EA',2,3, NOW()),
+  ('ETC-001','퓨즈 세트',        '기타',  '전체',             'EA',5,0, NOW());
+
+  INSERT INTO tb_stock_history (part_no,type,qty,equipment,work_desc,user_name) VALUES
+  ('HT-001','IN', 5,  NULL,       '신규 입고',    '관리자'),
+  ('HT-002','IN', 2,  NULL,       '신규 입고',    '관리자'),
+  ('TC-001','IN', 10, NULL,       '신규 입고',    '관리자'),
+  ('TC-002','IN', 4,  NULL,       '신규 입고',    '관리자'),
+  ('O2-001','IN', 2,  NULL,       '신규 입고',    '관리자'),
+  ('FN-001','IN', 1,  NULL,       '신규 입고',    '관리자'),
+  ('VV-001','IN', 2,  NULL,       '신규 입고',    '관리자'),
+  ('FL-001','IN', 3,  NULL,       '신규 입고',    '관리자'),
+  ('FL-002','IN', 5,  NULL,       '신규 입고',    '관리자'),
+  ('ETC-001','IN',20, NULL,       '신규 입고',    '관리자'),
+  ('HT-001','OUT',1,'열처리로 1호기','히터 교체', '홍길동'),
+  ('HT-001','OUT',1,'열처리로 2호기','히터 교체', '홍길동'),
+  ('HT-002','OUT',1,'열처리로 3호기','히터 교체', '김철수'),
+  ('TC-001','OUT',2,'열처리로 전체','열전대 교체','이영희'),
+  ('FL-001','OUT',3,'세척기',       '필터 교체',  '박정수');
+
+  ────────────────────────────────────────────────────────────────────────────
+-->
+
+<mapper namespace="PartsMapper">
+
+    <!-- ── 부품 마스터 resultMap ── -->
+    <resultMap id="partsMap" type="com.sample_pro.domain.Parts">
+        <id     property="partNo"       column="part_no"/>
+        <result property="partName"     column="part_name"/>
+        <result property="category"     column="category"/>
+        <result property="equipment"    column="equipment"/>
+        <result property="unit"         column="unit"/>
+        <result property="minStock"     column="min_stock"/>
+        <result property="replaceCycle" column="replace_cycle"/>
+        <result property="createdAt"    column="created_at"/>
+        <result property="totalIn"      column="total_in"/>
+        <result property="totalOut"     column="total_out"/>
+        <result property="currentStock" column="current_stock"/>
+        <result property="stockStatus"  column="stock_status"/>
+    </resultMap>
+
+    <!-- ── 이력 resultMap ── -->
+    <resultMap id="historyMap" type="com.sample_pro.domain.StockHistory">
+        <id     property="id"        column="id"/>
+        <result property="partNo"    column="part_no"/>
+        <result property="partName"  column="part_name"/>
+        <result property="category"  column="category"/>
+        <result property="type"      column="type"/>
+        <result property="qty"       column="qty"/>
+        <result property="equipment" column="equipment"/>
+        <result property="workDesc"  column="work_desc"/>
+        <result property="userName"  column="user_name"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <!-- ── 재고 현황 조회 (현재재고 = 총입고 - 총사용) ── -->
+    <select id="selectPartsList" parameterType="map" resultMap="partsMap">
+        SELECT
+            p.part_no,
+            p.part_name,
+            p.category,
+            p.equipment,
+            p.unit,
+            p.min_stock,
+            p.replace_cycle,
+            DATE_FORMAT(p.created_at, '%Y-%m-%d') AS created_at,
+            IFNULL(SUM(CASE WHEN h.type = 'IN'  THEN h.qty END), 0) AS total_in,
+            IFNULL(SUM(CASE WHEN h.type = 'OUT' THEN h.qty END), 0) AS total_out,
+            IFNULL(SUM(CASE WHEN h.type = 'IN'  THEN h.qty END), 0) -
+            IFNULL(SUM(CASE WHEN h.type = 'OUT' THEN h.qty END), 0) AS current_stock,
+            CASE
+                WHEN (IFNULL(SUM(CASE WHEN h.type='IN' THEN h.qty END),0) -
+                      IFNULL(SUM(CASE WHEN h.type='OUT' THEN h.qty END),0)) = 0
+                     THEN '재고없음'
+                WHEN (IFNULL(SUM(CASE WHEN h.type='IN' THEN h.qty END),0) -
+                      IFNULL(SUM(CASE WHEN h.type='OUT' THEN h.qty END),0)) &lt; p.min_stock
+                     THEN '부족'
+                ELSE '정상'
+            END AS stock_status
+        FROM tb_parts p
+        LEFT JOIN tb_stock_history h ON p.part_no = h.part_no
+        <where>
+            <if test="category != null">AND p.category = #{category}</if>
+            <if test="keyword  != null">AND (p.part_name LIKE #{keyword} OR p.part_no LIKE #{keyword})</if>
+        </where>
+        GROUP BY p.part_no, p.part_name, p.category, p.equipment,
+                 p.unit, p.min_stock, p.replace_cycle, p.created_at
+        ORDER BY p.category, p.part_no
+    </select>
+
+    <!-- ── 단건 조회 ── -->
+    <select id="selectPartsByNo" parameterType="string" resultMap="partsMap">
+        SELECT part_no, part_name, category, equipment, unit, min_stock, replace_cycle,
+               DATE_FORMAT(created_at,'%Y-%m-%d') AS created_at
+        FROM tb_parts WHERE part_no = #{partNo}
+    </select>
+
+    <!-- ── 부품 추가 ── -->
+    <insert id="insertParts" parameterType="com.sample_pro.domain.Parts">
+        INSERT INTO tb_parts (part_no, part_name, category, equipment, unit, min_stock, replace_cycle)
+        VALUES (#{partNo}, #{partName}, #{category}, #{equipment}, #{unit}, #{minStock}, #{replaceCycle})
+    </insert>
+
+    <!-- ── 부품 수정 ── -->
+    <update id="updateParts" parameterType="com.sample_pro.domain.Parts">
+        UPDATE tb_parts
+        SET part_name     = #{partName},
+            category      = #{category},
+            equipment     = #{equipment},
+            unit          = #{unit},
+            min_stock     = #{minStock},
+            replace_cycle = #{replaceCycle}
+        WHERE part_no = #{partNo}
+    </update>
+
+    <!-- ── 부품 삭제 ── -->
+    <delete id="deleteParts" parameterType="string">
+        DELETE FROM tb_parts WHERE part_no = #{partNo}
+    </delete>
+
+    <!-- ── 이력 조회 ── -->
+    <select id="selectHistoryList" parameterType="map" resultMap="historyMap">
+        SELECT h.id, h.part_no, p.part_name, p.category,
+               h.type, h.qty, h.equipment, h.work_desc, h.user_name,
+               DATE_FORMAT(h.created_at, '%Y-%m-%d %H:%i') AS created_at
+        FROM tb_stock_history h
+        LEFT JOIN tb_parts p ON h.part_no = p.part_no
+        <where>
+            <if test="partNo != null">AND h.part_no = #{partNo}</if>
+            <if test="type   != null">AND h.type    = #{type}</if>
+            <if test="fromDt != null">AND DATE(h.created_at) &gt;= #{fromDt}</if>
+            <if test="toDt   != null">AND DATE(h.created_at) &lt;= #{toDt}</if>
+        </where>
+        ORDER BY h.id DESC
+        LIMIT 500
+    </select>
+
+    <!-- ── 이력 추가 ── -->
+    <insert id="insertHistory" parameterType="com.sample_pro.domain.StockHistory">
+        INSERT INTO tb_stock_history (part_no, type, qty, equipment, work_desc, user_name)
+        VALUES (#{partNo}, #{type}, #{qty}, #{equipment}, #{workDesc}, #{userName})
+    </insert>
+
+    <!-- ── 이력 삭제 ── -->
+    <delete id="deleteHistory" parameterType="int">
+        DELETE FROM tb_stock_history WHERE id = #{id}
+    </delete>
+
+</mapper>
