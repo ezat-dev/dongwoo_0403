@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  ── DDL (MySQL / MariaDB) ────────────────────────────────────────────────────
+  CREATE TABLE tb_calib_thermocouple (
+    calib_id       INT AUTO_INCREMENT PRIMARY KEY,
+    equip_type     VARCHAR(50)   NOT NULL           COMMENT '설비구분',
+    equip_name     VARCHAR(100)  NOT NULL           COMMENT '설비명',
+    zone_location  VARCHAR(100)                     COMMENT '존/위치',
+    meas_location  VARCHAR(100)                     COMMENT '측정 위치',
+    attach_file    VARCHAR(255)                     COMMENT '첨부 파일명',
+    last_calib_dt  DATE                             COMMENT '최근 보정일',
+    next_calib_dt  DATE                             COMMENT '다음 보정 예정일',
+    std_temp       DECIMAL(7,2)                     COMMENT '기준온도(℃)',
+    meas_temp      DECIMAL(7,2)                     COMMENT '측정온도(℃)',
+    deviation      DECIMAL(7,2)                     COMMENT '편차(℃)',
+    judgment       VARCHAR(10)  DEFAULT '합격'      COMMENT '판정(합격/불합격)',
+    status         VARCHAR(20)  DEFAULT '정상'      COMMENT '상태(정상/보정예정/보정필요/초과)',
+    handler        VARCHAR(50)                      COMMENT '담당자',
+    remark         VARCHAR(500)                     COMMENT '비고',
+    reg_dt         DATETIME DEFAULT CURRENT_TIMESTAMP,
+    upd_dt         DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    del_yn         CHAR(1)  DEFAULT 'N'             COMMENT '삭제여부'
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  ────────────────────────────────────────────────────────────────────────────
+-->
+
+<mapper namespace="CalibMapper">
+
+    <resultMap id="calibMap" type="com.sample_pro.domain.CalibThermocouple">
+        <id     property="calibId"      column="calib_id"/>
+        <result property="equipType"    column="equip_type"/>
+        <result property="equipName"    column="equip_name"/>
+        <result property="zoneLocation" column="zone_location"/>
+        <result property="measLocation" column="meas_location"/>
+        <result property="attachFile"   column="attach_file"/>
+        <result property="lastCalibDt"  column="last_calib_dt"/>
+        <result property="nextCalibDt"  column="next_calib_dt"/>
+        <result property="stdTemp"      column="std_temp"/>
+        <result property="measTemp"     column="meas_temp"/>
+        <result property="deviation"    column="deviation"/>
+        <result property="judgment"     column="judgment"/>
+        <result property="status"       column="status"/>
+        <result property="handler"      column="handler"/>
+        <result property="remark"       column="remark"/>
+        <result property="regDt"        column="reg_dt"/>
+        <result property="updDt"        column="upd_dt"/>
+        <result property="delYn"        column="del_yn"/>
+    </resultMap>
+
+    <!-- 목록 조회 (필터 조건 선택) -->
+    <select id="selectList" parameterType="map" resultMap="calibMap">
+        SELECT calib_id, equip_type, equip_name, zone_location, meas_location,
+               attach_file, last_calib_dt, next_calib_dt,
+               std_temp, meas_temp, deviation, judgment, status,
+               handler, remark, reg_dt, upd_dt
+        FROM tb_calib_thermocouple
+        WHERE del_yn = 'N'
+        <if test="equipType != null">
+            AND equip_type = #{equipType}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="keyword != null">
+            AND (equip_name LIKE #{keyword}
+              OR zone_location LIKE #{keyword}
+              OR meas_location LIKE #{keyword}
+              OR handler LIKE #{keyword})
+        </if>
+        ORDER BY calib_id DESC
+    </select>
+
+    <!-- 단건 조회 -->
+    <select id="selectById" parameterType="int" resultMap="calibMap">
+        SELECT calib_id, equip_type, equip_name, zone_location, meas_location,
+               attach_file, last_calib_dt, next_calib_dt,
+               std_temp, meas_temp, deviation, judgment, status,
+               handler, remark, reg_dt, upd_dt
+        FROM tb_calib_thermocouple
+        WHERE calib_id = #{calibId} AND del_yn = 'N'
+    </select>
+
+    <!-- D-Day 7일 이내 알림 조회 -->
+    <select id="selectDdayAlerts" resultMap="calibMap">
+        SELECT calib_id, equip_type, equip_name, zone_location, next_calib_dt,
+               status, handler,
+               DATEDIFF(next_calib_dt, CURDATE()) AS dday_diff
+        FROM tb_calib_thermocouple
+        WHERE del_yn = 'N'
+          AND next_calib_dt IS NOT NULL
+          AND DATEDIFF(next_calib_dt, CURDATE()) BETWEEN -999 AND 7
+        ORDER BY next_calib_dt ASC
+    </select>
+
+    <!-- 추가 -->
+    <insert id="insert" parameterType="com.sample_pro.domain.CalibThermocouple">
+        INSERT INTO tb_calib_thermocouple
+            (equip_type, equip_name, zone_location, meas_location,
+             last_calib_dt, next_calib_dt,
+             std_temp, meas_temp, deviation,
+             judgment, status, handler, remark)
+        VALUES
+            (#{equipType}, #{equipName}, #{zoneLocation}, #{measLocation},
+             #{lastCalibDt}, #{nextCalibDt},
+             #{stdTemp}, #{measTemp}, #{deviation},
+             #{judgment}, #{status}, #{handler}, #{remark})
+    </insert>
+
+    <!-- 수정 -->
+    <update id="update" parameterType="com.sample_pro.domain.CalibThermocouple">
+        UPDATE tb_calib_thermocouple
+        SET equip_type    = #{equipType},
+            equip_name    = #{equipName},
+            zone_location = #{zoneLocation},
+            meas_location = #{measLocation},
+            last_calib_dt = #{lastCalibDt},
+            next_calib_dt = #{nextCalibDt},
+            std_temp      = #{stdTemp},
+            meas_temp     = #{measTemp},
+            deviation     = #{deviation},
+            judgment      = #{judgment},
+            status        = #{status},
+            handler       = #{handler},
+            remark        = #{remark},
+            upd_dt        = CURRENT_TIMESTAMP
+        WHERE calib_id = #{calibId}
+    </update>
+
+    <!-- 첨부 파일 업데이트 -->
+    <update id="updateAttach" parameterType="map">
+        UPDATE tb_calib_thermocouple
+        SET attach_file = #{attachFile}, upd_dt = CURRENT_TIMESTAMP
+        WHERE calib_id = #{calibId}
+    </update>
+
+    <!-- 소프트 삭제 -->
+    <update id="softDelete" parameterType="int">
+        UPDATE tb_calib_thermocouple
+        SET del_yn = 'Y', upd_dt = CURRENT_TIMESTAMP
+        WHERE calib_id = #{calibId}
+    </update>
+
+</mapper>

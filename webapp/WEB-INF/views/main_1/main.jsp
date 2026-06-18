@@ -62,23 +62,69 @@ html, body { height: 100%; font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
   display: flex; align-items: center; justify-content: center;
   padding: 12px 14px; border-bottom: 1px solid var(--border);
   min-height: 62px; flex-shrink: 0; overflow: hidden;
+  cursor: pointer;
+  transition: background .2s, box-shadow .2s;
+  border-radius: 0;
 }
-.sb-logo img { height: 34px; max-width: 180px; object-fit: contain; transition: max-width .22s; }
+.sb-logo:hover {
+  background: rgba(37,99,235,.07);
+  box-shadow: inset 0 -2px 0 var(--primary);
+}
+.sb-logo:hover img { filter: brightness(1.08) drop-shadow(0 1px 4px rgba(37,99,235,.25)); }
+.sb-logo img { height: 34px; max-width: 180px; object-fit: contain; transition: max-width .22s, filter .2s; }
 .sidebar.collapsed .sb-logo img { max-width: 32px; }
+.sb-logo-text { transition: opacity .18s, width .22s; overflow: hidden; white-space: nowrap; }
+.sidebar.collapsed .sb-logo-text { opacity: 0; width: 0; }
 
 /* 스크롤 영역 */
 .sb-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 0; }
 .sb-body::-webkit-scrollbar { width: 3px; }
 .sb-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* 그룹 타이틀 */
-.sb-group-title {
-  font-size: 9px; font-weight: 700; letter-spacing: 1.2px;
-  color: var(--light); text-transform: uppercase;
-  padding: 10px 18px 3px; white-space: nowrap;
-  transition: opacity .15s;
+/* 그룹 헤더 */
+.sb-group-header {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 10px 4px 12px; cursor: pointer;
+  border-radius: 7px; margin: 6px 4px 0;
+  transition: background .13s; user-select: none;
 }
-.sidebar.collapsed .sb-group-title { opacity: 0; pointer-events: none; }
+.sb-group-header:hover { background: var(--bg); }
+.sb-group-cat-icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  font-size: 13px; display: flex; align-items: center; justify-content: center;
+}
+.sb-group-name {
+  flex: 1; font-size: 12px; font-weight: 700; letter-spacing: .6px;
+  color: var(--text); white-space: nowrap; transition: opacity .15s;
+}
+.sb-group-chevron {
+  font-size: 9px; color: var(--light);
+  transition: transform .2s, opacity .15s;
+}
+.sb-group-header.closed .sb-group-chevron { transform: rotate(-90deg); }
+.sidebar.collapsed .sb-group-name,
+.sidebar.collapsed .sb-group-chevron,
+.sidebar.collapsed .sb-group-cat-icon { opacity: 0; pointer-events: none; }
+
+/* 그룹 바디 */
+.sb-group-body { overflow: hidden; transition: max-height .25s ease; }
+.sb-group-body.open  { max-height: 600px; }
+.sb-group-body.closed { max-height: 0; }
+
+/* 준비중 아이템 */
+.sb-item.coming-soon {
+  cursor: default; pointer-events: none;
+  color: var(--text); background: transparent;
+}
+.sb-item.coming-soon .sb-icon { opacity: .5; }
+.sb-item.coming-soon .sb-label {
+  font-size: 11px; font-style: italic;
+  color: var(--muted);
+}
+.sb-item.coming-soon .sb-label::after {
+  content: '…';
+  margin-left: 3px; color: var(--light);
+}
 
 /* 메뉴 아이템 */
 .sb-item {
@@ -179,65 +225,164 @@ html, body { height: 100%; font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
   <!-- ══ 사이드바 ══ -->
   <nav class="sidebar" id="sidebar">
 
-    <div class="sb-logo">
-      <img src="${pageContext.request.contextPath}/img/동우 로고 디자인.png" alt="로고">
+    <div class="sb-logo" onclick="go('${pageContext.request.contextPath}/main_1/equip/monitor','통신 모니터링',null)">
+      <span style="display:inline-flex;align-items:center;gap:8px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.9">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+          <line x1="12" y1="12" x2="12" y2="16"/>
+          <line x1="10" y1="14" x2="14" y2="14"/>
+        </svg>
+        <span class="sb-logo-text" style="font-size:15px;font-weight:800;color:var(--primary);letter-spacing:.5px">SMART MES</span>
+      </span>
     </div>
 
     <div class="sb-body">
 
+      <%-- 제품관리
+      <div class="sb-group-header closed empty" onclick="toggleGroup(this)">
+        <span class="sb-group-cat-icon">📦</span>
+        <span class="sb-group-name">제품관리</span>
+        <span class="sb-group-chevron">▼</span>
+      </div>
+      <div class="sb-group-body closed">
+      </div>
+      --%>
+
+      <%-- 생산관리
+      <div class="sb-group-header closed empty" onclick="toggleGroup(this)">
+        <span class="sb-group-cat-icon">🏭</span>
+        <span class="sb-group-name">생산관리</span>
+        <span class="sb-group-chevron">▼</span>
+      </div>
+      <div class="sb-group-body closed">
+      </div>
+      --%>
+
+      <%-- 생산공정관리
+      <div class="sb-group-header closed empty" onclick="toggleGroup(this)">
+        <span class="sb-group-cat-icon">⚙️</span>
+        <span class="sb-group-name">생산공정관리</span>
+        <span class="sb-group-chevron">▼</span>
+      </div>
+      <div class="sb-group-body closed">
+      </div>
+      --%>
+
       <!-- 모니터링 -->
-      <div class="sb-group-title">통신 모니터링</div>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/main/monitor','메인 모니터링',this);return false;">
-        <div class="sb-icon">🧭</div><span class="sb-label">메인 모니터링</span>
-      </a>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/equip/monitor','설비 모니터링',this);return false;">
-        <div class="sb-icon">🖥️</div><span class="sb-label">통신 모니터링</span>
-      </a>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/equip/detail','설비 상세',this);return false;">
-        <div class="sb-icon">🔍</div><span class="sb-label">설비 상세</span>
-      </a>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/trend','트렌드',this);return false;">
-        <div class="sb-icon">📈</div><span class="sb-label">트렌드</span>
-      </a>
+      <div class="sb-group-header open" onclick="toggleGroup(this)">
+        <span class="sb-group-cat-icon">📡</span>
+        <span class="sb-group-name">모니터링</span>
+        <span class="sb-group-chevron">▼</span>
+      </div>
+      <div class="sb-group-body open">
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/equip/monitor','통신 모니터링',this);return false;">
+          <div class="sb-icon">🖥️</div><span class="sb-label">통신 모니터링</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/main/monitor','메인 모니터링',this);return false;">
+          <div class="sb-icon">🧭</div><span class="sb-label">메인 모니터링</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/equip/detail','설비 상세',this);return false;">
+          <div class="sb-icon">🔍</div><span class="sb-label">설비 상세</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/work/list','작업LIST',this);return false;">
+          <div class="sb-icon">📋</div><span class="sb-label">작업LIST</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/work/now1','공정현황-1',this);return false;">
+          <div class="sb-icon">🏭</div><span class="sb-label">공정현황-1</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/work/now2','공정현황-2',this);return false;">
+          <div class="sb-icon">🏭</div><span class="sb-label">공정현황-2</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/trend','트렌드',this);return false;">
+          <div class="sb-icon">📈</div><span class="sb-label">트렌드</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/alarm/history','알람 이력',this);return false;">
+          <div class="sb-icon">🔔</div><span class="sb-label">알람 이력</span><span class="sb-badge" id="alarmBadge">0</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/alarm/ranking','알람 랭킹',this);return false;">
+          <div class="sb-icon">🏆</div><span class="sb-label">알람 랭킹</span>
+        </a>
+      </div>
 
-      <!-- 알람 -->
-      <div class="sb-group-title">알람</div>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/alarm/history','알람 이력',this);return false;">
-        <div class="sb-icon">🔔</div><span class="sb-label">알람 이력</span><span class="sb-badge" id="alarmBadge">0</span>
-      </a>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/alarm/ranking','알람 랭킹',this);return false;">
-        <div class="sb-icon">🏆</div><span class="sb-label">알람 랭킹</span>
-      </a>
+      <!-- 설비보존관리 -->
+      <div class="sb-group-header open" onclick="toggleGroup(this)">
+        <span class="sb-group-cat-icon">🔧</span>
+        <span class="sb-group-name">설비보존관리</span>
+        <span class="sb-group-chevron">▼</span>
+      </div>
+      <div class="sb-group-body open">
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/calib/status','보정현황',this);return false;">
+          <div class="sb-icon">🌡️</div><span class="sb-label">보정현황</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/inspect/daily','일상점검일지',this);return false;">
+          <div class="sb-icon">📋</div><span class="sb-label">일상점검일지</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/auxiliary/inspection','부대설비 점검표',this);return false;">
+          <div class="sb-icon">🏭</div><span class="sb-label">부대설비 점검표</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/spare/parts','스페어파트',this);return false;">
+          <div class="sb-icon">🔩</div><span class="sb-label">스페어파트</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/facility/backup','BACKUP-DATA',this);return false;">
+          <div class="sb-icon">💾</div><span class="sb-label">BACKUP-DATA</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/consumable/ledger','유류·소모재 관리대장',this);return false;">
+          <div class="sb-icon">🛢️</div><span class="sb-label">유류·소모재 관리대장</span>
+        </a>
+      </div>
 
-      <!-- 보정현황 -->
-      <div class="sb-group-title">보정현황</div>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/calib/status','보정현황',this);return false;">
-        <div class="sb-icon">🌡️</div><span class="sb-label">보정현황</span>
-      </a>
+      <!-- 품질관리 -->
+      <div class="sb-group-header open" onclick="toggleGroup(this)">
+        <span class="sb-group-cat-icon">✅</span>
+        <span class="sb-group-name">품질관리</span>
+        <span class="sb-group-chevron">▼</span>
+      </div>
+      <div class="sb-group-body open">
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/inspect/fproof','F/PROOF',this);return false;">
+          <div class="sb-icon">🛡️</div><span class="sb-label">F/PROOF</span>
+        </a>
+      </div>
 
-      <!-- 점검 -->
-      <div class="sb-group-title">점검</div>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/inspect/daily','일상점검일지',this);return false;">
-        <div class="sb-icon">📋</div><span class="sb-label">일상점검일지</span>
-      </a>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/inspect/fproof','F/PROOF',this);return false;">
-        <div class="sb-icon">🛡️</div><span class="sb-label">F/PROOF</span>
-      </a>
+      <!-- 경영정보 -->
+      <div class="sb-group-header closed empty" onclick="toggleGroup(this)">
+        <span class="sb-group-cat-icon">📊</span>
+        <span class="sb-group-name">경영정보</span>
+        <span class="sb-group-chevron">▼</span>
+      </div>
+      <div class="sb-group-body closed">
+        <%-- <a class="sb-item coming-soon" href="#"><div class="sb-icon">·</div><span class="sb-label">준비중</span></a> --%>
+      </div>
 
-      <!-- 자재 -->
-      <div class="sb-group-title">자재</div>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/spare/parts','스페어파트',this);return false;">
-        <div class="sb-icon">🔩</div><span class="sb-label">스페어파트</span>
-      </a>
+      <!-- 기준정보 -->
+      <div class="sb-group-header open" onclick="toggleGroup(this)">
+        <span class="sb-group-cat-icon">🗂️</span>
+        <span class="sb-group-name">기준정보</span>
+        <span class="sb-group-chevron">▼</span>
+      </div>
+      <div class="sb-group-body open">
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/user/manage','사용자 관리',this);return false;">
+          <div class="sb-icon">👤</div><span class="sb-label">사용자 관리</span>
+        </a>
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/user/permission','권한 부여',this);return false;">
+          <div class="sb-icon">🔐</div><span class="sb-label">권한 부여</span>
+        </a>
+        <%-- 제품 등록
+        <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/management/productInsert','제품 등록',this);return false;">
+          <div class="sb-icon">🔐</div><span class="sb-label">제품 등록</span>
+        </a>
+        --%>
+      </div>
 
-      <!-- 시스템 -->
-      <div class="sb-group-title">시스템</div>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/user/manage','사용자 관리',this);return false;">
-        <div class="sb-icon">👤</div><span class="sb-label">사용자 관리</span>
-      </a>
-      <a class="sb-item" href="#" onclick="go('${pageContext.request.contextPath}/main_1/user/permission','권한 부여',this);return false;">
-        <div class="sb-icon">🔐</div><span class="sb-label">권한 부여</span>
-      </a>
+      <%-- 작업지시
+      <div class="sb-group-header closed empty" onclick="toggleGroup(this)">
+        <span class="sb-group-cat-icon">📝</span>
+        <span class="sb-group-name">작업지시</span>
+        <span class="sb-group-chevron">▼</span>
+      </div>
+      <div class="sb-group-body closed">
+      </div>
+      --%>
 
     </div>
 
@@ -282,6 +427,14 @@ function go(url, title, el) {
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('collapsed');
 }
+function toggleGroup(header) {
+  var isOpen = header.classList.contains('open');
+  header.classList.toggle('open', !isOpen);
+  header.classList.toggle('closed', isOpen);
+  var body = header.nextElementSibling;
+  body.classList.toggle('open', !isOpen);
+  body.classList.toggle('closed', isOpen);
+}
 function updateDate() {
   var d = new Date(), days = ['일','월','화','수','목','금','토'];
   var s = d.getFullYear()+'.'+pad(d.getMonth()+1)+'.'+pad(d.getDate())
@@ -302,6 +455,18 @@ fetch('${pageContext.request.contextPath}/emp/me')
       document.getElementById('userAvatar').textContent = name.charAt(0);
     }
   });
+
+var OV_URLS = {
+  1: '${pageContext.request.contextPath}/main_1/main/monitor',
+  2: '${pageContext.request.contextPath}/main_1/main/monitor2'
+};
+function goOverview(num) {
+  document.getElementById('pageFrame').src = OV_URLS[num];
+  document.getElementById('pageTitle').textContent = 'OVERVIEW-' + num;
+  document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('active'); });
+  document.querySelectorAll('.ov-tab').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('ovTab' + num).classList.add('active');
+}
 
 function doLogout(){
   fetch('${pageContext.request.contextPath}/user/logout', {method:'POST'})

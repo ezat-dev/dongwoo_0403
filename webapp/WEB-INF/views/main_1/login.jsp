@@ -668,10 +668,15 @@ body::after{
 
         <div class="brand-logo">
           <div class="brand-logo-box">
-            <img src="${pageContext.request.contextPath}/img/동우 로고 디자인.png" alt="동우 로고">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.7">
+              <rect x="2" y="7" width="20" height="14" rx="2"/>
+              <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+              <line x1="12" y1="12" x2="12" y2="16"/>
+              <line x1="10" y1="14" x2="14" y2="14"/>
+            </svg>
           </div>
           <div class="brand-logo-text">
-            <strong>DONGWOO MES</strong>
+            <strong>SMART MES</strong>
             <span>Smart Factory Platform</span>
           </div>
         </div>
@@ -822,7 +827,7 @@ body::after{
         </div>
 
         <div class="form-footer">
-          <span>© 2026 <span class="strong">DONGWOO</span> All rights reserved.</span>
+          <span>© 2026 <span class="strong">SMART MES</span> All rights reserved.</span>
           <span>Confidential</span>
         </div>
 
