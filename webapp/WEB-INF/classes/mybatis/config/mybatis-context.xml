@@ -33,5 +33,9 @@
     <!-- management -->
     <mapper resource="mybatis/mapper/management/EzInOutMapper.xml"/>
     <mapper resource="mybatis/mapper/management/EzInOutAttendMapper.xml"/>
+    <mapper resource="mybatis/mapper/management/ProductMapper.xml"/>
+    <mapper resource="mybatis/mapper/management/CorpMapper.xml"/>
+    <mapper resource="mybatis/mapper/management/FacMapper.xml"/>
+    <mapper resource="mybatis/mapper/management/TesterMapper.xml"/>
   </mappers>
 </configuration>

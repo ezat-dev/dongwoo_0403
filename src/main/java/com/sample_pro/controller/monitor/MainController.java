@@ -57,6 +57,18 @@ public class MainController {
     // 설비보존관리 - BACKUP-DATA
     @RequestMapping(value = "/facility/backup", method = RequestMethod.GET) public String facilityBackup() { return "/main_1/facility/backup_data.jsp"; }
 
+    // 제품등록
+    @RequestMapping(value = "/management/productInsert", method = RequestMethod.GET) public String productInsert() { return "/main_1/management/productInsert.jsp"; }
+
+    // 거래처등록
+    @RequestMapping(value = "/management/corpInsert", method = RequestMethod.GET) public String corpInsert() { return "/main_1/management/corpInsert.jsp"; }
+
+    // 설비등록
+    @RequestMapping(value = "/management/facInsert", method = RequestMethod.GET) public String facInsert() { return "/main_1/management/facInsert.jsp"; }
+
+    // 측정기기등록
+    @RequestMapping(value = "/management/testerInsert", method = RequestMethod.GET) public String testerInsert() { return "/main_1/management/testerInsert.jsp"; }
+
     // 유류, 소모재 관리대장
     @RequestMapping(value = "/consumable/ledger", method = RequestMethod.GET) public String consumableLedger() { return "/main_1/facility/consumableLedger.jsp"; }
 

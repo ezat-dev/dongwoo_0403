@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="TesterMapper">
+
+    <resultMap id="testerMap" type="com.sample_pro.domain.Tester">
+        <id     property="ter_code"  column="ter_code"/>
+        <result property="ter_name"  column="ter_name"/>
+        <result property="ter_no"    column="ter_no"/>
+        <result property="ter_model" column="ter_model"/>
+        <result property="ter_kind"  column="ter_kind"/>
+        <result property="ter_man"   column="ter_man"/>
+        <result property="ter_bigo"  column="ter_bigo"/>
+    </resultMap>
+
+    <select id="selectMaxCode" resultType="string">
+        SELECT MAX(ter_code) FROM tb_tester WHERE ter_code REGEXP '^T[0-9]+$'
+    </select>
+
+    <select id="selectList" parameterType="map" resultMap="testerMap">
+        SELECT ter_code, ter_name, ter_no, ter_model, ter_kind, ter_man, ter_bigo
+        FROM tb_tester
+        <where>
+            <if test="kwTerName != null and kwTerName != ''">
+                AND ter_name LIKE CONCAT('%',#{kwTerName},'%')
+            </if>
+            <if test="kwTerNo != null and kwTerNo != ''">
+                AND ter_no LIKE CONCAT('%',#{kwTerNo},'%')
+            </if>
+            <if test="kwTerKind != null and kwTerKind != ''">
+                AND ter_kind LIKE CONCAT('%',#{kwTerKind},'%')
+            </if>
+        </where>
+        ORDER BY ter_code
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="selectCount" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM tb_tester
+        <where>
+            <if test="kwTerName != null and kwTerName != ''">
+                AND ter_name LIKE CONCAT('%',#{kwTerName},'%')
+            </if>
+            <if test="kwTerNo != null and kwTerNo != ''">
+                AND ter_no LIKE CONCAT('%',#{kwTerNo},'%')
+            </if>
+            <if test="kwTerKind != null and kwTerKind != ''">
+                AND ter_kind LIKE CONCAT('%',#{kwTerKind},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectOne" parameterType="string" resultMap="testerMap">
+        SELECT * FROM tb_tester WHERE ter_code = #{terCode}
+    </select>
+
+    <insert id="insert" parameterType="com.sample_pro.domain.Tester">
+        INSERT INTO tb_tester (ter_code, ter_name, ter_no, ter_model, ter_kind, ter_man, ter_bigo)
+        VALUES (#{ter_code}, #{ter_name}, #{ter_no}, #{ter_model}, #{ter_kind}, #{ter_man}, #{ter_bigo})
+    </insert>
+
+    <update id="update" parameterType="com.sample_pro.domain.Tester">
+        UPDATE tb_tester SET
+            ter_name=#{ter_name}, ter_no=#{ter_no}, ter_model=#{ter_model},
+            ter_kind=#{ter_kind}, ter_man=#{ter_man}, ter_bigo=#{ter_bigo}
+        WHERE ter_code = #{ter_code}
+    </update>
+
+    <delete id="delete" parameterType="string">
+        DELETE FROM tb_tester WHERE ter_code = #{terCode}
+    </delete>
+
+</mapper>

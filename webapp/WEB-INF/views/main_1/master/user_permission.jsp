@@ -109,8 +109,12 @@ var PAGES = [
   { url:'auxiliary/inspection', name:'부대설비 점검표', icon:'🏭' },
   { url:'inspect/fproof', name:'F/PROOF',        icon:'🛡️' },
   { url:'spare/parts',    name:'스페어파트',     icon:'🔩' },
-  { url:'user/manage',    name:'사용자 관리',    icon:'👤' },
-  { url:'user/permission',name:'권한 부여',      icon:'🔐' }
+  { url:'user/manage',           name:'사용자 관리',  icon:'👤' },
+  { url:'user/permission',       name:'권한 부여',    icon:'🔐' },
+  { url:'management/productInsert', name:'제품 등록',  icon:'📦' },
+  { url:'management/corpInsert',    name:'거래처 등록', icon:'🏢' },
+  { url:'management/facInsert',     name:'설비 등록',   icon:'⚙️' },
+  { url:'management/testerInsert',  name:'측정기기 등록', icon:'🔬' }
 ];
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }

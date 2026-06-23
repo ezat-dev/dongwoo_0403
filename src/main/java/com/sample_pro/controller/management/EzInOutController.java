@@ -47,6 +47,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import com.sample_pro.domain.CompanyEmployee;
 import com.sample_pro.domain.EzInOutRecord;
 import com.sample_pro.domain.EzInOutVisit;
+import com.sample_pro.domain.SecurityMonitorAddress;
 import com.sample_pro.domain.SolapiSendResult;
 import com.sample_pro.service.management.EzInOutAttendService;
 import com.sample_pro.service.management.EzInOutService;
@@ -277,9 +278,10 @@ public class EzInOutController {
         }
 
         String pin  = trim(body.get("pin"));
-        String gate = trim(body.get("gate")); // "front" | "back"
-        boolean isFront = !"back".equals(gate);
-        String visitReason = isFront ? "정문 출입" : "후문 출입";
+        String gate = trim(body.get("gate")); // "front" | "back" | "security"
+        boolean isSecurityGate = "security".equals(gate);
+        boolean isFront        = !isSecurityGate && !"back".equals(gate);
+        String visitReason = isSecurityGate ? "경비 출입" : (isFront ? "정문 출입" : "후문 출입");
         int plcAddress     = isFront ? PLC_DOOR_FRONT_ADDRESS : PLC_DOOR_BACK_ADDRESS;
 
         if (pin.isEmpty())          return ResponseEntity.ok(error("PIN을 입력해 주세요."));
@@ -296,6 +298,14 @@ public class EzInOutController {
             session.removeAttribute(SESSION_PIN_ATTEMPTS);
             session.removeAttribute(SESSION_PIN_LOCKED_UNTIL);
             session.setAttribute(SESSION_EMP_AUTH, Boolean.TRUE);
+
+            // 경비 모드: PLC 도어 개방 없이 보안 모니터 페이지로 이동
+            if (isSecurityGate) {
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("success", true);
+                response.put("redirectUrl", "/ez_in_out/security-monitor");
+                return ResponseEntity.ok(response);
+            }
 
             // 직원 정보 조회
             CompanyEmployee emp = null;
@@ -444,6 +454,76 @@ public class EzInOutController {
     }
 
     /* =============================================
+       경비 모니터 페이지 (GET)
+    ============================================= */
+    @RequestMapping(value = "/security-monitor", method = RequestMethod.GET)
+    public String securityMonitorPage(HttpSession session) {
+        Boolean auth = (Boolean) session.getAttribute(SESSION_EMP_AUTH);
+        if (auth == null || !auth) return "redirect:/ez_in_out/pin";
+        return "/ez_in_out/ez_in_out_security.jsp";
+    }
+
+    /* =============================================
+       경비 PLC 상태 조회 (D498~D506, GET)
+    ============================================= */
+    @RequestMapping(value = "/security-monitor/status",
+                    method = RequestMethod.GET,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> securityMonitorStatus() {
+        try {
+            int[] vals = readPlc(SecurityMonitorAddress.READ_START_ADDRESS,
+                                 SecurityMonitorAddress.READ_TOTAL_COUNT);
+            List<Map<String, Object>> sensors = new ArrayList<>();
+            for (int i = 0; i < SecurityMonitorAddress.SENSOR_COUNT; i++) {
+                Map<String, Object> s = new LinkedHashMap<>();
+                s.put("name",    SecurityMonitorAddress.SENSOR_NAMES[i]);
+                s.put("address", SecurityMonitorAddress.SENSOR_ADDRESSES[i]);
+                s.put("on",      vals[1 + i] != 0); // 0=D499, 1~7=D500~D506
+                sensors.add(s);
+            }
+            Map<String, Object> resp = new LinkedHashMap<>();
+            resp.put("success", true);
+            resp.put("sensors", sensors);
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            return ResponseEntity.ok(error("PLC 상태 조회 실패: " + detailMessage(e)));
+        }
+    }
+
+    /* =============================================
+       경비 시작 (POST) → D499 = 1
+    ============================================= */
+    @RequestMapping(value = "/security-monitor/start",
+                    method = RequestMethod.POST,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> securityMonitorStart() {
+        String r = writePlc(SecurityMonitorAddress.D_SECURITY, SecurityMonitorAddress.D_SECURITY_ON);
+        Map<String, Object> resp = new LinkedHashMap<>();
+        resp.put("success", !r.startsWith("plc_error"));
+        resp.put("plc", r);
+        System.out.println(">>> [SECURITY START] D" + SecurityMonitorAddress.D_SECURITY + "=1 → " + r);
+        return ResponseEntity.ok(resp);
+    }
+
+    /* =============================================
+       경비 종료 (POST) → D499 = 0
+    ============================================= */
+    @RequestMapping(value = "/security-monitor/stop",
+                    method = RequestMethod.POST,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> securityMonitorStop() {
+        String r = writePlc(SecurityMonitorAddress.D_SECURITY, SecurityMonitorAddress.D_SECURITY_OFF);
+        Map<String, Object> resp = new LinkedHashMap<>();
+        resp.put("success", !r.startsWith("plc_error"));
+        resp.put("plc", r);
+        System.out.println(">>> [SECURITY STOP] D" + SecurityMonitorAddress.D_SECURITY + "=0 → " + r);
+        return ResponseEntity.ok(resp);
+    }
+
+    /* =============================================
        공통: PLC 주소에 값 쓰기
        실패해도 예외를 던지지 않고 문자열로 반환
     ============================================= */
@@ -470,6 +550,30 @@ public class EzInOutController {
             System.out.println(">>> [PLC WRITE ERR] D" + address + " : " + e.getMessage());
             return "plc_error: " + e.getMessage();
         }
+    }
+
+    /* =============================================
+       공통: PLC 연속 워드 읽기
+    ============================================= */
+    @SuppressWarnings("unchecked")
+    private int[] readPlc(int start, int count) {
+        try {
+            Map<?, ?> res = rest.getForEntity(
+                CSHARP_API + "/api/plc/read?start=" + start + "&count=" + count,
+                Map.class
+            ).getBody();
+            if (res != null && Boolean.TRUE.equals(res.get("success"))) {
+                List<Number> vals = (List<Number>) res.get("values");
+                int[] arr = new int[count];
+                for (int i = 0; i < Math.min(vals.size(), count); i++) {
+                    arr[i] = vals.get(i) != null ? vals.get(i).intValue() : 0;
+                }
+                return arr;
+            }
+        } catch (Exception e) {
+            System.out.println(">>> [PLC READ ERR] D" + start + "~" + (start + count - 1) + ": " + e.getMessage());
+        }
+        return new int[count];
     }
 
     /* =============================================

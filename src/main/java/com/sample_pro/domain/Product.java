@@ -3,8 +3,8 @@ package com.sample_pro.domain;
 public class Product {
 	
 	//PRODUCT 테이블
-	private int prod_code;
-	private int corp_code;
+	private String prod_code;
+	private String corp_code;
 	private String corp_name;           //거래처명
 	private String prod_name;			//품명
 	private String prod_no;				//품번
@@ -131,16 +131,16 @@ public class Product {
 	public void setHeat_file_name(String heat_file_name) {
 		this.heat_file_name = heat_file_name;
 	}
-	public int getProd_code() {
+	public String getProd_code() {
 		return prod_code;
 	}
-	public void setProd_code(int prod_code) {
+	public void setProd_code(String prod_code) {
 		this.prod_code = prod_code;
 	}
-	public int getCorp_code() {
+	public String getCorp_code() {
 		return corp_code;
 	}
-	public void setCorp_code(int corp_code) {
+	public void setCorp_code(String corp_code) {
 		this.corp_code = corp_code;
 	}
 	public String getProd_name() {

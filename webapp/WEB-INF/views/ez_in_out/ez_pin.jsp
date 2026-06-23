@@ -608,27 +608,26 @@
             border-radius: 999px;
             padding: 4px;
             gap: 0;
-            width: 220px;
+            width: 270px;
         }
         .gate-switch-thumb {
             position: absolute;
             top: 4px;
             left: 4px;
-            width: calc(50% - 4px);
+            width: calc((100% - 8px) / 3);
             height: calc(100% - 8px);
             background: linear-gradient(135deg, var(--navy-mid), var(--navy-light));
             border-radius: 999px;
             transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
             box-shadow: 0 2px 8px rgba(13,27,62,0.22);
         }
-        .gate-switch.back .gate-switch-thumb {
-            transform: translateX(calc(100% + 0px));
-        }
+        .gate-switch.back     .gate-switch-thumb { transform: translateX(100%); }
+        .gate-switch.security .gate-switch-thumb { transform: translateX(200%); }
         .gate-option {
             flex: 1;
             text-align: center;
             padding: 8px 0;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             position: relative;
@@ -638,8 +637,9 @@
             color: var(--text-muted);
             user-select: none;
         }
-        .gate-switch.front .gate-option.opt-front,
-        .gate-switch.back  .gate-option.opt-back {
+        .gate-switch.front    .gate-option.opt-front,
+        .gate-switch.back     .gate-option.opt-back,
+        .gate-switch.security .gate-option.opt-security {
             color: #fff;
         }
 
@@ -707,8 +707,9 @@
         <div class="gate-toggle">
             <div class="gate-switch front" id="gateSwitch">
                 <div class="gate-switch-thumb"></div>
-                <div class="gate-option opt-front" onclick="setGate('front')">🚪 정문</div>
-                <div class="gate-option opt-back"  onclick="setGate('back')">🚗 후문</div>
+                <div class="gate-option opt-front"    onclick="setGate('front')">🚪 정문</div>
+                <div class="gate-option opt-back"     onclick="setGate('back')">🚗 후문</div>
+                <div class="gate-option opt-security" onclick="setGate('security')">🔒 경비</div>
             </div>
         </div>
 
@@ -953,7 +954,6 @@
         })
         .then(function(result) {
             if (result && result.success) {
-                alert('PIN 인증 성공: 등록된 PIN과 일치합니다.');
                 onSuccess();
             } else {
                 onFail(result && result.error ? result.error : 'PIN이 올바르지 않습니다.');
@@ -975,8 +975,10 @@
         document.getElementById('backBtn').style.display      = 'none';
         document.getElementById('successView').classList.add('show');
 
- 
-       
+        var redirectUrl = currentGate === 'security'
+            ? contextPath + '/ez_in_out/security-monitor'
+            : contextPath + '/ez_in_out/employee/dashboard';
+        setTimeout(function() { window.location.href = redirectUrl; }, 1200);
     }
 
     // ── 실패 처리 ─────────────────────────────────────

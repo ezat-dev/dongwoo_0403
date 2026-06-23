@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CorpMapper">
+
+    <resultMap id="corpMap" type="com.sample_pro.domain.Corp">
+        <id     property="corp_code"     column="CORP_CODE"/>
+        <result property="corp_name"     column="CORP_NAME"/>
+        <result property="corp_name2"    column="CORP_NAME2"/>
+        <result property="corp_no"       column="CORP_NO"/>
+        <result property="corp_tel"      column="CORP_TEL"/>
+        <result property="corp_fax"      column="CORP_FAX"/>
+        <result property="corp_boss"     column="CORP_BOSS"/>
+        <result property="corp_mast"     column="CORP_MAST"/>
+        <result property="corp_upte"     column="CORP_UPTE"/>
+        <result property="corp_upjo"     column="CORP_UPJO"/>
+        <result property="corp_add"      column="CORP_ADD"/>
+        <result property="corp_plc"      column="CORP_PLC"/>
+        <result property="corp_bigo"     column="CORP_BIGO"/>
+        <result property="corp_jan"      column="CORP_JAN"/>
+        <result property="corp_strt"     column="CORP_STRT"/>
+        <result property="corp_gyul1"    column="CORP_GYUL1"/>
+        <result property="corp_gyul2"    column="CORP_GYUL2"/>
+        <result property="corp_gubn"     column="CORP_GUBN"/>
+        <result property="corp_bman"     column="CORP_BMAN"/>
+        <result property="corp_hp"       column="CORP_HP"/>
+        <result property="corp_cno"      column="CORP_CNO"/>
+        <result property="corp_pwd"      column="CORP_PWD"/>
+        <result property="corp_mail"     column="CORP_MAIL"/>
+        <result property="corp_business" column="CORP_BUSINESS"/>
+    </resultMap>
+
+    <!-- 최대 거래처코드 조회 (자동채번용) -->
+    <select id="selectMaxCode" resultType="string">
+        SELECT MAX(CORP_CODE) FROM tb_corp WHERE CORP_CODE REGEXP '^C[0-9]+$'
+    </select>
+
+    <!-- 목록 조회 (페이징 + 검색) -->
+    <select id="selectList" parameterType="map" resultMap="corpMap">
+        SELECT CORP_CODE, CORP_NAME, CORP_GUBN, CORP_TEL, CORP_BOSS, CORP_UPTE, CORP_UPJO, CORP_HP, CORP_MAIL
+        FROM tb_corp
+        <where>
+            <if test="kwCorpName != null and kwCorpName != ''">
+                AND CORP_NAME LIKE CONCAT('%',#{kwCorpName},'%')
+            </if>
+        </where>
+        ORDER BY CORP_CODE
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 전체 건수 -->
+    <select id="selectCount" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM tb_corp
+        <where>
+            <if test="kwCorpName != null and kwCorpName != ''">
+                AND CORP_NAME LIKE CONCAT('%',#{kwCorpName},'%')
+            </if>
+        </where>
+    </select>
+
+    <!-- 단건 조회 -->
+    <select id="selectOne" parameterType="string" resultMap="corpMap">
+        SELECT * FROM tb_corp WHERE CORP_CODE = #{corpCode}
+    </select>
+
+    <!-- 등록 -->
+    <insert id="insert" parameterType="com.sample_pro.domain.Corp">
+        INSERT INTO tb_corp (
+            CORP_CODE, CORP_NAME, CORP_NAME2, CORP_NO, CORP_TEL, CORP_FAX,
+            CORP_BOSS, CORP_MAST, CORP_UPTE, CORP_UPJO, CORP_ADD, CORP_PLC,
+            CORP_BIGO, CORP_JAN, CORP_STRT, CORP_GYUL1, CORP_GYUL2, CORP_GUBN,
+            CORP_BMAN, CORP_HP, CORP_CNO, CORP_PWD, CORP_MAIL, CORP_BUSINESS
+        ) VALUES (
+            #{corp_code}, #{corp_name}, #{corp_name2}, #{corp_no}, #{corp_tel}, #{corp_fax},
+            #{corp_boss}, #{corp_mast}, #{corp_upte}, #{corp_upjo}, #{corp_add}, #{corp_plc},
+            #{corp_bigo}, #{corp_jan}, #{corp_strt}, #{corp_gyul1}, #{corp_gyul2}, #{corp_gubn},
+            #{corp_bman}, #{corp_hp}, #{corp_cno}, #{corp_pwd}, #{corp_mail}, #{corp_business}
+        )
+    </insert>
+
+    <!-- 수정 -->
+    <update id="update" parameterType="com.sample_pro.domain.Corp">
+        UPDATE tb_corp SET
+            CORP_NAME=#{corp_name}, CORP_NAME2=#{corp_name2}, CORP_NO=#{corp_no},
+            CORP_TEL=#{corp_tel}, CORP_FAX=#{corp_fax}, CORP_BOSS=#{corp_boss},
+            CORP_MAST=#{corp_mast}, CORP_UPTE=#{corp_upte}, CORP_UPJO=#{corp_upjo},
+            CORP_ADD=#{corp_add}, CORP_PLC=#{corp_plc}, CORP_BIGO=#{corp_bigo},
+            CORP_JAN=#{corp_jan}, CORP_STRT=#{corp_strt}, CORP_GYUL1=#{corp_gyul1},
+            CORP_GYUL2=#{corp_gyul2}, CORP_GUBN=#{corp_gubn}, CORP_BMAN=#{corp_bman},
+            CORP_HP=#{corp_hp}, CORP_CNO=#{corp_cno}, CORP_PWD=#{corp_pwd},
+            CORP_MAIL=#{corp_mail}, CORP_BUSINESS=#{corp_business}
+        WHERE CORP_CODE = #{corp_code}
+    </update>
+
+    <!-- 삭제 -->
+    <delete id="delete" parameterType="string">
+        DELETE FROM tb_corp WHERE CORP_CODE = #{corpCode}
+    </delete>
+
+</mapper>
