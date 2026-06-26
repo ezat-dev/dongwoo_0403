@@ -324,6 +324,50 @@ public class PlcController {
     }
 
     /**
+     * default PLC 워드 쓰기 (GET 방식).
+     * GET /plc/writeGet?address=400&value=123
+     *
+     * @param address 쓸 주소
+     * @param value   쓸 값 (0~65535)
+     */
+    @RequestMapping(value = "/writeGet", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> writeGet(
+            @RequestParam int address,
+            @RequestParam int value) {
+        System.out.println(">>> [WRITE_GET] addr=" + address + " <- " + value);
+        Map<String, Integer> body = new HashMap<>();
+        body.put("address", address);
+        body.put("value", value);
+        try {
+            return ResponseEntity.ok(postJson(CSHARP + "/api/plc/write", body));
+        } catch (Exception e) { return errFromCsharp(e); }
+    }
+
+    /**
+     * 특정 PLC 워드 쓰기 (GET 방식).
+     * GET /plc/writeGet/{id}?address=400&value=123
+     *
+     * @param id      tb_plc.plc_id
+     * @param address 쓸 주소
+     * @param value   쓸 값 (0~65535)
+     */
+    @RequestMapping(value = "/writeGet/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ResponseEntity<?> writeGetById(
+            @PathVariable String id,
+            @RequestParam int address,
+            @RequestParam int value) {
+        System.out.println(">>> [WRITE_GET/" + id + "] addr=" + address + " <- " + value);
+        Map<String, Integer> body = new HashMap<>();
+        body.put("address", address);
+        body.put("value", value);
+        try {
+            return ResponseEntity.ok(postJson(CSHARP + "/api/plc/write/" + id, body));
+        } catch (Exception e) { return errFromCsharp(e); }
+    }
+
+    /**
      * 특정 PLC TCP 연결 테스트 (ping).
      * GET /plc/ping/{id}
      *

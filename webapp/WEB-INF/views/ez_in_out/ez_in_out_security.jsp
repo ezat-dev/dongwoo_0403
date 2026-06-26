@@ -394,6 +394,121 @@
             .main-card { padding: 32px 28px 36px; }
             .status-circle { width: 76px; height: 76px; font-size: 14px; }
         }
+
+        /* ── 냉난방 경고 모달 ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.52);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .modal-box {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 32px 24px 28px;
+            width: 100%;
+            max-width: 340px;
+            text-align: center;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.28);
+            animation: popIn 0.28s cubic-bezier(0.22,1,0.36,1) both;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.88); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #F59E0B, #EF4444);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            box-shadow: 0 8px 24px rgba(239,68,68,0.28);
+        }
+
+        .modal-box h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+        }
+
+        .modal-box p {
+            font-size: 13.5px;
+            color: var(--text-sub);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .modal-hvac-list {
+            background: #FFF8F0;
+            border: 1px solid #FDE68A;
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 12.5px;
+            color: #92400E;
+            font-weight: 500;
+            line-height: 1.8;
+        }
+
+        .modal-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .modal-btn-cancel {
+            height: 48px;
+            background: transparent;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .modal-btn-cancel:hover {
+            border-color: var(--accent);
+            color: var(--primary);
+        }
+
+        .modal-btn-confirm {
+            height: 48px;
+            background: linear-gradient(135deg, #B91C1C, var(--danger));
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(239,68,68,0.3);
+            transition: all var(--transition);
+        }
+
+        .modal-btn-confirm:hover {
+            box-shadow: 0 6px 22px rgba(239,68,68,0.45);
+        }
     </style>
 </head>
 <body>
@@ -425,7 +540,7 @@
         <!-- 경비 제어 -->
         <div class="section-title">경비 제어</div>
         <div class="control-row">
-            <button class="btn-ctrl btn-start" id="btnStart" onclick="securityAction('start')">
+            <button class="btn-ctrl btn-start" id="btnStart" onclick="checkAndStart()">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                     <circle cx="9" cy="9" r="7.5" stroke="white" stroke-width="1.5"/>
                     <path d="M7 6L13 9L7 12V6Z" fill="white"/>
@@ -445,7 +560,7 @@
         <div class="divider"></div>
 
         <!-- 상태 모니터 -->
-        <div class="section-title">상태 모니터링 (D500~D506)</div>
+        <div class="section-title">상태 모니터링</div>
         <div class="monitor-grid" id="monitorGrid">
             <!-- JS로 카드 생성 -->
         </div>
@@ -470,18 +585,38 @@
 
 </div>
 
+<!-- 냉난방 경고 모달 -->
+<div class="modal-overlay" id="hvacModal" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <path d="M14 4L25 23H3L14 4Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M14 12V17" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="14" cy="20.5" r="1.2" fill="white"/>
+            </svg>
+        </div>
+        <h3>냉난방 가동 중</h3>
+        <p>PLC 조건에 의하여 냉난방 전부 OFF여야<br>경비 시작이 가능합니다.</p>
+        <div class="modal-hvac-list" id="hvacOnList"></div>
+        <div class="modal-btns" style="grid-template-columns: 1fr;">
+            <button class="modal-btn-cancel" onclick="closeHvacModal()">확인</button>
+        </div>
+    </div>
+</div>
+
 <script>
     var ctx = '<%=request.getContextPath()%>';
 
     // D500 순서대로 맵핑 (prev: 이전 상태 추적)
     var SENSORS = [
-        { name: '냉난방-공장입구', addr: 500, offText: 'OFF',  onText: 'ON',  prev: null },
-        { name: '냉난방-공장내부', addr: 501, offText: 'OFF',  onText: 'ON',  prev: null },
-        { name: '냉난방-접견실',   addr: 502, offText: 'OFF',  onText: 'ON',  prev: null },
-        { name: '냉난방-회의실',   addr: 503, offText: 'OFF',  onText: 'ON',  prev: null },
-        { name: '냉난방-2층',      addr: 504, offText: 'OFF',  onText: 'ON',  prev: null },
-        { name: '냉난방-3층',      addr: 505, offText: 'OFF',  onText: 'ON',  prev: null },
-        { name: '후문(공장)',       addr: 506, offText: '닫힘', onText: '열림', prev: null }
+        { name: '냉난방-공장입구', addr: 500, offText: 'OFF',  onText: 'ON',   prev: null },
+        { name: '냉난방-공장내부', addr: 501, offText: 'OFF',  onText: 'ON',   prev: null },
+        { name: '냉난방-접견실',   addr: 502, offText: 'OFF',  onText: 'ON',   prev: null },
+        { name: '냉난방-회의실',   addr: 503, offText: 'OFF',  onText: 'ON',   prev: null },
+        { name: '냉난방-2층',      addr: 504, offText: 'OFF',  onText: 'ON',   prev: null },
+        { name: '냉난방-3층',      addr: 505, offText: 'OFF',  onText: 'ON',   prev: null },
+        { name: '후문(공장)',       addr: 506, offText: '닫힘', onText: '열림', prev: null },
+        { name: '정문',             addr: 507, offText: '닫힘', onText: '열림', prev: null }
     ];
 
     var pollTimer = null;
@@ -494,7 +629,10 @@
             var card = document.createElement('div');
             card.className = 'monitor-card';
             card.innerHTML =
-                '<div class="card-label">' + s.name + '</div>' +
+                '<div class="card-label">' +
+                '  <div>' + s.name + '</div>' +
+                '  <div style="font-size:10px;font-weight:500;color:var(--text-muted);margin-top:2px;">D' + s.addr + '</div>' +
+                '</div>' +
                 '<div class="card-body">' +
                 '  <div class="status-circle" id="circle-' + i + '">' + s.offText + '</div>' +
                 '</div>';
@@ -574,9 +712,34 @@
             });
     }
 
-    // 물리 키보드: Escape → 뒤로
+    // ── 경비 시작 전 냉난방 체크 ─────────────────────
+    function checkAndStart() {
+        var onList = SENSORS.slice(0, 6).filter(function(s) { return s.prev === true; });
+
+        if (onList.length === 0) {
+            securityAction('start');
+            return;
+        }
+
+        var listHtml = onList.map(function(s) { return '· ' + s.name; }).join('<br>');
+        document.getElementById('hvacOnList').innerHTML = listHtml;
+        document.getElementById('hvacModal').style.display = 'flex';
+    }
+
+    function closeHvacModal() {
+        document.getElementById('hvacModal').style.display = 'none';
+    }
+
+    // 물리 키보드: Escape → 모달 닫기 or 뒤로
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') history.back();
+        if (e.key === 'Escape') {
+            var modal = document.getElementById('hvacModal');
+            if (modal.style.display !== 'none') {
+                closeHvacModal();
+            } else {
+                history.back();
+            }
+        }
     });
 </script>
 

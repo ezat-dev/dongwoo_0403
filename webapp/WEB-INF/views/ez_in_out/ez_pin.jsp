@@ -824,6 +824,16 @@
         currentGate = gate;
         var sw = document.getElementById('gateSwitch');
         sw.className = 'gate-switch ' + gate;
+
+        // 성공/잠김 화면 → 입력 폼 복귀
+        document.getElementById('successView').classList.remove('show');
+        document.getElementById('lockedScreen').classList.remove('show');
+        document.getElementById('pinMainView').style.display = '';
+        document.getElementById('dividerOr').style.display   = '';
+        document.getElementById('backBtn').style.display     = '';
+
+        resetPin();
+        clearError();
     }
 
     var pinValue    = '';
@@ -954,7 +964,7 @@
         })
         .then(function(result) {
             if (result && result.success) {
-                onSuccess();
+                onSuccess(result);
             } else {
                 onFail(result && result.error ? result.error : 'PIN이 올바르지 않습니다.');
             }
@@ -965,20 +975,20 @@
     }
 
     // ── 성공 처리 ─────────────────────────────────────
-    function onSuccess() {
+    function onSuccess(result) {
         attempts = 0;
         sessionStorage.removeItem('pin_attempts');
         sessionStorage.removeItem('pin_locked_until');
+
+        if (result && result.redirectUrl) {
+            window.location.href = contextPath + result.redirectUrl;
+            return;
+        }
 
         document.getElementById('pinMainView').style.display  = 'none';
         document.getElementById('dividerOr').style.display    = 'none';
         document.getElementById('backBtn').style.display      = 'none';
         document.getElementById('successView').classList.add('show');
-
-        var redirectUrl = currentGate === 'security'
-            ? contextPath + '/ez_in_out/security-monitor'
-            : contextPath + '/ez_in_out/employee/dashboard';
-        setTimeout(function() { window.location.href = redirectUrl; }, 1200);
     }
 
     // ── 실패 처리 ─────────────────────────────────────
